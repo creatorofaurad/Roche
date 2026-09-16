@@ -22,6 +22,11 @@ pub const BasicBlock = struct {
     first_external_call_pc: ?usize = null,
     last_state_write_pc: ?usize = null,
     first_state_read_pc: ?usize = null,
+    has_delegatecall: bool = false,
+    has_selfdestruct: bool = false,
+    has_divide_before_multiply: bool = false,
+    has_strict_balance_equality: bool = false,
+    has_timestamp_dependency: bool = false,
 };
 
 pub const ControlFlowGraph = struct {
@@ -38,6 +43,9 @@ pub const ControlFlowGraph = struct {
             .start_pc = 0,
         };
 
+        var prev_op: ?u8 = null;
+        var saw_div_in_block = false;
+
         while (pc < bytecode.len) {
             const op_pc = pc;
             const op = bytecode[pc];
@@ -46,25 +54,56 @@ pub const ControlFlowGraph = struct {
             if (op >= 0x60 and op <= 0x7F) { // PUSH1 to PUSH32
                 const push_bytes: usize = op - 0x60 + 1;
                 pc += push_bytes;
+                prev_op = op;
                 continue;
             }
 
-            // Track external calls
-            if (op == 0xF1 or op == 0xF4 or op == 0xFA) { // CALL, DELEGATECALL, STATICCALL
+            // Slither Detector 1: External Calls (CALL, DELEGATECALL, STATICCALL)
+            if (op == 0xF1 or op == 0xF4 or op == 0xFA) {
                 if (current_block.first_external_call_pc == null) {
                     current_block.first_external_call_pc = op_pc;
                 }
             }
-            // Track state writes
-            if (op == 0x55) { // SSTORE
+            if (op == 0xF4) { // DELEGATECALL
+                current_block.has_delegatecall = true;
+            }
+
+            // Slither Detector 2: State Writes (SSTORE)
+            if (op == 0x55) {
                 current_block.last_state_write_pc = op_pc;
             }
-            // Track state reads
-            if (op == 0x54) { // SLOAD
+
+            // Slither Detector 3: State Reads (SLOAD)
+            if (op == 0x54) {
                 if (current_block.first_state_read_pc == null) {
                     current_block.first_state_read_pc = op_pc;
                 }
             }
+
+            // Slither Detector 4: SELFDESTRUCT
+            if (op == 0xFF) {
+                current_block.has_selfdestruct = true;
+            }
+
+            // Slither Detector 5: Divide before Multiply (DIV -> MUL)
+            if (op == 0x04 or op == 0x05) { // DIV, SDIV
+                saw_div_in_block = true;
+            }
+            if (saw_div_in_block and op == 0x02) { // MUL
+                current_block.has_divide_before_multiply = true;
+            }
+
+            // Slither Detector 6: Strict Balance Equality (BALANCE -> EQ)
+            if (prev_op != null and (prev_op.? == 0x31 or prev_op.? == 0x47) and op == 0x14) {
+                current_block.has_strict_balance_equality = true;
+            }
+
+            // Slither Detector 7: Timestamp Dependency (TIMESTAMP -> JUMPI / EQ)
+            if (op == 0x42) { // TIMESTAMP
+                current_block.has_timestamp_dependency = true;
+            }
+
+            prev_op = op;
 
             // Check terminators
             var is_term = false;
@@ -77,6 +116,7 @@ pub const ControlFlowGraph = struct {
                 0xF3 => { is_term = true; term_type = .RETURN; },
                 0xFD => { is_term = true; term_type = .REVERT; },
                 0xFE => { is_term = true; term_type = .INVALID; },
+                0xFF => { is_term = true; term_type = .STOP; }, // SELFDESTRUCT terminates
                 else => {},
             }
 
@@ -92,6 +132,7 @@ pub const ControlFlowGraph = struct {
                     .id = cfg.block_count,
                     .start_pc = pc,
                 };
+                saw_div_in_block = false;
             }
         }
 

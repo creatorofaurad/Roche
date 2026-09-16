@@ -1,6 +1,6 @@
 # Grant Proposal: Volta – High-Performance Bare-Silicon EVM Security & Invariant Kernel
 
-**Applicant:** `coolkidsdontcode` (`cleolazren@gmail.com`)  
+**Applicant:** `creatorofaurad` ([GitHub](https://github.com/creatorofaurad) | Telegram: [@coolkidsdontcode](https://t.me/coolkidsdontcode) | `cleolazren@gmail.com`)  
 **Project Repository:** [github.com/creatorofaurad/volta](https://github.com/creatorofaurad/volta)  
 **Target Domain:** Arbitrum Developer Tooling & Core Infrastructure  
 **Requested Amount:** $35,000 USD (Milestone 1)  
@@ -77,8 +77,9 @@ Measured on standard x86_64 hardware across identical bytecode targets:
 
 ## 6. Team & Open Source Commitment
 
-- **Lead Architect:** `coolkidsdontcode` ([GitHub Profile](https://github.com/coolkidsdontcode))
-- **Primary Contact:** `cleolazren@gmail.com`
+- **Lead Architect:** `creatorofaurad` ([GitHub Profile](https://github.com/creatorofaurad))
+- **Telegram Contact:** [@coolkidsdontcode](https://t.me/coolkidsdontcode)
+- **Primary Contact Email:** `cleolazren@gmail.com`
 - **Commitment:** 100% MIT Open Source public goods software. All future developments will remain freely available to the Arbitrum and Ethereum developer ecosystems.
 
 ---

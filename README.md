@@ -174,4 +174,4 @@ jobs:
 
 ## License
 
-MIT © 2026 [coolkidsdontcode](https://github.com/coolkidsdontcode) (`cleolazren@gmail.com`).
+MIT © 2026 [creatorofaurad](https://github.com/creatorofaurad) · Telegram: [@coolkidsdontcode](https://t.me/coolkidsdontcode) · `cleolazren@gmail.com`.

@@ -74,6 +74,27 @@ pub const InvariantEngine = struct {
         return (block_timestamp - oracle_updated_at) <= max_staleness_seconds;
     }
 
+    /// 8. EIP-1153 Invariant: Transient Storage Isolation Invariant (∀ k, Select(S_transient, k) == 0 at transaction exit)
+    pub fn verifyTransientStorageCleanBoundary(transient_storage: *const storage_mod.TransientStorage) bool {
+        return transient_storage.verifyCleanBoundary();
+    }
+
+    /// 9. Hardware SIMD Isomorphism: AVX2 Dot-Product on EVM Word Memory
+    pub fn computeSimdWordDotProduct(block: *const types.BlockQ8_0, evm_word_floats: *const [32]f32) f32 {
+        var sum_v: types.Vec8f = @splat(0.0);
+        const scale_v: types.Vec8f = @splat(block.scale);
+        
+        comptime var i = 0;
+        inline while (i < 4) : (i += 1) {
+            const q_slice = block.qs[i * 8 .. i * 8 + 8];
+            const v_q_i8: @Vector(8, i8) = q_slice.*;
+            const v_q_f32: types.Vec8f = @floatFromInt(v_q_i8);
+            const x_slice: types.Vec8f = evm_word_floats[i * 8 .. i * 8 + 8].*;
+            sum_v += (v_q_f32 * scale_v) * x_slice;
+        }
+        return @reduce(.Add, sum_v);
+    }
+
     /// Run full formal invariant verification matrix
     pub fn runFullMatrix(storage: *const storage_mod.StorageState, min_k: u256) InvariantResult {
         var res = InvariantResult{};
@@ -117,4 +138,21 @@ test "Invariants: Comprehensive Halmos & Pierre SMT Prover Suite" {
     // 6. Oracle Freshness
     try std.testing.expect(InvariantEngine.verifyOracleRoundFreshness(1700000100, 1700000000, 300));
     try std.testing.expect(!InvariantEngine.verifyOracleRoundFreshness(1700000500, 1700000000, 300));
+
+    // 7. EIP-1153 Transient Storage Boundary Invariant
+    var ts = storage_mod.TransientStorage.init();
+    try std.testing.expect(InvariantEngine.verifyTransientStorageCleanBoundary(&ts));
+    ts.tstore(4, 99999);
+    try std.testing.expect(!InvariantEngine.verifyTransientStorageCleanBoundary(&ts));
+    ts.clearBoundary();
+    try std.testing.expect(InvariantEngine.verifyTransientStorageCleanBoundary(&ts));
+
+    // 8. 256-Bit SIMD Isomorphism AVX2 Dot-Product
+    const qblock = types.BlockQ8_0{
+        .scale = 0.5,
+        .qs = [_]i8{2} ** 32, // 2 * 0.5 = 1.0 per element
+    };
+    const evm_floats: [32]f32 = [_]f32{1.0} ** 32;
+    const dot_result = InvariantEngine.computeSimdWordDotProduct(&qblock, &evm_floats);
+    try std.testing.expectApproxEqAbs(@as(f32, 32.0), dot_result, 0.001);
 }

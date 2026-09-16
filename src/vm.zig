@@ -43,11 +43,12 @@ pub const MemoryState = struct {
 };
 
 pub const VM = struct {
-    stack: [types.MAX_STACK_DEPTH]u256 = [_]u256{0} ** types.MAX_STACK_DEPTH,
+    stack: [types.MAX_STACK_DEPTH]u256 align(64) = [_]u256{0} ** types.MAX_STACK_DEPTH,
     sp: usize = 0,
     pc: usize = 0,
     memory: MemoryState = .{},
     storage: storage_mod.StorageState = storage_mod.StorageState.init(),
+    transient_storage: storage_mod.TransientStorage = storage_mod.TransientStorage.init(),
     world: storage_mod.WorldState = storage_mod.WorldState.init(),
     cheatcodes: storage_mod.CheatcodeContext = storage_mod.CheatcodeContext.init(),
     coverage: fuzzer_mod.CoverageEngine = .{},
@@ -254,6 +255,17 @@ pub const VM = struct {
                     }
                 },
                 0x5B => {}, // JUMPDEST
+                0x5C => { // TLOAD (EIP-1153)
+                    const slot_u = self.pop() orelse return self.status;
+                    const slot: usize = @truncate(slot_u);
+                    _ = self.push(self.transient_storage.tload(slot));
+                },
+                0x5D => { // TSTORE (EIP-1153)
+                    const slot_u = self.pop() orelse return self.status;
+                    const val = self.pop() orelse return self.status;
+                    const slot: usize = @truncate(slot_u);
+                    self.transient_storage.tstore(slot, val);
+                },
 
                 0x60...0x7F => { // PUSH1..PUSH32
                     const num_bytes: usize = op - 0x60 + 1;

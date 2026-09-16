@@ -18,6 +18,26 @@ pub const COVERAGE_BITMAP_SIZE: usize = 65536; // 64KB AFL Shared Memory Table
 pub const MAX_ACCOUNTS: usize = 32;
 
 // =================================================================================================
+// 256-Bit Hardware SIMD Vector Types & EVM Word Isomorphism
+// 1 EVM Word (u256) == 32 Bytes == 1 AVX2 YMM Register (@Vector(32, u8) / @Vector(8, f32))
+// =================================================================================================
+pub const Vec32u8 = @Vector(32, u8);
+pub const Vec32i8 = @Vector(32, i8);
+pub const Vec8f = @Vector(8, f32);
+pub const Vec4u64 = @Vector(4, u64);
+
+/// 64-Byte Cache-Aligned Q8_0 SIMD Block (32 quantized weights)
+pub const BlockQ8_0 = extern struct {
+    scale: f32,
+    reserved: [28]u8 = [_]u8{0} ** 28,
+    qs: [32]i8,
+};
+
+comptime {
+    std.debug.assert(@sizeOf(BlockQ8_0) == 64);
+}
+
+// =================================================================================================
 // EVM Execution Status
 // =================================================================================================
 pub const ExecutionStatus = enum {
@@ -95,6 +115,8 @@ pub const Opcode = enum(u8) {
     MSIZE = 0x59,
     GAS = 0x5A,
     JUMPDEST = 0x5B,
+    TLOAD = 0x5C,
+    TSTORE = 0x5D,
 
     CALL = 0xF1,
     DELEGATECALL = 0xF4,

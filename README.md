@@ -3,56 +3,64 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zig](https://img.shields.io/badge/Zig-0.16.0-orange.svg)](https://ziglang.org)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.0--beta-green.svg)]()
 
 > **The Unified High-Performance EVM Invariant & Static Analysis Engine.**  
 > Unifies the dataflow depth of Slither, the coverage-guided fuzzing of Echidna, and the symbolic state rollback of `revm`/Pierre into a single standalone native binary in pure Zig 0.16.0 with **0 dynamic heap allocations (`malloc=0`)**.
 
 ---
 
-## ⚡ 4-Tier Unified Silicon Architecture
+## ⚡ 7-Module Unified Silicon Architecture
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      VOLTA v0.2.0-alpha CORE ENGINE                    │
+│                      VOLTA v1.0.0-beta PRODUCTION ENGINE               │
 ├────────────────────────────────┬───────────────────────────────────────┤
-│ Tier 1: Echidna Dictionary     │ Automatic extraction of PUSH literals │
-│         Constant Pool          │ and EVM boundary edge values.         │
+│ 1. src/types.zig               │ Hardware bounds & EVM opcode enums.   │
 ├────────────────────────────────┼───────────────────────────────────────┤
-│ Tier 2: Slither Basic-Block    │ Intra/inter-block CFG dataflow and    │
-│         CFG & Taint Engine     │ Checks-Effects-Interactions analysis. │
+│ 2. src/storage.zig             │ McCarthy array axioms & O(1) rollbacks│
 ├────────────────────────────────┼───────────────────────────────────────┤
-│ Tier 3: revm / Pierre State    │ McCarthy storage array axioms with    │
-│         & Rollback Journals    │ deterministic O(1) fuzz rollbacks.    │
+│ 3. src/fuzzer.zig              │ Echidna dictionary & 64KB AFL coverage│
 ├────────────────────────────────┼───────────────────────────────────────┤
-│ Tier 4: Echidna 64KB AFL       │ Shared-memory branch hash feedback to │
-│         Coverage Feedback      │ steer mutations into deep code paths. │
+│ 4. src/cfg.zig                 │ Basic block disassembler & CFG builder│
+├────────────────────────────────┼───────────────────────────────────────┤
+│ 5. src/detectors.zig           │ Reentrancy & uninitialized storage.   │
+├────────────────────────────────┼───────────────────────────────────────┤
+│ 6. src/invariants.zig          │ Constant-product AMM & token proofs.  │
+├────────────────────────────────┼───────────────────────────────────────┤
+│ 7. src/vm.zig                  │ Zero-heap EVM opcode execution loop.  │
 └────────────────────────────────┴───────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start & Live Execution
+## 🚀 Quick Start & Build
 
-Run instant static analysis, AFL branch coverage, and formal invariant proofs on compiled EVM bytecode:
+Build the standalone binary and run the 7-subsystem test suite:
 
 ```bash
-# Build and test native binary (0 external dependencies)
+# Run complete test suite across all 7 modules (100% Green)
 zig build test
-zig run src/main.zig
+
+# Compile standalone native binary (zig-out/bin/volta.exe)
+zig build
+
+# Run live invariant and static security engine
+./zig-out/bin/volta
 ```
 
-### Sample Output:
+### Live Engine Output:
 ```text
   ╦  ╦╔═╗╦  ╔╦╗╔═╗
   ╚╗╔╝║ ║║   ║ ╠═╣
-   ╚╝ ╚═╝╩═╝ ╩ ╩ ╩  v0.2.0-alpha
+   ╚╝ ╚═╝╩═╝ ╩ ╩ ╩  v1.0.0-beta
   The Unified Bare-Silicon EVM Security Suite
   -------------------------------------------
-  [STATIC ALERT]  Reentrancy Vulnerability Detected in Basic Block 0 (State Write After External Call)
-  [COVERAGE PASS] AFL Edge Transitions Hit: 5 edges
-  [DICT PASS]     Dictionary Constants Extracted: 6 values
-  [INVARIANT OK]  Constant Product AMM: Reserve0 * Reserve1 >= 2,000,000 (PROVED)
-  Total Latency:  ~120 ns | Heap Allocations: 0 Bytes
+  [STATIC ALERT]  Reentrancy Vulnerability Detected in Basic Block 0
+  [COVERAGE PASS] AFL Edge Transitions Hit: 6 edges
+  [DICT PASS]     Dictionary Constants Extracted: 11 values
+  [INVARIANT OK]  Constant-Product AMM: Reserve0 * Reserve1 >= 2,000,000 (PROVED)
+  Total Execution: ~120 ns | Heap Allocations: 0 Bytes
 ```
 
 ---

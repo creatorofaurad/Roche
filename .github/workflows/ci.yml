@@ -1,0 +1,29 @@
+name: Volta Bare-Silicon CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Build & Invariant Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: master
+
+      - name: Verify Zig Version
+        run: zig version
+
+      - name: Run Volta Invariant Test Suite
+        run: zig build test
+
+      - name: Build Volta ReleaseFast Binary
+        run: zig build -Doptimize=ReleaseFast

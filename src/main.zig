@@ -11,6 +11,7 @@ pub const detectors = @import("detectors.zig");
 pub const invariants = @import("invariants.zig");
 pub const vm = @import("vm.zig");
 pub const arena = @import("arena.zig");
+pub const live_protocol_tests = @import("live_protocol_tests.zig");
 
 pub const VERSION = types.VERSION;
 
@@ -93,4 +94,5 @@ test {
     _ = invariants;
     _ = vm;
     _ = arena;
+    _ = live_protocol_tests;
 }

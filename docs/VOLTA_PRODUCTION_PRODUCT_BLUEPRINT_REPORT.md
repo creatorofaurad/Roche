@@ -2,8 +2,7 @@
 ## Institutional Product Blueprint, Low-Level Architecture & Ecosystem Defense Strategy
 **Author:** Charles (`creatorofaurad`) & Yelena  
 **Repository:** [github.com/creatorofaurad/volta](https://github.com/creatorofaurad/volta)  
-**Target Environment:** Pure Native Zig 0.16.0 (Zero Dynamic Heap Allocations, AVX2 SIMD, 64-Byte Cache Alignment)  
-**Date:** September 2026
+**Target Environment:** Pure Native Zig 0.16.0 (Zero Dynamic Heap Allocations, AVX2 SIMD, 64-Byte Cache Alignment)
 
 ---
 
@@ -177,13 +176,13 @@ $ volta audit Vault.sol::0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
 ```
 
 ### 5.1 Three-Phase Commercial Roadmap
-1. **Phase 1: Developer Mindshare & Auditor Pilot Onboarding (Weeks 1–4)**
+1. **Phase 1: Developer Mindshare & Auditor Pilot Onboarding**
    * Deliver 1-on-1 feedback reviews with leading security guilds (Spearbit, Cantina, Zellic) and protocols (Euler, Ethena).
    * Establish Volta as the benchmark tool for sub-second v4 hook invariant verification.
-2. **Phase 2: Institutional Grants & Foundation Adoption (Weeks 5–8)**
+2. **Phase 2: Institutional Grants & Foundation Adoption**
    * Finalize the Alchemy-Arbitrum Orbit Grant ($35,000–$50,000).
    * Integrate Volta pre-commit actions into the official Uniswap v4 hook repository templates.
-3. **Phase 3: Proprietary Sequencer & MEV Invariant Engine (Month 3+)**
+3. **Phase 3: Proprietary Sequencer & MEV Invariant Engine**
    * Release `libvolta` (C/C++ FFI export) for sub-microsecond transaction pre-simulation in L2 sequencers, market-making infrastructure, and institutional risk desks.
 
 ---

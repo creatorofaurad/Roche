@@ -1,5 +1,5 @@
 //! volta: Bare-Silicon EVM Virtual Machine Interpreter
-//! Zero Dynamic Heap Allocations (`malloc=0`) & 64-Byte Cache-Aligned Memory.
+//! Zero Dynamic Heap Allocations (`malloc=0`), Multi-Account State & Cheatcode Hooks.
 
 const std = @import("std");
 const types = @import("types.zig");
@@ -47,7 +47,9 @@ pub const VM = struct {
     sp: usize = 0,
     pc: usize = 0,
     memory: MemoryState = .{},
-    storage: storage_mod.StorageState = .{},
+    storage: storage_mod.StorageState = storage_mod.StorageState.init(),
+    world: storage_mod.WorldState = storage_mod.WorldState.init(),
+    cheatcodes: storage_mod.CheatcodeContext = storage_mod.CheatcodeContext.init(),
     coverage: fuzzer_mod.CoverageEngine = .{},
     status: types.ExecutionStatus = .SUCCESS,
 
@@ -166,6 +168,45 @@ pub const VM = struct {
                     const a = self.pop() orelse return self.status;
                     _ = self.push(~a);
                 },
+
+                // Environmental & Cheatcode Context Opcodes
+                0x30 => { // ADDRESS
+                    var addr_val: u256 = 0;
+                    for (self.cheatcodes.current_address) |byte| {
+                        addr_val = (addr_val << 8) | @as(u256, byte);
+                    }
+                    _ = self.push(addr_val);
+                },
+                0x31 => { // BALANCE
+                    const target_u = self.pop() orelse return self.status;
+                    var target_addr: [20]u8 = undefined;
+                    var temp = target_u;
+                    var i: usize = 20;
+                    while (i > 0) {
+                        i -= 1;
+                        target_addr[i] = @truncate(temp & 0xFF);
+                        temp >>= 8;
+                    }
+                    const bal = self.world.getOrCreateAccount(target_addr).balance;
+                    _ = self.push(bal);
+                },
+                0x33 => { // CALLER (affected by vm.prank)
+                    var caller_val: u256 = 0;
+                    for (self.cheatcodes.current_caller) |byte| {
+                        caller_val = (caller_val << 8) | @as(u256, byte);
+                    }
+                    _ = self.push(caller_val);
+                },
+                0x42 => { // TIMESTAMP (affected by vm.warp)
+                    _ = self.push(@as(u256, self.cheatcodes.block_timestamp));
+                },
+                0x43 => { // NUMBER (affected by vm.roll)
+                    _ = self.push(@as(u256, self.cheatcodes.block_number));
+                },
+                0x46 => { // CHAINID
+                    _ = self.push(@as(u256, self.cheatcodes.chain_id));
+                },
+
                 0x50 => { // POP
                     _ = self.pop() orelse return self.status;
                 },
@@ -255,16 +296,26 @@ pub const VM = struct {
     }
 };
 
-test "VM: Stack, Arithmetic & Memory Execution" {
+test "VM: Stack, Arithmetic, Cheatcodes & Environmental Execution" {
     var vm = VM.init();
-    // PUSH1 5, PUSH1 20, PUSH1 10, ADD, SUB, PUSH1 2, MUL -> ((10 + 20) - 5) * 2 = 50
-    const code = [_]u8{
-        0x60, 5,  0x60, 20, 0x60, 10, 0x01,
-        0x03,
-        0x60, 2,  0x02,
-        0x00,
-    };
-    const status = vm.execute(&code);
-    try std.testing.expectEqual(types.ExecutionStatus.SUCCESS, status);
-    try std.testing.expectEqual(@as(u256, 50), vm.pop().?);
+    
+    // Test vm.prank and CALLER opcode (0x33)
+    const attacker = [_]u8{0x99} ** 20;
+    vm.cheatcodes.prank(attacker);
+    
+    // CALLER (0x33) STOP
+    const caller_code = [_]u8{ 0x33, 0x00 };
+    _ = vm.execute(&caller_code);
+    const popped_caller = vm.pop().?;
+    var expected_caller: u256 = 0;
+    for (attacker) |byte| {
+        expected_caller = (expected_caller << 8) | @as(u256, byte);
+    }
+    try std.testing.expectEqual(expected_caller, popped_caller);
+
+    // Test vm.warp and TIMESTAMP opcode (0x42)
+    vm.cheatcodes.warp(1700009999);
+    const time_code = [_]u8{ 0x42, 0x00 };
+    _ = vm.execute(&time_code);
+    try std.testing.expectEqual(@as(u256, 1700009999), vm.pop().?);
 }

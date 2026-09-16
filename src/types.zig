@@ -15,6 +15,7 @@ pub const MAX_ROLLBACK_LOGS: usize = 256;
 pub const MAX_BASIC_BLOCKS: usize = 256;
 pub const MAX_DICTIONARY_CONSTS: usize = 128;
 pub const COVERAGE_BITMAP_SIZE: usize = 65536; // 64KB AFL Shared Memory Table
+pub const MAX_ACCOUNTS: usize = 32;
 
 // =================================================================================================
 // EVM Execution Status
@@ -60,6 +61,27 @@ pub const Opcode = enum(u8) {
     SHL = 0x1B,
     SHR = 0x1C,
     SAR = 0x1D,
+
+    ADDRESS = 0x30,
+    BALANCE = 0x31,
+    ORIGIN = 0x32,
+    CALLER = 0x33,
+    CALLVALUE = 0x34,
+    CALLDATALOAD = 0x35,
+    CALLDATASIZE = 0x36,
+    CALLDATACOPY = 0x37,
+    CODESIZE = 0x38,
+    CODECOPY = 0x39,
+    GASPRICE = 0x3A,
+
+    BLOCKHASH = 0x40,
+    COINBASE = 0x41,
+    TIMESTAMP = 0x42,
+    NUMBER = 0x43,
+    PREVRANDAO = 0x44,
+    GASLIMIT = 0x45,
+    CHAINID = 0x46,
+    SELFBALANCE = 0x47,
 
     POP = 0x50,
     MLOAD = 0x51,

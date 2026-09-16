@@ -131,3 +131,36 @@ test "Live Target 5: 10,000-Run Live Gauntlet on Real Protocol Attack Suite" {
     try std.testing.expect(summary.passed_runs > 0);
     try std.testing.expect(summary.total_edges_discovered > 0);
 }
+
+// =================================================================================================
+// 6. COMPOUND / AAVE / MORPHO PROTOCOL: Insolvency & Bad-Debt Liquidation Cascade Suite
+// Bytecode Simulates: Collateral Price Crash ($2000 -> $800) triggering underwater insolvency deficit
+// =================================================================================================
+const LENDING_INSOLVENCY_CRASH_BYTECODE = [_]u8{
+    // Initialize Lending Vault: Slot 0 (Cash Reserve) = 1,000,000, Slot 1 (Total Borrows) = 4,000,000
+    0x62, 0x0F, 0x42, 0x40, 0x60, 0x00, 0x55, // SSTORE 1,000,000 to Slot 0
+    0x62, 0x3D, 0x09, 0x00, 0x60, 0x01, 0x55, // SSTORE 4,000,000 to Slot 1
+    // Total Depositor Claims in Slot 2 = 5,000,000 (Solvent: 1M + 4M = 5M)
+    0x62, 0x4C, 0x4B, 0x40, 0x60, 0x02, 0x55, // SSTORE 5,000,000 to Slot 2
+    // Bad Debt Event: Unrecoverable Default reduces Total Borrows by 2,000,000 without cash recovery
+    0x62, 0x1E, 0x84, 0x80, 0x60, 0x01, 0x55, // SSTORE 2,000,000 to Slot 1 (Defaulted / Written off)
+    0x00,
+};
+
+test "Live Target 6: Master Protocol Insolvency & Bad-Debt Cascade Trap" {
+    var engine = main_mod.VoltaEngine.init();
+    _ = engine.execute(&LENDING_INSOLVENCY_CRASH_BYTECODE);
+
+    const cash_reserve = engine.vm_core.storage.select(0);   // 1,000,000
+    const total_borrows = engine.vm_core.storage.select(1);  // 2,000,000 (Deficit)
+    const depositor_claims = engine.vm_core.storage.select(2); // 5,000,000
+
+    // Master Solvency Invariant: Cash (1M) + Borrows (2M) = 3M < 5M Claims -> PROTOCOL IS INSOLVENT!
+    const is_solvent = invariants.InvariantEngine.verifyProtocolSolvency(cash_reserve, total_borrows, depositor_claims);
+    try std.testing.expect(!is_solvent); // Trapped $2.0M bad-debt protocol insolvency!
+
+    // Position-Level Underwater Bad-Debt Invariant Check:
+    // Borrower has 2 ETH collateral ($800 crash = $1,600 value) against $2,000 debt
+    const position_solvent = invariants.InvariantEngine.verifyBadDebtDeficit(1600, 2000);
+    try std.testing.expect(!position_solvent); // Trapped underwater liquidation failure!
+}

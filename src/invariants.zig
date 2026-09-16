@@ -56,6 +56,18 @@ pub const InvariantEngine = struct {
         return collateral_value >= required_backing;
     }
 
+    /// 5b. Pierre Invariant: Master Protocol Solvency (Total Vault Assets + Outstanding Borrows >= Total Depositor Claims)
+    pub fn verifyProtocolSolvency(vault_cash_reserve: u256, total_borrows: u256, total_depositor_shares_value: u256) bool {
+        const total_protocol_assets: u512 = @as(u512, vault_cash_reserve) + @as(u512, total_borrows);
+        return total_protocol_assets >= @as(u512, total_depositor_shares_value);
+    }
+
+    /// 5c. Pierre Invariant: Bad Debt & Underwater Position Trap
+    pub fn verifyBadDebtDeficit(collateral_value_usd: u256, debt_value_usd: u256) bool {
+        // Position is strictly solvent if collateral value exceeds debt value
+        return collateral_value_usd >= debt_value_usd;
+    }
+
     /// 6. Halmos / SMT Invariant: McCarthy Storage Slot Disjoint Independence
     pub fn verifyMcCarthySlotIndependence(storage_before: *const storage_mod.StorageState, storage_after: *const storage_mod.StorageState, mutated_slot: usize) bool {
         for (0..types.MAX_STORAGE_SLOTS) |s| {

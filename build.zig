@@ -6,11 +6,15 @@ pub fn build(b: *std.Build) void {
         .preferred_optimize_mode = .ReleaseFast,
     });
 
-    const exe = b.addExecutable(.{
-        .name = "volta",
+    const exe_mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
+    });
+
+    const exe = b.addExecutable(.{
+        .name = "volta",
+        .root_module = exe_mod,
     });
 
     b.installArtifact(exe);
@@ -25,9 +29,7 @@ pub fn build(b: *std.Build) void {
     run_step.dependOn(&run_cmd.step);
 
     const unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = exe_mod,
     });
 
     const run_unit_tests = b.addRunArtifact(unit_tests);

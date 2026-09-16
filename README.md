@@ -174,4 +174,4 @@ jobs:
 
 ## License
 
-MIT © 2026 [creatorofaurad](https://github.com/creatorofaurad).
+MIT © 2026 [coolkidsdontcode](https://github.com/coolkidsdontcode) (`cleolazren@gmail.com`).

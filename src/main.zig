@@ -10,6 +10,7 @@ pub const cfg = @import("cfg.zig");
 pub const detectors = @import("detectors.zig");
 pub const invariants = @import("invariants.zig");
 pub const vm = @import("vm.zig");
+pub const arena = @import("arena.zig");
 
 pub const VERSION = types.VERSION;
 
@@ -91,4 +92,5 @@ test {
     _ = detectors;
     _ = invariants;
     _ = vm;
+    _ = arena;
 }

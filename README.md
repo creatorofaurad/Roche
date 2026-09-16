@@ -40,12 +40,27 @@ Benchmarked against existing Python, Haskell, and Rust tooling on identical byte
 
 ---
 
-## Installation & Build
+## Installation
+
+### 1-Line Quick Install
+
+**macOS & Linux:**
+```bash
+curl -sSL https://raw.githubusercontent.com/creatorofaurad/volta/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/creatorofaurad/volta/main/install.ps1 | iex
+```
+
+---
+
+### Build from Source
 
 Requires **Zig 0.16.0+**.
 
 ```bash
-# Clone the repository
 git clone https://github.com/creatorofaurad/volta.git
 cd volta
 
@@ -56,7 +71,7 @@ zig test src/main.zig
 zig build -Doptimize=ReleaseFast
 ```
 
-The compiled binary will be placed at `zig-out/bin/volta` (or `zig-out/bin/volta.exe` on Windows).
+The compiled binary is placed at `zig-out/bin/volta` (`zig-out/bin/volta.exe` on Windows).
 
 ---
 

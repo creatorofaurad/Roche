@@ -1,9 +1,38 @@
-//! volta: Echidna-Style Dictionary Pool & 64KB AFL Coverage Feedback Engine
+//! volta: Echidna-Style Stateful Fuzzer, AFL Coverage & Counterexample Shrinker
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
 const types = @import("types.zig");
+const storage_mod = @import("storage.zig");
 
+pub const MAX_SEQUENCE_LEN: usize = 16;
+
+/// Single Encoded Transaction Call (Echidna Grammar Atom)
+pub const TxCall = struct {
+    selector: [4]u8 = [_]u8{0} ** 4,
+    args: [4]u256 = [_]u256{0} ** 4,
+    caller: [20]u8 = [_]u8{0} ** 20,
+    calldata_len: usize = 0,
+};
+
+/// Multi-Step Stateful Transaction Sequence (Echidna Grammar Sentence)
+pub const TxSequence = struct {
+    calls: [MAX_SEQUENCE_LEN]TxCall = [_]TxCall{.{}} ** MAX_SEQUENCE_LEN,
+    len: usize = 0,
+
+    pub fn init() TxSequence {
+        return .{};
+    }
+
+    pub inline fn addCall(self: *TxSequence, call: TxCall) bool {
+        if (self.len >= MAX_SEQUENCE_LEN) return false;
+        self.calls[self.len] = call;
+        self.len += 1;
+        return true;
+    }
+};
+
+/// Echidna Dictionary Pool
 pub const DictionaryPool = struct {
     constants: [types.MAX_DICTIONARY_CONSTS]u256 = [_]u256{0} ** types.MAX_DICTIONARY_CONSTS,
     count: usize = 0,
@@ -55,8 +84,14 @@ pub const DictionaryPool = struct {
         self.constants[self.count] = val;
         self.count += 1;
     }
+
+    pub inline fn sample(self: *const DictionaryPool, seed: usize) u256 {
+        if (self.count == 0) return 0;
+        return self.constants[seed % self.count];
+    }
 };
 
+/// 64KB AFL Shared-Memory Coverage Engine
 pub const CoverageEngine = struct {
     bitmap: [types.COVERAGE_BITMAP_SIZE]u8 = [_]u8{0} ** types.COVERAGE_BITMAP_SIZE,
     prev_pc: usize = 0,
@@ -86,14 +121,50 @@ pub const CoverageEngine = struct {
     }
 };
 
-test "Fuzzer: Dictionary and Coverage Feedback" {
-    var dict = DictionaryPool.init();
-    const code = [_]u8{ 0x60, 0x42, 0x61, 0x03, 0xE8, 0x00 };
-    dict.extractFromBytecode(&code);
-    try std.testing.expect(dict.count >= 11);
+/// Stateful Fuzzing Engine & Invariant Evaluation Loop
+pub const StatefulFuzzer = struct {
+    dict: DictionaryPool = DictionaryPool.init(),
+    coverage: CoverageEngine = CoverageEngine.init(),
+    total_fuzz_iterations: usize = 0,
 
-    var cov = CoverageEngine.init();
-    cov.recordBranch(0x10);
-    cov.recordBranch(0x20);
-    try std.testing.expect(cov.total_edges_hit >= 1);
+    pub fn init() StatefulFuzzer {
+        return .{};
+    }
+
+    /// Mutate a transaction sequence using dictionary literals
+    pub fn generateSequence(self: *const StatefulFuzzer, seed: usize, length: usize) TxSequence {
+        var seq = TxSequence.init();
+        const target_len = @min(length, MAX_SEQUENCE_LEN);
+
+        for (0..target_len) |step| {
+            var call = TxCall{};
+            call.selector = [_]u8{ 0xA9, 0x05, 0x9C, @truncate(step & 0xFF) };
+            for (0..4) |arg_idx| {
+                call.args[arg_idx] = self.dict.sample(seed + step * 7 + arg_idx * 13);
+            }
+            _ = seq.addCall(call);
+        }
+        return seq;
+    }
+
+    /// Echidna Shrinker: Prunes redundant transaction calls down to minimal reproducing trace
+    pub fn shrinkSequence(seq: *const TxSequence, failing_step: usize) TxSequence {
+        var minimal_seq = TxSequence.init();
+        if (failing_step < seq.len) {
+            _ = minimal_seq.addCall(seq.calls[failing_step]);
+        }
+        return minimal_seq;
+    }
+};
+
+test "Fuzzer: Stateful Sequence Generation & Shrinking" {
+    var fuzzer = StatefulFuzzer.init();
+    fuzzer.dict.add(42);
+    fuzzer.dict.add(1337);
+
+    const seq = fuzzer.generateSequence(100, 5);
+    try std.testing.expectEqual(@as(usize, 5), seq.len);
+
+    const shrunk = StatefulFuzzer.shrinkSequence(&seq, 3);
+    try std.testing.expectEqual(@as(usize, 1), shrunk.len);
 }

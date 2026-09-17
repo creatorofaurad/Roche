@@ -20,9 +20,9 @@ jobs:
           version: 0.16.0
 
       - name: Build Volta ReleaseFast Binary
-        run: zig build -Doptimize=ReleaseFast
+        run: zig build --release=fast
 
-      - name: Execute 24-Suite Invariant & Verification Battery
+      - name: Execute 25-Suite Invariant & Verification Battery
         run: zig test src/main.zig
 
       - name: Execute Autonomous Exploit Synthesis Pipeline (Sandboxed)

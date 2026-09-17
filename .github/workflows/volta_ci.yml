@@ -1,0 +1,34 @@
+name: Volta Bare-Silicon Verification Battery
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    name: Native Verification & Benchmark Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Native Zig Compiler
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.16.0
+
+      - name: Build Volta ReleaseFast Binary
+        run: zig build -Doptimize=ReleaseFast
+
+      - name: Execute 24-Suite Invariant & Verification Battery
+        run: zig test src/main.zig
+
+      - name: Execute Autonomous Exploit Synthesis Pipeline (Sandboxed)
+        run: ./zig-out/bin/volta orchestrate EulerVault 6000F16103E860005500 250
+
+      - name: Verify Zero Dynamic Heap Allocation & Exit Code Contract
+        run: |
+          ./zig-out/bin/volta audit 6000F16103E860005500
+          echo "Verification suite passed with exit code 0."

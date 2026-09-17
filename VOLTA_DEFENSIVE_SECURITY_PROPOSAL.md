@@ -61,9 +61,9 @@ Volta integrates 19 modular subsystems into a single, high-performance binary:
 
 ---
 
-## 4. The 15 Mathematical Invariant Families
+## 4. The 17 Mathematical Invariant Families
 
-Volta evaluates 15 domain-specific invariant families natively on every state transition:
+Volta evaluates 17 domain-specific invariant families natively on every state transition:
 
 1. **AMM Constant Product Monotonicity:** $x_1 \cdot y_1 \ge x_0 \cdot y_0$ (Uniswap V2/V4, SushiSwap).
 2. **Conservation of Token Supply:** $\sum \text{Balance}(u_i) \equiv \text{TotalSupply}$ (ERC-20, WETH).
@@ -80,6 +80,8 @@ Volta evaluates 15 domain-specific invariant families natively on every state tr
 13. **Governance Timelock Delay:** $t_{\text{execute}} \ge t_{\text{queue}} + \text{MinDelay} \land \text{QuorumReached} = \text{true}$ (Governor Bravo).
 14. **Curve StableSwap Virtual Price:** $D_{\text{after}} \ge D_{\text{before}} \land \text{VirtualPrice}_{\text{after}} \ge \text{VirtualPrice}_{\text{before}}$ (Curve Finance).
 15. **Balancer Vault Reentrancy Lock:** $\text{InVaultContext} \implies \text{ExternalStateRead} = \text{BLOCKED}$ (Balancer V2/V3).
+16. **Gross Asset Value (GAV) Monotonicity:** $\text{GAV}_{\text{after}} \ge \text{GAV}_{\text{before}}$ (Enzyme Blue portfolio rebalancing).
+17. **Redemption Queue Conservation:** $\text{Assets}_{\text{out}} \ge \frac{\text{Shares} \cdot \text{Price}}{10^{18}}$ (Enzyme Blue single-asset queue).
 
 ---
 

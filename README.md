@@ -74,7 +74,7 @@ pub const JournalEntry = struct {
 When a transaction reverts or a branch exploration path terminates, the VM rolls back storage mutations by iterating backward through the journal array, restoring the previous slot values without allocating snapshot clones.
 
 ### 3. Cache-Conscious Data Alignment
-Core structures (including storage arrays, stack buffers, and SIMD register vectors) use Zig's `align(64)` attribute. This matches 64-byte L1 CPU cache lines to prevent multi-word data structures from crossing cache line boundaries during inner execution loops.
+Core structures (including storage arrays, stack buffers, and SIMD register vectors) use Zig's `align(64)` attribute. This matches 64-byte L1 CPU cache lines to reduce the likelihood of multi-word data structures crossing cache line boundaries during inner execution loops.
 
 ### 4. Vectorized Coverage Tracking
 Branch coverage tracking uses a 64KB AFL-style edge hitmap (`src/fuzz/bitmap_processor.zig`). Bitwise differences between the current trace and cumulative discovery maps are calculated across 256-bit AVX2 registers (`@Vector(32, u8)`), processing 32 edge entries per instruction.
@@ -191,7 +191,7 @@ Volta implements the core algorithms of 19 smart contract security tools in nati
 | **Halmos** | Symbolic Reasoning | Interval constraint domain solver (`IntervalU256`) | [`src/prover/symbolic_engine.zig`](src/prover/symbolic_engine.zig) |
 | **Manticore** | State Forking | Depth-first multipath exploration stack | [`src/prover/multipath_fork.zig`](src/prover/multipath_fork.zig) |
 | **HEVM** | EVM Semantics | Strict Yellow Paper & Cancun opcode transitions | [`src/prover/hevm_semantics.zig`](src/prover/hevm_semantics.zig) |
-| **Kontrol** | Formal Proving | KCFG basic-block transition reachability | [`src/prover/kontrol_kcfg.zig`](src/prover/kontrol_kcfg.zig) |
+| **Kontrol** | Reachability | KCFG basic-block transition reachability | [`src/prover/kontrol_kcfg.zig`](src/prover/kontrol_kcfg.zig) |
 | **Heimdall** | Reverse Engineering | 4-byte selector & jumpdest resolution | [`src/decompile/jumpdest_matcher.zig`](src/decompile/jumpdest_matcher.zig) |
 | **Panoramix** | Decompilation | Stack-to-IR control flow reconstruction | [`src/decompile/pseudocode_emitter.zig`](src/decompile/pseudocode_emitter.zig) |
 | **Eveem** | Proxy Analysis | Storage slot classification (EIP-1967/1822) | [`src/decompile/proxy_classifier.zig`](src/decompile/proxy_classifier.zig) |
@@ -202,7 +202,7 @@ Volta implements the core algorithms of 19 smart contract security tools in nati
 
 ## Measured Hardware Benchmarks
 
-Benchmark measurements conducted on consumer x86_64 hardware (AMD / Intel, AVX2 enabled, compiled with Zig 0.16.0 under `ReleaseFast`):
+Benchmark measurements conducted on benchmark host (Intel Core i5-8365U @ 1.60GHz, 24 GB RAM, 256 GB NVMe SSD, compiled with Zig 0.16.0 under `ReleaseFast`):
 
 ```text
 ===================================================================================================
@@ -242,7 +242,7 @@ Volta maintains a 25-suite automated verification matrix covering unit tests, in
  2/25 fuzzer.test.Fuzzer: Stateful Sequence Generation & Shrinking...OK (Fuzzing Core)
  3/25 cfg.test.CFG: Basic Block Disassembly.........................OK (Static Analysis)
  4/25 detectors.test.Detectors: Full Slither 7-Detector Suite.......OK (Static Analysis)
- 5/25 invariants.test.Invariants: SMT Prover Suite..................OK (Invariant Engine)
+ 5/25 invariants.test.Invariants: Property Invariant Suite..........OK (Invariant Checking)
  6/25 vm.test.VM: Stack, Arithmetic, Cheatcodes & OpCodes...........OK (EVM Semantics)
  7/25 arena.test.Arena: 10,000 In-Sample Gauntlet...................OK (Fuzzing Arena)
  8/25 Live Target 1: Euler V2 Vault Donation Inflation..............OK (Protocol Regression)

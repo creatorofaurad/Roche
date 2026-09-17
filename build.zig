@@ -16,6 +16,7 @@ pub fn build(b: *std.Build) void {
         .name = "volta",
         .root_module = exe_mod,
     });
+    exe.stack_size = 16 * 1024 * 1024; // 16MB Stack allocation
 
     b.installArtifact(exe);
 

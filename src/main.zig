@@ -12,6 +12,7 @@ pub const invariants = @import("invariants.zig");
 pub const vm = @import("vm.zig");
 pub const arena = @import("arena.zig");
 pub const live_protocol_tests = @import("live_protocol_tests.zig");
+pub const foundry_synth = @import("foundry_synth.zig");
 pub const cli = @import("cli.zig");
 
 pub const VERSION = types.VERSION;
@@ -88,6 +89,13 @@ pub fn main(init: std.process.Init) !void {
             return;
         }
         handler.runFuzz(runs);
+    } else if (std.mem.eql(u8, command, "synth")) {
+        const target = args.next() orelse {
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex.\nUsage: volta synth <hex> [invariant_name]\n", .{});
+            return;
+        };
+        const inv_name = args.next() orelse "verifyConstantProduct";
+        handler.runSynth(target, inv_name);
     } else if (std.mem.eql(u8, command, "gauntlet")) {
         std.debug.print("\x1b[1;32m[*] Executing Volta 10,000-Run In-Sample Gauntlet & Walk-Forward Protocol...\x1b[0m\n", .{});
         var arena_inst = arena.ArenaHarness.init(0x1337BEEFCAFE);
@@ -130,5 +138,6 @@ test {
     _ = vm;
     _ = arena;
     _ = live_protocol_tests;
+    _ = foundry_synth;
     _ = cli;
 }

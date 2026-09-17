@@ -15,7 +15,12 @@ pub const live_protocol_tests = @import("live_protocol_tests.zig");
 pub const foundry_synth = @import("foundry_synth.zig");
 pub const cli = @import("cli.zig");
 
+pub const cannibal_engine = @import("cannibal_engine.zig");
+pub const orchestrator = @import("orchestrator.zig");
+
 pub const VERSION = types.VERSION;
+
+pub var global_orchestrator: orchestrator.MasterOrchestrator align(64) = undefined;
 
 pub const VoltaEngine = struct {
     vm_core: vm.VM = vm.VM.init(),
@@ -61,6 +66,26 @@ pub fn main(init: std.process.Init) !void {
         cli.CliHandler.printHelp();
     } else if (std.mem.eql(u8, command, "version") or std.mem.eql(u8, command, "-v") or std.mem.eql(u8, command, "--version")) {
         std.debug.print("volta v{s} (bare-silicon x86_64 native)\n", .{VERSION});
+    } else if (std.mem.eql(u8, command, "orchestrate") or std.mem.eql(u8, command, "pipeline")) {
+        const target = args.next() orelse {
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing contract name or hex.\nUsage: volta orchestrate <name> <hex> [runs_per_thread]\n", .{});
+            return;
+        };
+        const hex = args.next() orelse "6000F16103E860005500";
+        var runs: usize = 250;
+        if (args.next()) |runs_str| {
+            runs = std.fmt.parseInt(usize, runs_str, 10) catch 250;
+        }
+        std.debug.print("\x1b[1;32m[*] Executing Volta Master Autonomous Exploit Synthesis Pipeline...\x1b[0m\n", .{});
+        global_orchestrator = orchestrator.MasterOrchestrator.init(4);
+        const res = global_orchestrator.executeAutonomousPipeline(target, hex, runs);
+        std.debug.print("  [+] Violations Detected:  \x1b[31m{d}\x1b[0m\n", .{res.violations_detected});
+        std.debug.print("  [+] Fuzz Iterations:      \x1b[33m{d}\x1b[0m\n", .{res.fuzz_iterations_run});
+        std.debug.print("  [+] PoC Synthesized:      \x1b[32m{s}\x1b[0m\n", .{if (res.poc_synthesized) "TRUE" else "FALSE"});
+        std.debug.print("  [+] PoC Buffer Length:    \x1b[36m{d} bytes\x1b[0m\n", .{res.poc_bytes_len});
+        if (res.poc_synthesized) {
+            std.debug.print("\n\x1b[1;32m=== Auto-Generated Foundry PoC (.t.sol) ===\x1b[0m\n{s}\n", .{global_orchestrator.foundry_synth.poc_buffer[0..res.poc_bytes_len]});
+        }
     } else if (std.mem.eql(u8, command, "audit")) {
         const target = args.next() orelse {
             std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex or file path.\nUsage: volta audit <hex|file>\n", .{});
@@ -140,4 +165,6 @@ test {
     _ = live_protocol_tests;
     _ = foundry_synth;
     _ = cli;
+    _ = cannibal_engine;
+    _ = orchestrator;
 }

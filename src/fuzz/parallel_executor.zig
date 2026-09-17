@@ -7,7 +7,7 @@ const std = @import("std");
 const havoc = @import("havoc_engine.zig");
 const bitmap = @import("bitmap_processor.zig");
 
-pub const MAX_WORKER_THREADS = 16;
+pub const MAX_WORKER_THREADS = 4;
 
 pub const WorkerState = struct {
     id: u32,

@@ -315,3 +315,42 @@ test "Live Target 12: Concentrated Liquidity Tick Bounds Out-of-Range Violation"
     const bounds_safe = invariants.InvariantEngine.verifyConcentratedLiquidityBounds(current_sqrt_p, lower_sqrt_p, upper_sqrt_p, 10000);
     try std.testing.expect(!bounds_safe);
 }
+
+// =================================================================================================
+// 12. ENZYME BLUE PROTOCOL: Single Asset Redemption Queue & GAV Conservation
+// Bytecode Simulates: ComptrollerLib GAV Rebalance & Queue Dispersal
+// =================================================================================================
+pub const ENZYME_BLUE_REDEMPTION_BYTECODE = [_]u8{
+    // Slot 0 (GAV Before) = 1,000,000 ether (1e24)
+    0x61, 0x03, 0xE8, 0x60, 0x00, 0x55,
+    // External CALL to integration adapter
+    0x60, 0x00, 0xF1,
+    // Slot 1 (GAV After) = 900,000 ether (Unaccounted slippage drain!)
+    0x61, 0x03, 0x84, 0x60, 0x01, 0x55,
+    0x00,
+};
+
+test "Live Target 13: Enzyme Blue Single Asset Redemption Queue & GAV Conservation" {
+    var engine = main_mod.VoltaEngine.init();
+
+    // 1. Static Audit: Check CEI on external adapter call
+    const audit = engine.audit(&ENZYME_BLUE_REDEMPTION_BYTECODE);
+    try std.testing.expect(audit.reentrancy);
+
+    // 2. Execute bytecode
+    _ = engine.execute(&ENZYME_BLUE_REDEMPTION_BYTECODE);
+    const gav_before = engine.vm_core.storage.select(0);
+    const gav_after = engine.vm_core.storage.select(1);
+
+    // 3. Enzyme Invariant: GAV monotonicity during rebalance
+    const gav_monotonic = invariants.InvariantEngine.verifyGavMonotonicity(gav_before, gav_after);
+    try std.testing.expect(!gav_monotonic);
+
+    // 4. Redemption Queue Conservation: Burn 100 shares @ $1.50 (1.5e18) -> Expect >= 150 units
+    const valid_redemption = invariants.InvariantEngine.verifyRedemptionConservation(100, 150, 1_500_000_000_000_000_000);
+    try std.testing.expect(valid_redemption);
+
+    const defective_redemption = invariants.InvariantEngine.verifyRedemptionConservation(100, 120, 1_500_000_000_000_000_000);
+    try std.testing.expect(!defective_redemption);
+}
+

@@ -269,6 +269,22 @@ pub const InvariantEngine = struct {
         return true;
     }
 
+    /// 17. Enzyme Blue: Gross Asset Value (GAV) Monotonicity during portfolio rebalance
+    pub fn verifyGavMonotonicity(gav_before: u256, gav_after: u256) bool {
+        return gav_after >= gav_before;
+    }
+
+    /// 18. Enzyme Blue: Single Asset Redemption Queue Conservation
+    pub fn verifyRedemptionConservation(
+        burned_shares: u256,
+        redeemed_assets: u256,
+        share_price: u256,
+    ) bool {
+        if (burned_shares == 0) return true;
+        const expected_value: u512 = (@as(u512, burned_shares) * @as(u512, share_price)) / 1_000_000_000_000_000_000;
+        return @as(u512, redeemed_assets) >= expected_value;
+    }
+
     /// Run full formal invariant verification matrix
     pub fn runFullMatrix(storage: *const storage_mod.StorageState, min_k: u256) InvariantResult {
         var res = InvariantResult{};
@@ -406,7 +422,15 @@ test "Invariants: Comprehensive Halmos & Pierre SMT Prover Suite" {
     const spec_bridge_fail = InvariantSpec{ .category = .BRIDGE_CONSERVATION, .slot_a = 1, .slot_b = 0, .threshold = 0 };
     try std.testing.expect(!spec_bridge_fail.check(&storage)); // 2000 <= 1000 - 0 is false
 
-    // 18. Full Verification Matrix Pass
+    // 19. Enzyme Blue: GAV Monotonicity & Redemption Conservation Checks
+    try std.testing.expect(InvariantEngine.verifyGavMonotonicity(100_000_000, 105_000_000));
+    try std.testing.expect(!InvariantEngine.verifyGavMonotonicity(100_000_000, 95_000_000));
+
+    // Burn 10 shares @ $2.00/share (2e18) -> Expect >= 20 units of asset
+    try std.testing.expect(InvariantEngine.verifyRedemptionConservation(10, 20, 2_000_000_000_000_000_000));
+    try std.testing.expect(!InvariantEngine.verifyRedemptionConservation(10, 15, 2_000_000_000_000_000_000));
+
+    // 20. Full Verification Matrix Pass
     const matrix_res = InvariantEngine.runFullMatrix(&storage, 2_000_000);
     try std.testing.expect(matrix_res.amm_constant_product);
     try std.testing.expect(matrix_res.conservation_of_supply);

@@ -194,6 +194,15 @@ pub const InvariantEngine = struct {
         return @reduce(.Add, sum_v);
     }
 
+    /// 9b. Hardware SIMD Isomorphism: AVX2 Batched U256 Equality & Solvency Verification
+    pub fn verifyBatchWordEqualities(a: *const [4]types.U256, b: *const [4]types.U256) @Vector(4, bool) {
+        var res: [4]bool = undefined;
+        inline for (0..4) |idx| {
+            res[idx] = types.U256.eq(a[idx], b[idx]);
+        }
+        return @as(@Vector(4, bool), res);
+    }
+
     /// 10. Pierre / Hyperliquid Invariant: Perpetual Futures Margin Solvency
     pub fn verifyPerpMarginSolvency(vault_collateral: u256, total_margin: u256, unrealized_pnl_deficit: u256, protocol_fee_pool: u256) bool {
         const required_backing: u512 = @as(u512, total_margin) + @as(u512, unrealized_pnl_deficit) + @as(u512, protocol_fee_pool);
@@ -374,6 +383,22 @@ test "Invariants: Comprehensive Halmos & Pierre SMT Prover Suite" {
 
     const spec_solvency = InvariantSpec{ .category = .PROTOCOL_SOLVENCY, .slot_a = 0, .slot_b = 1, .threshold = 3000 };
     try std.testing.expect(spec_solvency.check(&storage));
+
+    // 18. Batch SIMD U256 Equality & Vector Conversion Check
+    const u_a = [4]types.U256{
+        types.U256.fromU64(10),
+        types.U256.fromU64(20),
+        types.U256.fromU64(30),
+        types.U256.fromU64(40),
+    };
+    const u_b = [4]types.U256{
+        types.U256.fromU64(10),
+        types.U256.fromU64(99),
+        types.U256.fromU64(30),
+        types.U256.fromU64(40),
+    };
+    const batch_eq = InvariantEngine.verifyBatchWordEqualities(&u_a, &u_b);
+    try std.testing.expectEqual(@as(@Vector(4, bool), @Vector(4, bool){ true, false, true, true }), batch_eq);
 
     const spec_bridge = InvariantSpec{ .category = .BRIDGE_CONSERVATION, .slot_a = 0, .slot_b = 1, .threshold = 0 };
     try std.testing.expect(spec_bridge.check(&storage)); // 1000 <= 2000 - 0 is true

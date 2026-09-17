@@ -219,3 +219,88 @@ pub const Opcode = enum(u8) {
     SELFDESTRUCT = 0xFF,
     _,
 };
+
+// =================================================================================================
+// 256-Bit Hardware SIMD Integer Representation (AVX2 4x64-bit Limbs)
+// =================================================================================================
+pub const U256 = extern struct {
+    limbs: [4]u64 align(32),
+
+    pub const ZERO = U256{ .limbs = .{ 0, 0, 0, 0 } };
+    pub const ONE = U256{ .limbs = .{ 1, 0, 0, 0 } };
+    pub const MAX = U256{ .limbs = .{ ~@as(u64, 0), ~@as(u64, 0), ~@as(u64, 0), ~@as(u64, 0) } };
+
+    pub inline fn fromU64(v: u64) U256 {
+        return .{ .limbs = .{ v, 0, 0, 0 } };
+    }
+
+    pub inline fn fromNative(val: u256) U256 {
+        return .{
+            .limbs = .{
+                @truncate(val),
+                @truncate(val >> 64),
+                @truncate(val >> 128),
+                @truncate(val >> 192),
+            },
+        };
+    }
+
+    pub inline fn toNative(self: U256) u256 {
+        return @as(u256, self.limbs[0]) |
+            (@as(u256, self.limbs[1]) << 64) |
+            (@as(u256, self.limbs[2]) << 128) |
+            (@as(u256, self.limbs[3]) << 192);
+    }
+
+    pub inline fn toVector(self: U256) Vec4u64 {
+        return @as(Vec4u64, self.limbs);
+    }
+
+    pub inline fn fromVector(v: Vec4u64) U256 {
+        return .{ .limbs = @as([4]u64, v) };
+    }
+
+    pub inline fn add(a: U256, b: U256) struct { res: U256, carry: u8 } {
+        var res: U256 = undefined;
+        const c0 = @addWithOverflow(a.limbs[0], b.limbs[0]);
+        res.limbs[0] = c0[0];
+        const c1_init = @addWithOverflow(a.limbs[1], c0[1]);
+        const c1 = @addWithOverflow(c1_init[0], b.limbs[1]);
+        res.limbs[1] = c1[0];
+        const c1_carry = c1_init[1] | c1[1];
+
+        const c2_init = @addWithOverflow(a.limbs[2], c1_carry);
+        const c2 = @addWithOverflow(c2_init[0], b.limbs[2]);
+        res.limbs[2] = c2[0];
+        const c2_carry = c2_init[1] | c2[1];
+
+        const c3_init = @addWithOverflow(a.limbs[3], c2_carry);
+        const c3 = @addWithOverflow(c3_init[0], b.limbs[3]);
+        res.limbs[3] = c3[0];
+        const c3_carry = c3_init[1] | c3[1];
+
+        return .{ .res = res, .carry = c3_carry };
+    }
+
+    pub inline fn eq(a: U256, b: U256) bool {
+        const va: Vec4u64 = a.toVector();
+        const vb: Vec4u64 = b.toVector();
+        const cmp = va == vb;
+        return @reduce(.And, cmp);
+    }
+
+    pub inline fn lt(a: U256, b: U256) bool {
+        var i: usize = 4;
+        while (i > 0) {
+            i -= 1;
+            if (a.limbs[i] < b.limbs[i]) return true;
+            if (a.limbs[i] > b.limbs[i]) return false;
+        }
+        return false;
+    }
+};
+
+comptime {
+    std.debug.assert(@sizeOf(U256) == 32);
+    std.debug.assert(@alignOf(U256) == 32);
+}

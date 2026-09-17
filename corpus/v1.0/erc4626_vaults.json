@@ -1,0 +1,20 @@
+{
+  "corpus_version": "1.0",
+  "category": "ERC-4626 Tokenized Vaults",
+  "invariants": [
+    {
+      "id": "ERC4626-001",
+      "name": "First-Deposit Zero-Share Inflation Barrier",
+      "predicate": "!(delta_assets > 0 && shares_issued == 0)",
+      "test_function": "Live Target 3: Ethena PSM ERC-4626 First-Deposit Share Inflation Barrier",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    },
+    {
+      "id": "ERC4626-002",
+      "name": "Deposit-Redeem Exchange Rate Monotonicity",
+      "predicate": "previewRedeem(previewDeposit(assets)) <= assets",
+      "test_function": "Live Target 1: Euler V2 Vault Donation & Reentrancy",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    }
+  ]
+}

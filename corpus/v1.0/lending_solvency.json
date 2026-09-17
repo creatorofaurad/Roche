@@ -1,0 +1,20 @@
+{
+  "corpus_version": "1.0",
+  "category": "Lending Markets & Solvency",
+  "invariants": [
+    {
+      "id": "SOLV-001",
+      "name": "Master Protocol Solvency Condition",
+      "predicate": "total_cash + total_borrows >= total_claims",
+      "test_function": "Live Target 6: Master Protocol Insolvency & Bad-Debt Cascade Trap",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    },
+    {
+      "id": "SOLV-002",
+      "name": "Bad-Debt Liquidation Deficit Trap",
+      "predicate": "collateral_value * liquidation_threshold >= total_debt",
+      "test_function": "Live Target 6 & Live Target 9: Perpetual Futures Margin Solvency",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "corpus_version": "1.0",
+  "category": "AMM Liquidity Pools",
+  "invariants": [
+    {
+      "id": "AMM-001",
+      "name": "Uniswap V2/V3 Constant Product Monotonicity",
+      "predicate": "reserve0_after * reserve1_after >= reserve0_before * reserve1_before",
+      "test_function": "Live Target 2: Uniswap V4 Hook Pool Liquidity Drain",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    },
+    {
+      "id": "AMM-002",
+      "name": "Dynamic Swap Fee Conservation",
+      "predicate": "effective_fee_bps >= min_pool_fee_bps",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    },
+    {
+      "id": "AMM-003",
+      "name": "Concentrated Liquidity Tick Bounds",
+      "predicate": "current_tick >= MIN_TICK && current_tick <= MAX_TICK",
+      "test_function": "Live Target 12: Concentrated Liquidity Tick Bounds",
+      "expected_status": "TRAPPED_AND_VERIFIED"
+    }
+  ]
+}

@@ -4,8 +4,7 @@ zig-out/
 *.obj
 *.exe
 
-# Internal Architecture, Proposals & Audit Documents
-ARCHITECTURE.md
+# Internal Proposals & Private Audit Documents
 SPECIFICATION.md
 VOLTA_DEFENSIVE_SECURITY_PROPOSAL.md
 VOLTA_COMPLETE_INSTITUTIONAL_DOCUMENTATION.md

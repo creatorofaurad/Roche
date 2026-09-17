@@ -1,12 +1,14 @@
-# Volta: Bare-Silicon EVM Invariant Prover & Exploit Synthesis Engine
+# Volta: Bare-Silicon EVM Invariant Prover & Autonomous Exploit Synthesis Engine
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zig: 0.16.0](https://img.shields.io/badge/Zig-0.16.0-orange.svg)](https://ziglang.org)
 [![Build: Native ReleaseFast](https://img.shields.io/badge/Build-ReleaseFast-green.svg)](build.zig)
-[![Tests: 23/23 Passing](https://img.shields.io/badge/Tests-23%2F23%20Passing-brightgreen.svg)](src/main.zig)
+[![Tests: 25/25 Passing](https://img.shields.io/badge/Tests-25%2F25%20Passing-brightgreen.svg)](src/main.zig)
 [![Dynamic Allocations](https://img.shields.io/badge/Heap%20Allocations-0%20Bytes-success.svg)](src/vm.zig)
+[![Memory Invariant](https://img.shields.io/badge/Alignment-64--Byte%20L1%20Cache-purple.svg)](src/types.zig)
+[![Vectorization](https://img.shields.io/badge/SIMD-256--Bit%20AVX2-red.svg)](src/invariants.zig)
 
-Volta is a deterministic, zero-heap, hardware-vectorized EVM state verification and autonomous exploit synthesis engine written in pure native **Zig 0.16.0**. It absorbs and translates the verification logic of 19 industry-standard security frameworks into bare silicon—eliminating Python interpreters, Go garbage collectors, JVM runtimes, and dynamic heap overhead.
+Volta is a deterministic, zero-heap, hardware-vectorized EVM state verification and autonomous exploit synthesis engine engineered in pure native **Zig 0.16.0**. It absorbs and translates the verification logic of 19 industry-standard security frameworks directly into bare silicon—eliminating Python interpreters, Go garbage collectors, JVM runtimes, and dynamic heap overhead.
 
 ---
 
@@ -14,7 +16,7 @@ Volta is a deterministic, zero-heap, hardware-vectorized EVM state verification 
 
 Volta operates strictly under three immutable systems invariants:
 
-1. **Zero Heap Allocation (`malloc = 0`):** No `std.heap.page_allocator`, `GeneralPurposeAllocator`, or runtime reallocations exist anywhere in the core execution path. All stack frames, memory arrays, CFG nodes, taint graphs, and rollback journals are statically bounded in pre-allocated buffers.
+1. **Zero Dynamic Heap Allocation (`malloc = 0`):** No `std.heap.page_allocator`, `GeneralPurposeAllocator`, or runtime reallocations exist anywhere in the core execution path. All stack frames, memory arrays, CFG nodes, taint graphs, and rollback journals are statically bounded in pre-allocated buffers.
 2. **64-Byte Hardware Cache-Line Alignment (`align(64)`):** Every internal data structure—stack buffers, linear byte memory, McCarthy storage arrays, and SIMD registers—is aligned to 64 bytes to eliminate L1/L2 cache cross-line boundary penalties.
 3. **256-Bit AVX2 SIMD Hardware Vectorization:** Hot-loop bitwise inspections, branch scanning, invariant arithmetic, and coverage bitmaps run across 256-bit registers (`@Vector(32, u8)` and `@Vector(8, u32)`).
 
@@ -54,15 +56,15 @@ Volta unifies static analysis, multi-core parallel exploration, formal SMT invar
 
 1. **Bytecode Lowering & CFG Extraction:** Disassembles raw bytecode, constructs the Control Flow Graph, and evaluates 22 static security detectors in sub-millisecond time.
 2. **Parallel Havoc Exploration:** Dispatches stateful call sequences across multiple native worker threads, guided by 64KB AVX2 coverage bitmaps.
-3. **Formal Invariant Boundary Proving:** Proves state transitions against 15 mathematical invariant families on every execution step ($< 1.00\text{ ns}$ latency).
+3. **Formal Invariant Boundary Proving:** Proves state transitions against 17 mathematical invariant families on every execution step ($< 1.00\text{ ns}$ latency).
 4. **Hierarchical Delta-Debugging (HDD):** When a violation occurs, bisects failing multi-transaction traces from $N$ steps down to the minimal 2-step exploit sequence in $O(N \log N)$ time.
 5. **Autonomous Foundry PoC Synthesis:** Emits a standalone, compilable Solidity test contract (`.t.sol`) with reproduction assertions and state setups.
 
 ---
 
-## 15 Mathematical Invariant Families
+## 17 Mathematical Invariant Families
 
-Volta embeds 15 mathematical verification rules directly into [`src/invariants.zig`](src/invariants.zig):
+Volta embeds 17 mathematical verification rules directly into [`src/invariants.zig`](src/invariants.zig):
 
 1. **AMM Constant Product Monotonicity:** $k_{\text{current}} = x_1 \cdot y_1 \ge x_0 \cdot y_0 = k_{\text{initial}}$
 2. **Conservation of Total Supply:** $\sum \text{Balance}(u_i) \equiv \text{TotalSupply}$
@@ -77,8 +79,10 @@ Volta embeds 15 mathematical verification rules directly into [`src/invariants.z
 11. **Cross-Chain Bridge Token Conservation:** $\text{Minted}_{L2} \le \text{Locked}_{L1} - \text{Burned}_{L2}$
 12. **Concentrated Liquidity Tick Bounds:** $\text{Tick}_{\text{lower}} \le \text{CurrentTick} \le \text{Tick}_{\text{upper}} \land \text{Liquidity}_{\text{active}} \le \text{TotalPoolLiquidity}$
 13. **Governance Timelock Execution Delay:** $t_{\text{execute}} \ge t_{\text{queue}} + \text{MinDelay} \land \text{QuorumReached} = \text{true}$
-14. **Curve AMM Invariant:** $D_{\text{after}} \ge D_{\text{before}} \land \text{VirtualPrice}_{\text{after}} \ge \text{VirtualPrice}_{\text{before}}$
+14. **Curve AMM Virtual Price Conservation:** $D_{\text{after}} \ge D_{\text{before}} \land \text{VirtualPrice}_{\text{after}} \ge \text{VirtualPrice}_{\text{before}}$
 15. **Balancer Vault Reentrancy Lock:** $\text{InVaultContext} \implies \text{ExternalStateRead} = \text{BLOCKED}$
+16. **Gross Asset Value (GAV) Monotonicity:** $\text{GAV}_{\text{after}} \ge \text{GAV}_{\text{before}} \quad (\text{portfolio rebalancing})$
+17. **Redemption Queue Conservation:** $\text{RedeemedAssets} \ge \frac{\text{BurnedShares} \cdot \text{SharePrice}}{10^{18}}$
 
 ---
 
@@ -96,7 +100,7 @@ Tested on consumer silicon (AMD / Intel x86_64, AVX2 enabled, compiled with `Rel
 
 ---
 
-## Live Exploit Verification Suite (23/23 Green)
+## Live Exploit Verification Suite (25/25 Green)
 
 Volta maintains a master test suite reproducing historical and zero-day threat classes with 100% determinism:
 
@@ -106,7 +110,7 @@ Volta maintains a master test suite reproducing historical and zero-day threat c
 | 2 | `fuzzer.test` | Stateful sequence generation & $O(N \log N)$ HDD shrinking | **PASS** |
 | 3 | `cfg.test` | Basic block disassembly & edge recovery | **PASS** |
 | 4 | `detectors.test` | 22-detector static CFG taint analysis | **PASS** |
-| 5 | `invariants.test` | Halmos & SMT constraint evaluation suite | **PASS** |
+| 5 | `invariants.test` | Comprehensive Halmos & Pierre SMT constraint evaluation suite | **PASS** |
 | 6 | `vm.test` | Evaluation stack, cheatcodes & environmental opcodes | **PASS** |
 | 7 | `arena.test` | 10,000 in-sample gauntlet & walk-forward arena | **PASS** |
 | 8 | `Live Target 1` | Euler Finance V2: Vault donation & exchange rate inflation | **PASS** |
@@ -121,10 +125,12 @@ Volta maintains a master test suite reproducing historical and zero-day threat c
 | 17 | `Live Target 10` | Multichain Bridge: Cross-chain token conservation trap | **PASS** |
 | 18 | `Live Target 11` | Liquid Staking (LSD): Exchange rate depeg barrier | **PASS** |
 | 19 | `Live Target 12` | Concentrated Liquidity: Out-of-range tick bounds overflow | **PASS** |
-| 20 | `foundry_synth.test` | Autonomous `.t.sol` Solidity PoC generation | **PASS** |
-| 21 | `cli.test` | CLI hex decoding & command routing | **PASS** |
-| 22 | `cannibal_engine.test` | **19/19 Modular Competitor Cannibalization Suite** | **PASS** |
-| 23 | `orchestrator.test` | **End-to-End Automated Exploit Synthesis Pipeline** | **PASS** |
+| 20 | `Live Target 13` | Enzyme Blue: Single Asset Redemption Queue & GAV Conservation | **PASS** |
+| 21 | `foundry_synth.test` | Autonomous `.t.sol` Solidity PoC generation | **PASS** |
+| 22 | `cli.test` | CLI hex decoding & command routing | **PASS** |
+| 23 | `cannibal_engine.test` | **19/19 Modular Competitor Cannibalization Suite** | **PASS** |
+| 24 | `orchestrator.test` | **End-to-End Automated Exploit Synthesis Pipeline** | **PASS** |
+| 25 | `kernel_router.test` | **Kernel Router: Exit Codes & Signal Registration** | **PASS** |
 
 ---
 
@@ -151,7 +157,7 @@ Volta maintains a master test suite reproducing historical and zero-day threat c
 git clone https://github.com/creatorofaurad/volta.git
 cd volta
 
-# Run all 23 test suites
+# Run all 25 test suites
 zig test src/main.zig
 
 # Run the 100,000-pass hardware benchmark

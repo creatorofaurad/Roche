@@ -47,6 +47,8 @@ pub const InvariantCategory = enum {
     GOVERNANCE_TIMELOCK,
     CURVE_VIRTUAL_PRICE,
     BALANCER_REENTRANCY_GUARD,
+    GAV_MONOTONICITY,
+    REDEMPTION_CONSERVATION,
 };
 
 pub const InvariantSpec = struct {
@@ -73,6 +75,8 @@ pub const InvariantSpec = struct {
             .GOVERNANCE_TIMELOCK => InvariantEngine.verifyGovernanceTimelockAndQuorum(storage.select(self.slot_a), storage.select(self.slot_b), self.threshold, @as(u256, self.param_u64), 0, self.param_u64 + 1, 0),
             .CURVE_VIRTUAL_PRICE => InvariantEngine.verifyCurveVirtualPriceConservation(storage.select(self.slot_a), storage.select(self.slot_b), self.threshold),
             .BALANCER_REENTRANCY_GUARD => InvariantEngine.verifyBalancerVaultReentrancyGuard(storage.select(self.slot_a) != 0, storage.select(self.slot_b) != 0),
+            .GAV_MONOTONICITY => InvariantEngine.verifyGavMonotonicity(storage.select(self.slot_a), storage.select(self.slot_b)),
+            .REDEMPTION_CONSERVATION => InvariantEngine.verifyRedemptionConservation(storage.select(self.slot_a), storage.select(self.slot_b), self.threshold),
         };
     }
 };
@@ -92,6 +96,8 @@ pub const InvariantResult = struct {
     concentrated_liquidity_bounded: bool = true,
     governance_timelock_safe: bool = true,
     curve_virtual_price_safe: bool = true,
+    gav_monotonicity_safe: bool = true,
+    redemption_conserved: bool = true,
     all_passed: bool = true,
 };
 
@@ -299,6 +305,8 @@ pub const InvariantEngine = struct {
         res.bridge_conserved = verifyBridgeTokenConservation(storage.select(0), storage.select(1), storage.select(2));
         res.concentrated_liquidity_bounded = verifyConcentratedLiquidityBounds(storage.select(2), storage.select(0), storage.select(1), 1);
         res.curve_virtual_price_safe = verifyCurveVirtualPriceConservation(storage.select(0), storage.select(1), 50);
+        res.gav_monotonicity_safe = verifyGavMonotonicity(storage.select(0), storage.select(1));
+        res.redemption_conserved = verifyRedemptionConservation(storage.select(0), storage.select(1), 1_000_000_000_000_000_000);
 
         res.all_passed = res.amm_constant_product and
             res.conservation_of_supply and
@@ -310,7 +318,9 @@ pub const InvariantEngine = struct {
             res.lsd_rate_bounded and
             res.bridge_conserved and
             res.concentrated_liquidity_bounded and
-            res.curve_virtual_price_safe;
+            res.curve_virtual_price_safe and
+            res.gav_monotonicity_safe and
+            res.redemption_conserved;
 
         return res;
     }

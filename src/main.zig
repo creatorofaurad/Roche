@@ -17,6 +17,7 @@ pub const cli = @import("cli.zig");
 
 pub const cannibal_engine = @import("cannibal_engine.zig");
 pub const orchestrator = @import("orchestrator.zig");
+pub const kernel_router = @import("kernel_router.zig");
 
 pub const VERSION = types.VERSION;
 
@@ -50,6 +51,8 @@ pub const VoltaEngine = struct {
 };
 
 pub fn main(init: std.process.Init) !void {
+    kernel_router.bindInterruptHandlers();
+
     var args = try std.process.Args.Iterator.initAllocator(init.minimal.args, init.gpa);
     defer args.deinit();
 
@@ -167,4 +170,5 @@ test {
     _ = cli;
     _ = cannibal_engine;
     _ = orchestrator;
+    _ = kernel_router;
 }

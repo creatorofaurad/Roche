@@ -1,0 +1,38 @@
+{
+  "test_suite_audit": {
+    "total_suites": 25,
+    "passing_suites": 25,
+    "failing_suites": 0,
+    "leaking_suites": 0,
+    "flakiness_detected": false,
+    "audit_timestamp": "2026-09-18T14:17:38+05:30",
+    "compiler": "Zig 0.16.0",
+    "suites": [
+      { "id": 1, "name": "main.test_0", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 2, "name": "fuzzer.test.Fuzzer: Stateful Sequence Generation & Shrinking", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 3, "name": "cfg.test.CFG: Basic Block Disassembly", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 4, "name": "detectors.test.Detectors: Full Slither 7-Detector Suite", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 5, "name": "invariants.test.Invariants: Comprehensive Halmos & Pierre SMT Prover Suite", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 6, "name": "vm.test.VM: Stack, Arithmetic, Cheatcodes & Environmental Execution", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 7, "name": "arena.test.Arena: 10,000 In-Sample Gauntlet & Walk-Forward Protocol", "type": "integration", "status": "PASS", "stability": "STABLE" },
+      { "id": 8, "name": "live_protocol_tests.test.Live Target 1: Euler V2 Vault Donation", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 9, "name": "live_protocol_tests.test.Live Target 2: Uniswap V4 Hook Pool Liquidity Drain", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 10, "name": "live_protocol_tests.test.Live Target 3: Ethena PSM ERC-4626 First-Deposit Share Inflation Barrier", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 11, "name": "live_protocol_tests.test.Live Target 4: Flash Loan Arbitrage Callback Reentrancy", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 12, "name": "live_protocol_tests.test.Live Target 5: 10,000-Run Live Gauntlet on Real Protocol Attack Suite", "type": "integration", "status": "PASS", "stability": "STABLE" },
+      { "id": 13, "name": "live_protocol_tests.test.Live Target 6: Master Protocol Insolvency & Bad-Debt Cascade Trap", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 14, "name": "live_protocol_tests.test.Live Target 7: Curve LP Precision Truncation & Division Detection", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 15, "name": "live_protocol_tests.test.Live Target 8: Balancer Vault Read-Only Reentrancy Guard Trap", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 16, "name": "live_protocol_tests.test.Live Target 9: Perpetual Futures Margin Solvency Deficit Trap", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 17, "name": "live_protocol_tests.test.Live Target 10: Multichain Cross-Chain Bridge Token Conservation Trap", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 18, "name": "live_protocol_tests.test.Live Target 11: Liquid Staking LSD Exchange Rate Depeg Barrier", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 19, "name": "live_protocol_tests.test.Live Target 12: Concentrated Liquidity Tick Bounds Out-of-Range Violation", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 20, "name": "live_protocol_tests.test.Live Target 13: Enzyme Blue Single Asset Redemption Queue & GAV Conservation", "type": "exploit", "status": "PASS", "stability": "STABLE" },
+      { "id": 21, "name": "foundry_synth.test.Foundry Synth: Solidity PoC Generation", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 22, "name": "cli.test.CLI: Hex Parsing & Audit Execution", "type": "unit", "status": "PASS", "stability": "STABLE" },
+      { "id": 23, "name": "cannibal_engine.test.Volta 19/19 Modular Cannibal Engine Integration", "type": "integration", "status": "PASS", "stability": "STABLE" },
+      { "id": 24, "name": "orchestrator.test.Master Orchestrator: End-to-End Automated Exploit Synthesis", "type": "integration", "status": "PASS", "stability": "STABLE" },
+      { "id": 25, "name": "kernel_router.test.Kernel Router: Exit Codes & Signal Registration", "type": "unit", "status": "PASS", "stability": "STABLE" }
+    ]
+  }
+}

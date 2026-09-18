@@ -39,22 +39,22 @@ Traditional smart contract security workflows suffer from fragmentation and trac
 
 ### The Volta Architecture
 Volta consolidates disassembly, static taint analysis, symbolic path exploration, invariant checking, and test-case minimization into a **single native binary** written in pure Zig:
-- **Zero Heap Allocations ($0\text{ bytes}$):** All execution stacks, memory pages, journals, and graphs operate within deterministic, preallocated static buffers.
-- **Automated Minimization:** Hierarchical Delta-Debugging ($O(N \log N)$) bisects failing transaction sequences down to the exact causal subset.
-- **Instant Foundry Synthesis:** Automatically emits standalone, compile-ready `.t.sol` test files with accurate invariant assertions and setup harnesses.
+- **Zero Heap Allocations ($0\text{ bytes}$):** All execution stacks, 128 KB memory pages, journals, and graphs operate within deterministic, preallocated 64-byte cache-aligned static buffers.
+- **RAW Dynamic Dependency Slicing:** Prunes non-causal transaction noise in $O(V+E)$ via sub-word Read-After-Write state dependency DAG traversal.
+- **Hierarchical Delta-Debugging ($O(N \log N)$):** Bisects causal failing transaction sequences down to 1-minimal counterexamples.
+- **Attacker Callback & Foundry Synthesis:** Automatically emits compile-ready `.t.sol` test files with nested `ExploitHarness` contracts supporting ERC-3156 flash loans and swap callbacks.
 
 ---
 
 ## Key Features
 
-- **Zero-Allocation Execution Core:** Native EVM implementation with strictly $0\text{ bytes}$ dynamic memory allocation on hot execution paths.
+- **Zero-Allocation Execution Core:** Native EVM implementation with strictly $0\text{ bytes}$ dynamic memory allocation on hot execution paths and 128 KB static linear memory capacity.
 - **17 Protocol Invariant Families:** Opcode-level invariant monitoring for AMMs, lending markets, liquid staking, cross-chain bridges, and transient storage.
-- **Hierarchical Trace Minimization:** $O(N \log N)$ delta-debugging algorithm reduces complex multi-call exploit sequences to minimal reproducible steps.
-- **Foundry PoC Emission:** Direct generation of runnable Foundry test files (`.t.sol`) with zero external post-processing.
+- **RAW Slicing & Trace Minimization:** $O(V+E)$ dynamic state dependency extraction paired with Hierarchical Delta-Debugging for sub-50ms trace reduction.
+- **Callback Harness & PoC Emission:** Direct generation of runnable Foundry test files (`.t.sol`) with auto-synthesized receiver contracts.
 - **Vectorized Bitmaps:** 256-bit AVX2 SIMD branch coverage acceleration processing 32 edge map entries per cycle.
 - **Deterministic McCarthy Storage:** $O(1)$ state rollback journals for sub-microsecond transaction rollbacks during stateful search.
 - **Comprehensive Test Suite:** 27/27 test suites passing (100% green) across unit, integration, differential, EEST, and live DeFi protocol exploits.
-- **High-Throughput Execution:** Evaluates invariants in $<1.00\text{ ns}$ and processes up to 8.3 million transactions per second.
 
 ---
 

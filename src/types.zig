@@ -9,7 +9,10 @@ pub const VERSION = "1.0.0-beta";
 // Hardware & Memory Constants
 // =================================================================================================
 pub const MAX_STACK_DEPTH: usize = 1024;
-pub const MAX_MEMORY_BYTES: usize = 4096;
+pub const MAX_MEMORY_BYTES: usize = 131072; // 128 KB aligned static buffer for deep multicall / nested ABI frames
+pub const MAX_CALLDATA_BYTES: usize = 131072; // 128 KB calldata capacity
+pub const MAX_BYTECODE_SIZE: usize = 24576; // EIP-170 max code size (24 KB)
+pub const MAX_TRANSIENT_STORAGE_KEYS: usize = 1024;
 pub const MAX_STORAGE_SLOTS: usize = 256;
 pub const MAX_ROLLBACK_LOGS: usize = 128;
 pub const MAX_BASIC_BLOCKS: usize = 256;
@@ -17,7 +20,6 @@ pub const MAX_DICTIONARY_CONSTS: usize = 128;
 pub const COVERAGE_BITMAP_SIZE: usize = 65536; // 64KB AFL Shared Memory Table
 pub const MAX_ACCOUNTS: usize = 16;
 pub const MAX_RETURNDATA_BYTES: usize = 1024;
-pub const MAX_CALLDATA_BYTES: usize = 1024;
 pub const MAX_CALL_FRAMES: usize = 8;
 
 // =================================================================================================

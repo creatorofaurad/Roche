@@ -227,6 +227,97 @@ pub const StatefulFuzzer = struct {
         return minimal_seq;
     }
 
+    /// Read-After-Write (RAW) / Write-After-Read (WAR) State Access Profile per Transaction Step
+    pub const StepStateAccess = struct {
+        reads: [16]u256 = [_]u256{0} ** 16,
+        read_count: usize = 0,
+        writes: [16]u256 = [_]u256{0} ** 16,
+        write_count: usize = 0,
+        sub_word_masks: [16]u256 = [_]u256{~@as(u256, 0)} ** 16, // Sub-word precision mask (e.g. packed uint128/uint64)
+
+        pub inline fn addRead(self: *StepStateAccess, slot: u256) void {
+            if (self.read_count < 16) {
+                self.reads[self.read_count] = slot;
+                self.read_count += 1;
+            }
+        }
+
+        pub inline fn addWrite(self: *StepStateAccess, slot: u256, mask: u256) void {
+            if (self.write_count < 16) {
+                self.writes[self.write_count] = slot;
+                self.sub_word_masks[self.write_count] = mask;
+                self.write_count += 1;
+            }
+        }
+    };
+
+    /// Dynamic Backward Slicing via Read-After-Write (RAW) Dependency DAG
+    /// Extracts minimal causal transaction subset in O(V + E) before running 1-minimal delta debugging.
+    pub fn sliceTraceRAW(
+        seq: *const TxSequence,
+        accesses: []const StepStateAccess,
+        failing_step: usize,
+    ) TxSequence {
+        if (seq.len == 0 or failing_step >= seq.len) return seq.*;
+
+        // Bitset tracking steps included in backward causal slice
+        var included = [_]bool{false} ** MAX_SEQUENCE_LEN;
+        included[failing_step] = true;
+
+        // Worklist for backward DAG traversal
+        var queue = [_]usize{0} ** MAX_SEQUENCE_LEN;
+        var q_head: usize = 0;
+        var q_tail: usize = 0;
+        queue[q_tail] = failing_step;
+        q_tail += 1;
+
+        while (q_head < q_tail) {
+            const curr = queue[q_head];
+            q_head += 1;
+
+            if (curr >= accesses.len) continue;
+            const curr_access = accesses[curr];
+
+            // For each slot read by the current step, find the most recent prior step that wrote to it (RAW edge)
+            for (0..curr_access.read_count) |r_idx| {
+                const read_slot = curr_access.reads[r_idx];
+                var prior: usize = curr;
+                while (prior > 0) {
+                    prior -= 1;
+                    if (prior >= accesses.len) continue;
+                    const prior_access = accesses[prior];
+
+                    var has_overlap = false;
+                    for (0..prior_access.write_count) |w_idx| {
+                        if (prior_access.writes[w_idx] == read_slot) {
+                            has_overlap = true;
+                            break;
+                        }
+                    }
+
+                    if (has_overlap) {
+                        if (!included[prior]) {
+                            included[prior] = true;
+                            queue[q_tail] = prior;
+                            q_tail += 1;
+                        }
+                        // Connect to immediate writer
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Construct reduced causal sequence
+        var sliced = TxSequence.init();
+        for (0..seq.len) |idx| {
+            if (included[idx]) {
+                _ = sliced.addCall(seq.calls[idx]);
+            }
+        }
+        return if (sliced.len > 0) sliced else seq.*;
+    }
+
     /// Hierarchical Delta-Debugging (HDD): Bisection and chunked trace reduction (O(N log N))
     pub fn minimizeTraceBisection(
         seq: *const TxSequence,
@@ -289,4 +380,22 @@ test "Fuzzer: Stateful Sequence Generation & Shrinking" {
     for (fuzzer.coverage.bitmap) |byte| {
         try std.testing.expectEqual(@as(u8, 0), byte);
     }
+
+    // Test RAW Dynamic Slicing
+    var raw_seq = TxSequence.init();
+    const step0 = TxCall{}; // Writes slot 0x100
+    const step1 = TxCall{}; // Writes slot 0x200 (noise)
+    const step2 = TxCall{}; // Reads slot 0x100 and fails
+    _ = raw_seq.addCall(step0);
+    _ = raw_seq.addCall(step1);
+    _ = raw_seq.addCall(step2);
+
+    var accesses: [3]StatefulFuzzer.StepStateAccess = [_]StatefulFuzzer.StepStateAccess{.{}} ** 3;
+    accesses[0].addWrite(0x100, ~@as(u256, 0));
+    accesses[1].addWrite(0x200, ~@as(u256, 0));
+    accesses[2].addRead(0x100);
+
+    const sliced = StatefulFuzzer.sliceTraceRAW(&raw_seq, &accesses, 2);
+    // Step 1 is noise (unconnected storage write) and should be pruned:
+    try std.testing.expectEqual(@as(usize, 2), sliced.len);
 }

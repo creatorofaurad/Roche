@@ -127,6 +127,12 @@ pub fn main(init: std.process.Init) !void {
         };
         const inv_name = args.next() orelse "verifyConstantProduct";
         handler.runSynth(target, inv_name);
+    } else if (std.mem.eql(u8, command, "repro")) {
+        const protocol = args.next() orelse {
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing protocol identifier.\nUsage: volta repro <euler|uniswap|ethena|curve|enzyme>\n", .{});
+            return;
+        };
+        handler.runRepro(protocol);
     } else if (std.mem.eql(u8, command, "gauntlet")) {
         std.debug.print("\x1b[1;32m[*] Executing Volta 10,000-Run In-Sample Gauntlet & Walk-Forward Protocol...\x1b[0m\n", .{});
         var arena_inst = arena.ArenaHarness.init(0x1337BEEFCAFE);

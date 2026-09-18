@@ -14,10 +14,10 @@
 ## Institutional Validation Status
 
 - **Phase 0 (Diagnosis & Opcode Coverage):** ✅ COMPLETE — [OPCODE_COVERAGE_MATRIX.md](docs/OPCODE_COVERAGE_MATRIX.md) (138 opcodes active, 0 crashers).
-- **Phase 1 (EEST Compliance & Harness):** ✅ ACTIVE — [EEST Harness](src/eest_harness.zig) integrated into 27/27 green test suites.
-- **Phase 2 (Differential Testing vs. revm):** ✅ ACTIVE — [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
-- **Phase 3 (Exploit Corpus Expansion):** ✅ ACTIVE — [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped across all major DeFi exploit families ($3.5B+ scope).
-- **Phase 4 & 5 (Performance & Audit Freeze):** ✅ ACTIVE — Hardware baseline locked at 8.3M tx/s, 0 dynamic allocations.
+- **Phase 1 (EEST Compliance & Harness):** 🔄 ACTIVE — [EEST Harness](src/eest_harness.zig) integrated; baseline vectors passing in 27/27 test suites.
+- **Phase 2 (Differential Testing vs. revm):** 🔄 ACTIVE — [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
+- **Phase 3 (Exploit Corpus Expansion):** 🔄 ACTIVE — [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped; **13 protocol exploit reproductions currently verified in code**.
+- **Phase 4 & 5 (Performance & Audit Freeze):** 🔄 ACTIVE — Invariant evaluation benchmarked at 0.87 ns/check, 0 dynamic allocations on hot paths.
 
 ---
 

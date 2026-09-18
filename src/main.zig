@@ -15,6 +15,9 @@ pub const live_protocol_tests = @import("live_protocol_tests.zig");
 pub const foundry_synth = @import("foundry_synth.zig");
 pub const cli = @import("cli.zig");
 
+pub const eest_harness = @import("eest_harness.zig");
+pub const differential_engine = @import("differential_engine.zig");
+
 pub const cannibal_engine = @import("cannibal_engine.zig");
 pub const orchestrator = @import("orchestrator.zig");
 pub const kernel_router = @import("kernel_router.zig");
@@ -171,4 +174,6 @@ test {
     _ = cannibal_engine;
     _ = orchestrator;
     _ = kernel_router;
+    _ = eest_harness;
+    _ = differential_engine;
 }

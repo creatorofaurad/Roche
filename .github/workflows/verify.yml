@@ -1,0 +1,32 @@
+name: Volta Verification & Compliance Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Native Invariant Verification & EEST Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Zig Compiler
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.16.0
+
+      - name: Verify Formatting
+        run: zig fmt --check src/
+
+      - name: Execute Full Verification Suite (27/27 Suites)
+        run: zig test src/main.zig
+
+      - name: Build Optimized Bare-Silicon Release
+        run: zig build -Doptimize=ReleaseFast
+
+      - name: Execute Native Latency Benchmark
+        run: ./zig-out/bin/volta benchmark

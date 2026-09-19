@@ -7,6 +7,11 @@ zig-out/
 *.lib
 target/
 
+# Site dependencies & build artifacts
+site/node_modules/
+site/.next/
+site/screenshot_*.png
+
 # Internal Proposals & Private Audit Documents
 SPECIFICATION.md
 VOLTA_DEFENSIVE_SECURITY_PROPOSAL.md

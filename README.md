@@ -1,9 +1,11 @@
 # Volta
 
-**Built by a 15-year-old.** Production-ready, bare-silicon EVM verification engine.  
+**Built by Charles, a 15-year-old systems architect.** Production-ready, bare-silicon EVM verification engine.  
+Part of a broader portfolio of production infrastructure, cryptanalytic engines, and formal verification research. See [Systems Architecture Portfolio](./PORTFOLIO.md) for related work.  
 **Status: Independently verified production-grade.** 29/29 tests passing. 0 memory leaks. Sub-microsecond execution. Ready for institutional deployment.
 
 [![Verification Status](https://img.shields.io/badge/verified-production%20ready-brightgreen)](VERIFICATION_AUDIT.md)
+[![Portfolio](https://img.shields.io/badge/portfolio-11%20systems-purple.svg)](PORTFOLIO.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zig: 0.16.0](https://img.shields.io/badge/Zig-0.16.0-orange.svg)](https://ziglang.org)
 [![Tests: 29/29 Passing](https://img.shields.io/badge/Tests-29%2F29%20Passing-brightgreen.svg)](src/main.zig)

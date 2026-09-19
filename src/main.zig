@@ -17,6 +17,7 @@ pub const cli = @import("cli.zig");
 
 pub const eest_harness = @import("eest_harness.zig");
 pub const differential_engine = @import("differential_engine.zig");
+pub const c_api = @import("c_api.zig");
 
 pub const cannibal_engine = @import("cannibal_engine.zig");
 pub const orchestrator = @import("orchestrator.zig");
@@ -186,4 +187,5 @@ test {
     _ = kernel_router;
     _ = eest_harness;
     _ = differential_engine;
+    _ = c_api;
 }

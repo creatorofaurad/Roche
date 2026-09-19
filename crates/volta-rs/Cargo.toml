@@ -1,0 +1,20 @@
+[package]
+name = "volta-rs"
+version = "0.2.0"
+edition = "2021"
+authors = ["Charles <creatorofaurad>"]
+description = "Native Rust bindings & Foundry plugin for Volta: Bare-Silicon EVM Trace Minimizer & SMT Prover"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/creatorofaurad/volta"
+keywords = ["ethereum", "evm", "fuzzing", "foundry", "security"]
+categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
+
+[dependencies]
+# Zero required external dependencies for core FFI bindings
+
+[dev-dependencies]
+# Optional test utilities
+
+[lib]
+name = "volta_rs"
+crate-type = ["rlib", "cdylib"]

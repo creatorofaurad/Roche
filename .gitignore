@@ -3,6 +3,9 @@ zig-out/
 *.pdb
 *.obj
 *.exe
+*.dll
+*.lib
+target/
 
 # Internal Proposals & Private Audit Documents
 SPECIFICATION.md

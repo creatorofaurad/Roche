@@ -20,6 +20,30 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(exe);
 
+    // C-ABI FFI Static Library target for Rust / Foundry linking
+    const lib_static = b.addLibrary(.{
+        .name = "volta_static",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/c_api.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+        .linkage = .static,
+    });
+    b.installArtifact(lib_static);
+
+    // C-ABI FFI Dynamic Shared Library target
+    const lib_shared = b.addLibrary(.{
+        .name = "volta",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/c_api.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+        .linkage = .dynamic,
+    });
+    b.installArtifact(lib_shared);
+
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {

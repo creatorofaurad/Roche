@@ -2,34 +2,25 @@
 
 @layer base {
   :root {
-    --background: #080809;
-    --foreground: #f4f4f5;
-    --card: #101012;
-    --card-border: #222226;
-    --accent: #22c55e;
-    --accent-glow: rgba(34, 197, 94, 0.15);
+    --background: #000000;
+    --foreground: #ffffff;
+    --card: #09090b;
+    --card-border: #18181b;
     --muted: #71717a;
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     overflow-x: hidden;
   }
 }
 
-.glow-emerald {
-  box-shadow: 0 0 50px -10px rgba(34, 197, 94, 0.2);
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
-
-.radar-grid {
-  background-image: radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.08) 0%, transparent 65%),
-                    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 32px 32px, 32px 32px;
-}
-
-.terminal-header {
-  background: linear-gradient(180deg, #18181b 0%, #121214 100%);
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

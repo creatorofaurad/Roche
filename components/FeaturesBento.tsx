@@ -1,119 +1,156 @@
 "use client";
 
 import React from "react";
-import { Globe, Shield, Terminal, ArrowRight, Box, Radio, Zap } from "lucide-react";
+import { Shield, Terminal, Cpu, Layers } from "lucide-react";
 
 export default function FeaturesBento() {
   return (
-    <section id="features" className="py-20 border-t border-[#1c1c20] relative">
-      <div className="mx-auto max-w-7xl px-6 space-y-12">
-        
-        {/* Section Header */}
-        <div className="space-y-3 max-w-2xl">
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
-            One window for everything you verify locally.
-          </h2>
-          <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-            Name it, share it, and watch every EVM state transition and opcode flow through — without touching your contract bytecode.
-          </p>
+    <section id="architecture" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-zinc-900 bg-black">
+      {/* Section Header */}
+      <div className="max-w-3xl mb-16">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 text-xs font-mono uppercase tracking-widest mb-4">
+          <Layers className="w-3.5 h-3.5" />
+          Silicon Subsystems
         </div>
+        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-4">
+          Core Engine Architecture
+        </h2>
+        <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+          Zero heap allocations. 64-byte aligned SIMD memory layouts. McCarthy store-select SMT provers executing directly on native hardware registers.
+        </p>
+      </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-          {/* Top-Left Bento Item: Real-time Request Inspector (Span 8) */}
-          <div className="md:col-span-8 rounded-2xl border border-[#222226] bg-[#101013] p-6 space-y-4 overflow-hidden relative group">
-            <div className="space-y-1">
-              <h3 className="text-base font-semibold text-white">See every state transition in real time</h3>
-              <p className="text-xs text-zinc-400">Inspect storage slots, call frames, gas costs, and status codes as they flow through — no heavy node debuggers needed.</p>
+      {/* Bento Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Box 1: Real-time Invariant Inspector (Span 8) */}
+        <div className="md:col-span-8 rounded border border-zinc-900 bg-zinc-950 p-6 space-y-4 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-white">
+                Real-Time State & Invariant Inspector
+              </h3>
+              <span className="text-[11px] font-mono text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                0 Bytes Heap
+              </span>
             </div>
+            <p className="text-xs sm:text-sm text-zinc-400 mb-4">
+              Inspect storage slots, McCarthy select/store taints, and opcode execution times with sub-microsecond precision.
+            </p>
 
-            {/* 3D Tilted Inspector Table */}
-            <div className="rounded-xl border border-[#27272a] bg-[#0c0c0e] p-3 font-mono text-[11px] text-zinc-400 shadow-inner overflow-x-auto">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2 text-zinc-500 text-[10px]">
-                <span>METHOD · PATH</span>
-                <span>STATUS</span>
+            {/* Table */}
+            <div className="rounded border border-zinc-800 bg-black p-3 font-mono text-xs text-zinc-400 overflow-x-auto">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2 text-zinc-500 text-[11px]">
+                <span>OPCODE · TARGET</span>
+                <span>STATE</span>
                 <span>LATENCY</span>
-                <span>GAS</span>
+                <span>INVARIANT STATUS</span>
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-zinc-300 hover:bg-zinc-900/50 p-1 rounded">
-                  <span className="text-emerald-400 font-bold">EXEC · /v4/swap_hook</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[9px]">200 OK</span>
+                <div className="flex items-center justify-between text-zinc-300 p-1 rounded">
+                  <span className="text-white font-bold">TSTORE · slot_0x0 (Hook)</span>
+                  <span className="px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 text-[10px]">TRANSIENT</span>
                   <span>142 ns</span>
-                  <span>21,000</span>
+                  <span className="text-white font-semibold">VALIDATED</span>
                 </div>
-                <div className="flex items-center justify-between text-zinc-300 hover:bg-zinc-900/50 p-1 rounded">
-                  <span className="text-emerald-400 font-bold">READ · /storage/slot_0x0</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[9px]">200 OK</span>
+                <div className="flex items-center justify-between text-zinc-300 p-1 rounded">
+                  <span className="text-white font-bold">SLOAD · reserves[0]</span>
+                  <span className="px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 text-[10px]">STORAGE</span>
                   <span>87 ns</span>
-                  <span>2,100</span>
+                  <span className="text-white font-semibold">x * y &gt;= k OK</span>
                 </div>
-                <div className="flex items-center justify-between text-zinc-300 hover:bg-zinc-900/50 p-1 rounded bg-red-950/20 border border-red-900/30">
-                  <span className="text-red-400 font-bold">REVERT · /vault/donate</span>
-                  <span className="px-1.5 py-0.5 rounded bg-red-950 text-red-400 text-[9px]">400 REVERT</span>
+                <div className="flex items-center justify-between text-zinc-300 p-1 rounded bg-zinc-900/40 border border-zinc-800">
+                  <span className="text-white font-bold">MSTORE · donate(1 wei)</span>
+                  <span className="px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 text-[10px]">REVERT</span>
                   <span>310 ns</span>
-                  <span>84,500</span>
+                  <span className="text-white font-bold">[BREACH MAPPED]</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Top-Right Bento Item: Named local URLs (Span 4) */}
-          <div className="md:col-span-4 rounded-2xl border border-[#222226] bg-[#101013] p-6 flex flex-col justify-between space-y-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400">
-              <Box className="h-6 w-6" />
-            </div>
-            <div className="space-y-2">
-              <span className="text-xs font-mono text-emerald-400">roche.localhost</span>
-              <h3 className="text-base font-semibold text-white">Named Local Invariants</h3>
-              <p className="text-xs text-zinc-400">Works seamlessly with any smart contract framework, Foundry test suite, or Hardhat script.</p>
-            </div>
+          <div className="text-xs font-mono text-zinc-500 pt-2 border-t border-zinc-900 flex items-center justify-between">
+            <span>Direct Win32/POSIX system calls</span>
+            <span className="text-zinc-400">ICFG SSA IR Engine</span>
           </div>
-
-          {/* Bottom-Right Bento Item: Instant public links (Span 4) */}
-          <div className="md:col-span-4 rounded-2xl border border-[#222226] bg-[#101013] p-6 flex flex-col justify-between space-y-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400">
-              <Radio className="h-6 w-6 animate-pulse" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="text-xs font-mono text-emerald-400">crimson-otter.roche.live</span>
-              </div>
-              <h3 className="text-base font-semibold text-white">Instant Exploit PoC Tunnels</h3>
-              <p className="text-xs text-zinc-400">Share verifiable Foundry test harnesses over HTTPS in one click — demos, webhooks, audit reviews.</p>
-            </div>
-          </div>
-
-          {/* Bottom-Left Bento Item: Pipeline in the middle (Span 8) */}
-          <div className="md:col-span-8 rounded-2xl border border-[#222226] bg-[#101013] p-6 flex flex-col justify-between space-y-6">
-            <div className="space-y-1">
-              <h3 className="text-base font-semibold text-white">Roche sits at bare silicon</h3>
-              <p className="text-xs text-zinc-400">It intercepts opcode transitions, records every storage slot delta, and enables sub-microsecond state rollbacks.</p>
-            </div>
-
-            {/* Architecture Pipeline Visual */}
-            <div className="flex items-center justify-between rounded-xl bg-[#0c0c0e] border border-[#222226] p-4 text-xs font-mono">
-              <div className="flex items-center gap-2 text-zinc-400">
-                <Globe className="h-4 w-4 text-emerald-400" />
-                <span>Sequencer / Fuzzer</span>
-              </div>
-              <div className="h-0.5 flex-1 mx-4 bg-gradient-to-r from-emerald-500/20 via-emerald-400 to-emerald-500/20" />
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold">
-                <Shield className="h-4 w-4" />
-                <span>Roche Engine</span>
-              </div>
-              <div className="h-0.5 flex-1 mx-4 bg-gradient-to-r from-emerald-500/20 via-emerald-400 to-emerald-500/20" />
-              <div className="flex items-center gap-2 text-zinc-400">
-                <Terminal className="h-4 w-4 text-zinc-500" />
-                <span>Foundry .t.sol</span>
-              </div>
-            </div>
-          </div>
-
         </div>
 
+        {/* Box 2: Named Local Invariants (Span 4) */}
+        <div className="md:col-span-4 rounded border border-zinc-900 bg-zinc-950 p-6 space-y-4 flex flex-col justify-between">
+          <div>
+            <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mb-4">
+              <Shield className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">
+              Formal Protocol Invariants
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Define mathematical protocol invariants in simple declarative syntax. Proves pool solvency, oracle safety, and non-reentrancy automatically.
+            </p>
+          </div>
+
+          <div className="p-3 rounded bg-black border border-zinc-800 font-mono text-[11px] text-zinc-400 space-y-1">
+            <div className="text-white font-bold">invariant: k_monotonicity</div>
+            <div className="text-zinc-500">assert: pool.x * pool.y &gt;= k_prev</div>
+            <div className="text-zinc-500">solver: McCarthy Store-Select SMT</div>
+          </div>
+        </div>
+
+        {/* Box 3: Automated Foundry PoC Tunnels (Span 4) */}
+        <div className="md:col-span-4 rounded border border-zinc-900 bg-zinc-950 p-6 space-y-4 flex flex-col justify-between">
+          <div>
+            <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mb-4">
+              <Terminal className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">
+              Automated Foundry PoC Synthesis
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              When an invariant violation is discovered, Roche compresses the counter-example into a ≤ 4 step minimal trace and emits executable Solidity Foundry tests.
+            </p>
+          </div>
+
+          <div className="p-2.5 rounded bg-black border border-zinc-800 font-mono text-[11px] text-zinc-400">
+            <span className="text-white">$ roche export-poc --forge</span>
+            <div className="text-zinc-500 text-[10px] mt-1">↳ Generated test/ExploitPoC.t.sol</div>
+          </div>
+        </div>
+
+        {/* Box 4: Bare Silicon AVX-512 SIMD (Span 8) */}
+        <div className="md:col-span-8 rounded border border-zinc-900 bg-zinc-950 p-6 space-y-4 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-white">
+                256-Bit AVX2 & AVX-512 Vectorized Fuzzing Core
+              </h3>
+              <span className="text-[11px] font-mono text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                1.84M Execs/sec
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-zinc-400 mb-4">
+              Batch executes 8 to 32 parallel EVM contract states simultaneously in CPU vector registers (@Vector(8, f32) and @Vector(32, u8)).
+            </p>
+
+            <div className="p-4 rounded border border-zinc-800 bg-black font-mono text-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="text-zinc-500 text-[11px]">Hardware Cache Line:</div>
+                <div className="text-white font-bold">64-Byte Aligned</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-zinc-500 text-[11px]">Dynamic Heap Memory:</div>
+                <div className="text-white font-bold">0 Bytes (Zero malloc/free)</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-zinc-500 text-[11px]">Rollback Complexity:</div>
+                <div className="text-white font-bold">O(1) Ring Buffer Journal</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-xs font-mono text-zinc-500 pt-2 border-t border-zinc-900 flex items-center justify-between">
+            <span>Eliminates V8 garbage collector pauses</span>
+            <span className="text-white font-medium">100% Native Silicon</span>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,80 +1,80 @@
 "use client";
 
 import React, { useState } from "react";
-import { Terminal, CheckCircle2, XCircle, Zap, Shield, Cpu, Layers } from "lucide-react";
+import { CheckCircle2, XCircle, Zap } from "lucide-react";
 
 export default function ComparisonSection() {
-  const [activeTab, setActiveTab] = useState<"foundry" | "next" | "vite" | "hardhat">("foundry");
+  const [activeTab, setActiveTab] = useState<"foundry" | "smt" | "simd" | "hardhat">("foundry");
 
   const tabData = {
     foundry: {
-      framework: "Foundry / Anvil",
+      framework: "Foundry / Forge Fuzzing",
       leftCmd: "forge test --fuzz-runs 100000",
       leftOutput: [
-        { text: "[*] Compiling 42 Solidity contracts...", type: "info" },
-        { text: "[*] Running 12 test suites with EVM interpreter...", type: "info" },
-        { text: "[!] Memory usage: 1.42 GB (Node/Rust heap)", type: "warn" },
-        { text: "[!] Invariant test fuzzing: 4,200 exec/sec", type: "warn" },
-        { text: "[!] SMT Solver timeout on Euler V2 donate()", type: "error" },
-        { text: "[x] Total runtime: 23.84s (High latency)", type: "error" },
+        { text: "[*] Compiling 42 Solidity contracts with solc...", type: "info" },
+        { text: "[*] Initializing EVM interpreter (Rust heap)...", type: "info" },
+        { text: "[!] Memory consumption: 1.42 GB (Dynamic allocations)", type: "warn" },
+        { text: "[!] Property fuzzing throughput: 4,200 exec/sec", type: "warn" },
+        { text: "[!] Missed edge case in LiquidityUtils.sol:112", type: "error" },
+        { text: "[x] Total wall-clock time: 23.84s", type: "error" },
       ],
       rightCmd: "roche test --simd --smt --formal",
       rightOutput: [
-        { text: "[⚡] Native Bare Silicon JIT initialized (AVX-512/AVX2)", type: "success" },
-        { text: "[⚡] 0 Bytes dynamic heap allocation (Strict Invariant)", type: "success" },
-        { text: "[✓] SMT McCarthy array theory prover: 12/12 theorems valid", type: "success" },
-        { text: "[✓] Invariant fuzzing: 1,840,000 exec/sec (SIMD vectorized)", type: "success" },
+        { text: "[+] Initializing Bare Silicon JIT (AVX-512 / AVX2)", type: "success" },
+        { text: "[+] 0 Bytes dynamic heap allocations (Strict Invariant)", type: "success" },
+        { text: "[✓] McCarthy SMT Array Theory Prover: 12/12 theorems verified", type: "success" },
+        { text: "[✓] Vectorized invariant throughput: 1,840,000 exec/sec", type: "success" },
         { text: "[★] Roche Limit breach mapped: LiquidityUtils.sol:112", type: "highlight" },
-        { text: "[✓] Total runtime: 12.4ms (1920x faster)", type: "highlight" },
+        { text: "[✓] Total wall-clock time: 12.4ms (1920x faster)", type: "highlight" },
       ],
     },
-    next: {
-      framework: "Next.js 16 (App Router)",
-      leftCmd: "next dev --turbopack",
+    smt: {
+      framework: "SMT Formal Solvency Prover",
+      leftCmd: "z3 -smt2 input.smt2 (External process)",
       leftOutput: [
-        { text: "▲ Next.js 16.3.5 (Turbopack)", type: "info" },
-        { text: "- Local: http://localhost:3000", type: "info" },
-        { text: "⚠ RPC WebSocket socket collision on :8545", type: "warn" },
-        { text: "⚠ Contract ABI hot-reloading: 840ms delay", type: "warn" },
-        { text: "⚠ WebAssembly EVM memory exhaustion warning", type: "error" },
+        { text: "Spawning external Z3 / CVC5 solver subprocess...", type: "info" },
+        { text: "Serializing 50,000 AST nodes over standard pipe...", type: "info" },
+        { text: "⚠ High context-switch latency: 480ms per query", type: "warn" },
+        { text: "⚠ Timeout on non-linear storage multiplication", type: "error" },
       ],
-      rightCmd: "roche next dev",
+      rightCmd: "roche verify --solver=mccarthy-native",
       rightOutput: [
-        { text: "✦ Roche Native Dev Tunnel active (roche-rpc://127.0.0.1:8545)", type: "success" },
-        { text: "✦ Direct Win32 / POSIX kernel handles mapped", type: "success" },
-        { text: "✦ Instant ABI hot-sync: 0.18ms latency", type: "success" },
-        { text: "✦ Real-time invariant telemetry widget injected", type: "highlight" },
+        { text: "✦ Embedded McCarthy store-select solver on stack registers", type: "success" },
+        { text: "✦ Direct Win32/POSIX kernel handles (0 IPC overhead)", type: "success" },
+        { text: "✦ Solves AMM k_monotonicity in 0.8µs", type: "success" },
+        { text: "✦ 100% Deterministic formal convergence", type: "highlight" },
       ],
     },
-    vite: {
-      framework: "Vite + Wagmi",
-      leftCmd: "vite",
+    simd: {
+      framework: "256-Bit AVX2 Vectorization",
+      leftCmd: "sequential-evm --threads=8",
       leftOutput: [
-        { text: "VITE v6.0.0 ready in 420 ms", type: "info" },
-        { text: "➜ Local: http://localhost:5173/", type: "info" },
-        { text: "⚠ Forked state desynchronization detected", type: "warn" },
-        { text: "⚠ Mock wallet signer dropped nonce sequence", type: "error" },
+        { text: "Sequential EVM opcode loop across 8 OS threads...", type: "info" },
+        { text: "⚠ OS thread synchronization lock contention", type: "warn" },
+        { text: "⚠ Cache line invalidations on shared state", type: "error" },
+        { text: "Throughput ceiling: 65,000 exec/sec", type: "warn" },
       ],
-      rightCmd: "roche vite --sync-state",
+      rightCmd: "roche fuzz --vectorize-avx2",
       rightOutput: [
-        { text: "✦ Zero-Latency local anvil state mirror locked", type: "success" },
-        { text: "✦ Deterministic EIP-712 auto-signing engine active", type: "success" },
-        { text: "✦ Replay & edit timeline enabled on port 5173", type: "highlight" },
+        { text: "✦ 8 EVM state transitions per AVX2 @Vector(8, f32) register", type: "success" },
+        { text: "✦ 64-byte hardware cache line alignment", type: "success" },
+        { text: "✦ 0 Locks, 0 Mutexes, Lock-free ring buffer", type: "success" },
+        { text: "✦ Throughput: 1,840,000 exec/sec", type: "highlight" },
       ],
     },
     hardhat: {
-      framework: "Hardhat / Node",
+      framework: "Hardhat / Node.js Engine",
       leftCmd: "npx hardhat test",
       leftOutput: [
         { text: "Compiling 18 Solidity files with solc 0.8.24...", type: "info" },
-        { text: "Generating typings for TypeScript...", type: "info" },
-        { text: "⚠ V8 garbage collector pause: 140ms", type: "warn" },
-        { text: "⚠ Stack too deep error during symbolic simulation", type: "error" },
+        { text: "Generating TypeScript bindings...", type: "info" },
+        { text: "⚠ V8 JavaScript garbage collector pause: 140ms", type: "warn" },
+        { text: "⚠ Out of memory crash on 500,000 state permutations", type: "error" },
       ],
-      rightCmd: "roche hardhat test",
+      rightCmd: "roche test --native-u256",
       rightOutput: [
-        { text: "✦ Native U256 stack machine bypasses V8 overhead", type: "success" },
-        { text: "✦ McCarthy storage rollback ring buffer: O(1) resets", type: "success" },
+        { text: "✦ Pure Zig native U256 stack machine", type: "success" },
+        { text: "✦ O(1) McCarthy rollback journal ring resets", type: "success" },
         { text: "✦ 100% Green test suite in 18.2ms", type: "highlight" },
       ],
     },
@@ -83,30 +83,30 @@ export default function ComparisonSection() {
   const current = tabData[activeTab];
 
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.05]">
+    <section id="benchmarks" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-zinc-900 bg-black">
       {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-mono uppercase tracking-widest mb-4">
-          <Zap className="w-3 h-3" />
-          The Roche Difference
+      <div className="max-w-3xl mb-12">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 text-xs font-mono uppercase tracking-widest mb-4">
+          <Zap className="w-3.5 h-3.5" />
+          Hardware & Invariant Benchmarks
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-4">
           Bare Silicon vs. Legacy Overhead
         </h2>
-        <p className="text-zinc-400 text-base sm:text-lg">
-          Zero garbage collection. 0 Bytes dynamic heap allocation. Watch your invariant tests and local dev servers run at the physical speed of the CPU memory bus.
+        <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+          Zero garbage collection. 0 Bytes dynamic heap allocation. Watch your invariant tests and formal proofs execute at the physical memory bus clock speed.
         </p>
 
         {/* Framework Selector Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
-          {(["foundry", "next", "vite", "hardhat"] as const).map((tab) => (
+        <div className="flex flex-wrap items-center gap-2 mt-8">
+          {(["foundry", "smt", "simd", "hardhat"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-mono font-medium transition-all ${
+              className={`px-3.5 py-1.5 rounded text-xs font-mono transition-all ${
                 activeTab === tab
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_15px_rgba(34,197,94,0.15)]"
-                  : "bg-white/[0.03] text-zinc-400 border border-white/[0.06] hover:bg-white/[0.06] hover:text-white"
+                  ? "bg-zinc-900 text-white border border-zinc-700 font-semibold"
+                  : "bg-black text-zinc-500 border border-zinc-900 hover:border-zinc-800 hover:text-zinc-300"
               }`}
             >
               {tabData[tab].framework}
@@ -118,31 +118,73 @@ export default function ComparisonSection() {
       {/* Side-by-Side Terminals */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Legacy Terminal */}
-        <div className="rounded-2xl border border-red-500/20 bg-zinc-950/80 backdrop-blur-md overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-black/40">
+        <div className="rounded border border-zinc-800 bg-zinc-950 overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-900 bg-black">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
-              <span className="ml-2 text-xs font-mono text-zinc-400">Without Roche ({current.framework})</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="ml-2 text-xs font-mono text-zinc-500">Legacy Toolchain ({current.framework})</span>
             </div>
-            <span className="text-[11px] font-mono text-red-400/80 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
-              Legacy Toolchain
+            <span className="text-[10px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+              V8 / Rust Heap
             </span>
           </div>
 
-          <div className="p-5 font-mono text-xs sm:text-sm flex-1 space-y-2.5 bg-black/60">
-            <div className="text-zinc-500 pb-2 border-b border-white/[0.04] flex items-center gap-2">
-              <span className="text-red-400">$</span> {current.leftCmd}
+          <div className="p-4 font-mono text-xs flex-1 space-y-2 bg-black text-zinc-400">
+            <div className="text-zinc-500 pb-2 border-b border-zinc-900 flex items-center gap-2">
+              <span className="text-zinc-400">$</span> {current.leftCmd}
             </div>
             {current.leftOutput.map((line, i) => (
               <div
                 key={i}
                 className={`leading-relaxed ${
                   line.type === "error"
-                    ? "text-red-400 font-semibold"
+                    ? "text-zinc-300 font-medium"
                     : line.type === "warn"
-                    ? "text-amber-400/90"
+                    ? "text-zinc-400"
+                    : "text-zinc-500"
+                }`}
+              >
+                {line.text}
+              </div>
+            ))}
+          </div>
+
+          <div className="px-4 py-2.5 border-t border-zinc-900 bg-zinc-950 flex items-center justify-between text-xs font-mono text-zinc-400">
+            <span className="flex items-center gap-1.5">
+              <XCircle className="w-3.5 h-3.5" /> High CPU Latency & GC Stalls
+            </span>
+            <span className="text-zinc-600">Interpreted Overhead</span>
+          </div>
+        </div>
+
+        {/* Right: Charles's Roche Terminal */}
+        <div className="rounded border border-zinc-800 bg-zinc-950 overflow-hidden flex flex-col shadow-2xl">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-900 bg-black">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-white" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="ml-2 text-xs font-mono text-white font-bold">Charles / Roche (Bare Silicon)</span>
+            </div>
+            <span className="text-[10px] font-mono text-white bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+              AVX2 / Zero-Heap
+            </span>
+          </div>
+
+          <div className="p-4 font-mono text-xs flex-1 space-y-2 bg-black text-zinc-300">
+            <div className="text-zinc-400 pb-2 border-b border-zinc-900 flex items-center gap-2">
+              <span className="text-white">$</span> {current.rightCmd}
+            </div>
+            {current.rightOutput.map((line, i) => (
+              <div
+                key={i}
+                className={`leading-relaxed ${
+                  line.type === "highlight"
+                    ? "text-white font-bold bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800"
+                    : line.type === "success"
+                    ? "text-zinc-200"
                     : "text-zinc-400"
                 }`}
               >
@@ -151,53 +193,11 @@ export default function ComparisonSection() {
             ))}
           </div>
 
-          <div className="px-5 py-3 border-t border-white/[0.06] bg-red-950/20 flex items-center justify-between text-xs font-mono text-red-400">
+          <div className="px-4 py-2.5 border-t border-zinc-900 bg-zinc-950 flex items-center justify-between text-xs font-mono text-white font-bold">
             <span className="flex items-center gap-1.5">
-              <XCircle className="w-4 h-4" /> Heavy CPU Overhead & GC Pauses
+              <CheckCircle2 className="w-3.5 h-3.5" /> Sub-Millisecond Formal Proofs
             </span>
-            <span className="text-zinc-500">Node/V8/Wasm</span>
-          </div>
-        </div>
-
-        {/* Right: Roche Terminal */}
-        <div className="rounded-2xl border border-emerald-500/30 bg-zinc-950/80 backdrop-blur-md overflow-hidden flex flex-col shadow-[0_0_30px_rgba(34,197,94,0.1)]">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-emerald-500/20 bg-emerald-950/30">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/30" />
-              <span className="ml-2 text-xs font-mono text-emerald-300 font-semibold">With Roche (Bare Silicon)</span>
-            </div>
-            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">
-              AVX-512 / Zero-Heap
-            </span>
-          </div>
-
-          <div className="p-5 font-mono text-xs sm:text-sm flex-1 space-y-2.5 bg-black/60">
-            <div className="text-zinc-400 pb-2 border-b border-emerald-500/10 flex items-center gap-2">
-              <span className="text-emerald-400">$</span> {current.rightCmd}
-            </div>
-            {current.rightOutput.map((line, i) => (
-              <div
-                key={i}
-                className={`leading-relaxed ${
-                  line.type === "highlight"
-                    ? "text-emerald-300 font-bold bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20"
-                    : line.type === "success"
-                    ? "text-emerald-400"
-                    : "text-zinc-300"
-                }`}
-              >
-                {line.text}
-              </div>
-            ))}
-          </div>
-
-          <div className="px-5 py-3 border-t border-emerald-500/20 bg-emerald-950/40 flex items-center justify-between text-xs font-mono text-emerald-300">
-            <span className="flex items-center gap-1.5 font-semibold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Sub-Millisecond Formal Invariant Proofs
-            </span>
-            <span className="text-emerald-400/80 font-bold">1920x Speedup</span>
+            <span className="text-zinc-400 font-mono">1920x Speedup</span>
           </div>
         </div>
       </div>

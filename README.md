@@ -1,6 +1,9 @@
-# Volta
+# Roche
 
-**Built by Charles, a 15-year-old systems architect.** Production-ready, bare-silicon EVM verification engine.  
+**Built by Charles, a 15-year-old systems architect.**
+
+Zero-allocation, bare-silicon EVM invariant verification engine.  
+Finds the precise **Roche Limit** of DeFi protocols before attackers do.  
 Part of a broader portfolio of production infrastructure, cryptanalytic engines, and formal verification research. See [Systems Architecture Portfolio](./PORTFOLIO.md) for related work.  
 **Status: Independently verified production-grade.** 29/29 tests passing. 0 memory leaks. Sub-microsecond execution. Ready for institutional deployment.
 
@@ -9,7 +12,7 @@ Part of a broader portfolio of production infrastructure, cryptanalytic engines,
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zig: 0.16.0](https://img.shields.io/badge/Zig-0.16.0-orange.svg)](https://ziglang.org)
 [![Tests: 29/29 Passing](https://img.shields.io/badge/Tests-29%2F29%20Passing-brightgreen.svg)](src/main.zig)
-[![Crates.io: volta-rs](https://img.shields.io/badge/crates.io-volta--rs%20v0.2.0-orange.svg)](crates/volta-rs)
+[![Crates.io: roche-rs](https://img.shields.io/badge/crates.io-roche--rs%20v0.2.0-orange.svg)](crates/roche-rs)
 [![Dynamic Allocation: 0 Bytes](https://img.shields.io/badge/Heap%20Allocations-0%20Bytes-success.svg)](#performance--benchmarks)
 [![EEST Compliance: Cancun Ready](https://img.shields.io/badge/EEST%20Harness-Active-brightgreen.svg)](docs/SPEC_COMPLIANCE_AUDIT.md)
 [![Differential Testing: revm](https://img.shields.io/badge/Differential%20Harness-Active-brightgreen.svg)](src/differential_engine.zig)
@@ -23,7 +26,7 @@ Part of a broader portfolio of production infrastructure, cryptanalytic engines,
 - **Phase 2 (Differential Testing vs. revm):** ✅ COMPLETE — [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
 - **Phase 3 (Exploit Corpus Expansion):** ✅ COMPLETE — [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped; **13 protocol exploit reproductions verified in code**.
 - **Phase 4 & 5 (Performance & Audit Freeze):** ✅ COMPLETE — Invariant evaluation benchmarked at physical floor (150–350ns), 0 dynamic allocations on hot paths.
-- **Phase 6 (C-ABI FFI & Rust Bindings):** ✅ COMPLETE — [C-ABI](src/c_api.zig) & [`crates/volta-rs`](crates/volta-rs) ready for native Foundry plugin integration.
+- **Phase 6 (C-ABI FFI & Rust Bindings):** ✅ COMPLETE — [C-ABI](src/c_api.zig) & [`crates/roche-rs`](crates/roche-rs) ready for native Foundry plugin integration.
 
 ---
 
@@ -84,38 +87,38 @@ All benchmarks are measured natively on bare silicon with zero heap allocations:
  
 ```bash
 # 1. Clone repository
-git clone https://github.com/creatorofaurad/volta.git
-cd volta
+git clone https://github.com/creatorofaurad/roche.git
+cd roche
 
 # 2. Build optimized native release
-zig build -Doptimize=ReleaseFast
+zig build --release=fast
 
 # 3. Execute full verification suite (29/29 Suites)
 zig test src/main.zig
 
 # 4. Run native silicon performance benchmark
-./zig-out/bin/volta benchmark
+./zig-out/bin/roche benchmark
 ```
 
 ---
 
-## Rust & Foundry Integration (`volta-rs`)
+## Rust & Foundry Integration (`roche-rs`)
 
-Add `volta-rs` to your `Cargo.toml`:
+Add `roche-rs` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-volta-rs = { path = "crates/volta-rs" } # or "0.2.0"
+roche-rs = { path = "crates/roche-rs" } # or "0.2.0"
 ```
 
 ```rust
-use volta_rs::{Volta, CallbackType};
+use roche_rs::{Roche, CallbackType};
 
 // 1. Dynamic Trace Minimization
-let res = Volta::minimize_trace(&read_slots, &write_slots, failing_step);
+let res = Roche::minimize_trace(&read_slots, &write_slots, failing_step);
 
 // 2. Synthesize Runnable Foundry PoC
-let poc = Volta::synthesize_poc(
+let poc = Roche::synthesize_poc(
     "EulerVaultExploit",
     "6000F16103E860005500",
     "verifySolvency",
@@ -128,14 +131,14 @@ let poc = Volta::synthesize_poc(
 ## Citation & License
 
 ```bibtex
-@software{volta2026,
-  author = {Volta Contributors},
-  title = {Volta: Zero-Allocation EVM Invariant Verification Engine and Trace Reducer},
+@software{roche2026,
+  author = {Roche Contributors},
+  title = {Roche: Zero-Allocation EVM Invariant Verification Engine and Trace Reducer},
   year = {2026},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/creatorofaurad/volta}}
+  howpublished = {\url{https://github.com/creatorofaurad/roche}}
 }
 ```
 
-Volta is licensed under the [MIT License](LICENSE).
+Roche is licensed under the [MIT License](LICENSE).

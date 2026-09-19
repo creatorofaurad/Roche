@@ -72,7 +72,7 @@ pub fn main(init: std.process.Init) !void {
     if (std.mem.eql(u8, command, "help") or std.mem.eql(u8, command, "-h") or std.mem.eql(u8, command, "--help")) {
         cli.CliHandler.printHelp();
     } else if (std.mem.eql(u8, command, "version") or std.mem.eql(u8, command, "-v") or std.mem.eql(u8, command, "--version")) {
-        std.debug.print("volta v{s} (bare-silicon x86_64 native)\n", .{VERSION});
+        std.debug.print("roche v{s} (bare-silicon x86_64 native)\n", .{VERSION});
     } else if (std.mem.eql(u8, command, "orchestrate") or std.mem.eql(u8, command, "pipeline")) {
         const target = args.next() orelse {
             std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing contract name or hex.\nUsage: volta orchestrate <name> <hex> [runs_per_thread]\n", .{});

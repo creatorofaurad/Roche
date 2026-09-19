@@ -39,13 +39,17 @@ var global_synth = foundry_synth.FoundrySynthesizer.init();
 // Exported C Functions (callconv(.c))
 // =================================================================================================
 
-/// Return current Volta engine semantic version
-pub export fn volta_c_version() [*:0]const u8 {
+/// Return current Roche engine semantic version
+pub export fn roche_c_version() [*:0]const u8 {
     return types.VERSION;
 }
 
+pub export fn volta_c_version() [*:0]const u8 {
+    return roche_c_version();
+}
+
 /// Execute bytecode in bare-silicon VM with static memory and return execution exit status
-pub export fn volta_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8 {
+pub export fn roche_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8 {
     if (bytecode_len == 0 or bytecode_len > types.MAX_BYTECODE_SIZE) return 2; // Malformed
     const code = bytecode_ptr[0..bytecode_len];
     global_vm = vm.VM.init();
@@ -53,8 +57,12 @@ pub export fn volta_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8
     return @intFromEnum(status);
 }
 
+pub export fn volta_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8 {
+    return roche_c_execute(bytecode_ptr, bytecode_len);
+}
+
 /// Run full Slither-equivalent static detector suite on bytecode
-pub export fn volta_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 {
+pub export fn roche_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 {
     if (bytecode_len == 0 or bytecode_len > types.MAX_BYTECODE_SIZE) return 0;
     const code = bytecode_ptr[0..bytecode_len];
     const graph = cfg.ControlFlowGraph.build(code);
@@ -71,8 +79,12 @@ pub export fn volta_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 
     return mask;
 }
 
+pub export fn volta_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 {
+    return roche_c_audit(bytecode_ptr, bytecode_len);
+}
+
 /// Minimize an execution trace using RAW dynamic dependency slicing and HDD bisection
-pub export fn volta_c_minimize_trace(
+pub export fn roche_c_minimize_trace(
     step_count: u32,
     read_slots: [*]const u64,
     write_slots: [*]const u64,
@@ -107,8 +119,18 @@ pub export fn volta_c_minimize_trace(
     return @truncate(sliced.len);
 }
 
+pub export fn volta_c_minimize_trace(
+    step_count: u32,
+    read_slots: [*]const u64,
+    write_slots: [*]const u64,
+    failing_step: u32,
+    out_result: *C_TraceResult,
+) u32 {
+    return roche_c_minimize_trace(step_count, read_slots, write_slots, failing_step, out_result);
+}
+
 /// Synthesize a runnable Foundry .t.sol PoC into a caller-supplied preallocated buffer
-pub export fn volta_c_synthesize_poc(
+pub export fn roche_c_synthesize_poc(
     test_name_ptr: [*]const u8,
     test_name_len: usize,
     target_hex_ptr: [*]const u8,
@@ -149,6 +171,30 @@ pub export fn volta_c_synthesize_poc(
     if (poc.len > out_buf_max_len) return 0;
     @memcpy(out_buf[0..poc.len], poc);
     return poc.len;
+}
+
+pub export fn volta_c_synthesize_poc(
+    test_name_ptr: [*]const u8,
+    test_name_len: usize,
+    target_hex_ptr: [*]const u8,
+    target_hex_len: usize,
+    inv_name_ptr: [*]const u8,
+    inv_name_len: usize,
+    callback_type: u8,
+    out_buf: [*]u8,
+    out_buf_max_len: usize,
+) usize {
+    return roche_c_synthesize_poc(
+        test_name_ptr,
+        test_name_len,
+        target_hex_ptr,
+        target_hex_len,
+        inv_name_ptr,
+        inv_name_len,
+        callback_type,
+        out_buf,
+        out_buf_max_len,
+    );
 }
 
 // =================================================================================================

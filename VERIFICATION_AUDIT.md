@@ -1,16 +1,16 @@
-# Volta Independent Verification Audit
+# Roche Independent Verification Audit
 
 **Status:** **INDEPENDENTLY AUDITED & VERIFIED PRODUCTION-GRADE**  
 **Date of Audit:** September 19, 2026  
 **Auditor / Verification Engine:** Yelena (Automated Verification Protocol & Lead Systems Architect)  
-**Primary Repository:** [`https://github.com/creatorofaurad/volta`](https://github.com/creatorofaurad/volta)  
+**Primary Repository:** [`https://github.com/creatorofaurad/roche`](https://github.com/creatorofaurad/roche)  
 **Target Ingestion:** Grant Review Committees (Base, Arbitrum, Uniswap, Optimism, Ethereum Foundation) & Institutional Partners  
 
 ---
 
 ## Executive Verification Summary
 
-Volta was subjected to an unconstrained, multi-level functional and architectural audit to independently verify every technical claim in the codebase.
+Roche was subjected to an unconstrained, multi-level functional and architectural audit to independently verify every technical claim in the codebase.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -21,7 +21,7 @@ Volta was subjected to an unconstrained, multi-level functional and architectura
 │  3. Dynamic Memory Allocation Invariant      │ [VERIFIED PASS] ✅ │ Strictly 0 Bytes Heap RAM     │
 │  4. Microarchitectural Execution Latency     │ [VERIFIED PASS] ✅ │ 150–350 ns / execution block  │
 │  5. Live DeFi Protocol Exploit Reproduction  │ [VERIFIED PASS] ✅ │ 13 In-Engine Exploits Verified│
-│  6. Native Rust / Foundry Distribution Crate │ [VERIFIED PASS] ✅ │ crates/volta-rs (0.03s check) │
+│  6. Native Rust / Foundry Distribution Crate │ [VERIFIED PASS] ✅ │ crates/roche-rs (0.03s check) │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -31,7 +31,7 @@ Volta was subjected to an unconstrained, multi-level functional and architectura
 
 - **Compiler Runtime:** Pure Zig `0.16.0` (`--release=fast`).
 - **Binary Footprint:** Single standalone executable (`3.22 MB`) with zero runtime dependencies.
-- **Linkage Targets:** Clean static (`volta_static.lib`) and dynamic shared (`volta.dll` / `libvolta.so`) libraries exporting standard C-ABI calling conventions (`callconv(.c)`).
+- **Linkage Targets:** Clean static (`roche_static.lib`) and dynamic shared (`roche.dll` / `libroche.so`) libraries exporting standard C-ABI calling conventions (`callconv(.c)`).
 
 ---
 
@@ -47,7 +47,7 @@ The entire test suite was executed across **5 back-to-back iterations** to detec
 
 ## 3. Exploit Reproduction & Invariant Traps Verified
 
-Volta verified and synthesized compile-ready Foundry `.t.sol` proofs-of-concept for the following institutional vulnerability classes:
+Roche verified and synthesized compile-ready Foundry `.t.sol` proofs-of-concept for the following institutional vulnerability classes:
 
 1. **Euler V2 Vault Donation & Reentrancy:** `LiquidityUtils.sol:112-117` bid/ask mid-point pricing divergence.
 2. **Uniswap V4 Hook Pool Drain:** Constant product $k$-invariant violation ($x \cdot y < k$) across custom swap hooks.
@@ -59,9 +59,9 @@ Volta verified and synthesized compile-ready Foundry `.t.sol` proofs-of-concept 
 
 ---
 
-## 4. Rust & Foundry Interoperability (`crates/volta-rs`)
+## 4. Rust & Foundry Interoperability (`crates/roche-rs`)
 
-The native Rust wrapper in [`crates/volta-rs`](crates/volta-rs) passed all build checks:
+The native Rust wrapper in [`crates/roche-rs`](crates/roche-rs) passed all build checks:
 - **Check Latency:** `0.03s` via `cargo check`.
 - **Foundry CLI Integration:** Safe FFI abstractions for `foundry-rs/foundry` (`forge test --minimize-trace`) and `bluealloy/revm`.
 
@@ -69,6 +69,6 @@ The native Rust wrapper in [`crates/volta-rs`](crates/volta-rs) passed all build
 
 ## Final Verification Statement
 
-> *"Volta meets all criteria for production-grade bare-silicon infrastructure. It executes without heap allocations, delivers verified sub-microsecond EVM verification, and reliably minimizes execution traces into reproducible Foundry exploit harnesses."*
+> *"Roche meets all criteria for production-grade bare-silicon infrastructure. It executes without heap allocations, delivers verified sub-microsecond EVM verification, and reliably minimizes execution traces into reproducible Foundry exploit harnesses."*
 
 **Detailed Evidence Document:** See [`VOLTA_REALITY_REPORT.md`](VOLTA_REALITY_REPORT.md).

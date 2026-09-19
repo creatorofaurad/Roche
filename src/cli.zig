@@ -279,8 +279,8 @@ pub const CliHandler = struct {
     pub fn printHelp() void {
         std.debug.print(
             \\
-            \\  \x1b[1;32mVOLTA :: The Bare-Silicon EVM Security & Invariant Suite\x1b[0m
-            \\  \x1b[90mUsage: volta <COMMAND> [OPTIONS] [TARGET]\x1b[0m
+            \\  \x1b[1;32mROCHE :: The Bare-Silicon EVM Security & Invariant Suite\x1b[0m
+            \\  \x1b[90mUsage: roche <COMMAND> [OPTIONS] [TARGET]\x1b[0m
             \\
             \\  \x1b[1mCOMMANDS:\x1b[0m
             \\    \x1b[36maudit\x1b[0m <hex>             Run 22-detector static CFG taint analysis
@@ -292,11 +292,11 @@ pub const CliHandler = struct {
             \\    \x1b[36mhelp\x1b[0m                    Display this help message
             \\
             \\  \x1b[1mEXAMPLES:\x1b[0m
-            \\    volta audit 0x6000F16103E860005500
-            \\    volta fuzz 0x6000F160005500 --runs 50000
-            \\    volta synth 0x6000F16103E860005500
-            \\    volta gauntlet
-            \\    volta benchmark
+            \\    roche audit 0x6000F16103E860005500
+            \\    roche fuzz 0x6000F160005500 --runs 50000
+            \\    roche synth 0x6000F16103E860005500
+            \\    roche gauntlet
+            \\    roche benchmark
             \\
         , .{});
     }

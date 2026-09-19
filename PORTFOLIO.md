@@ -6,7 +6,7 @@
 ---
 
 ## 1. Production EVM & Security Infrastructure
-- **[Volta](https://github.com/creatorofaurad/volta)** — Zero-allocation, bare-silicon EVM stateful verification and dynamic trace reduction engine. Passing 29/29 test suites, verified 0 bytes heap allocations, sub-microsecond execution, with native `crates/volta-rs` Rust bindings and Foundry PoC synthesis.
+- **[Roche](https://github.com/creatorofaurad/roche)** — Zero-allocation, bare-silicon EVM stateful verification and dynamic trace reduction engine. Finds the precise Roche Limit of DeFi protocols before attackers do. Passing 29/29 test suites, verified 0 bytes heap allocations, sub-microsecond execution, with native `crates/roche-rs` Rust bindings and Foundry PoC synthesis.
 
 ## 2. Cryptanalysis & Mathematical Complexity
 - **[1M](https://github.com/creatorofaurad/1M)** — Fundamental theoretical research on unconditional Boolean circuit size lower bounds via 2-dimensional LSV Ramanujan Complexes, $\varepsilon$-coboundary expansion, and non-linear Boolean Jacobian matrix rigidity over $\mathbb{F}_2$.

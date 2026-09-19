@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const exe = b.addExecutable(.{
-        .name = "volta",
+        .name = "roche",
         .root_module = exe_mod,
     });
     exe.stack_size = 16 * 1024 * 1024; // 16MB Stack allocation
@@ -22,7 +22,7 @@ pub fn build(b: *std.Build) void {
 
     // C-ABI FFI Static Library target for Rust / Foundry linking
     const lib_static = b.addLibrary(.{
-        .name = "volta_static",
+        .name = "roche_static",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/c_api.zig"),
             .target = target,
@@ -34,7 +34,7 @@ pub fn build(b: *std.Build) void {
 
     // C-ABI FFI Dynamic Shared Library target
     const lib_shared = b.addLibrary(.{
-        .name = "volta",
+        .name = "roche",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/c_api.zig"),
             .target = target,
@@ -50,7 +50,7 @@ pub fn build(b: *std.Build) void {
         run_cmd.addArgs(args);
     }
 
-    const run_step = b.step("run", "Run the volta CLI");
+    const run_step = b.step("run", "Run the roche CLI");
     run_step.dependOn(&run_cmd.step);
 
     const unit_tests = b.addTest(.{
@@ -58,6 +58,6 @@ pub fn build(b: *std.Build) void {
     });
 
     const run_unit_tests = b.addRunArtifact(unit_tests);
-    const test_step = b.step("test", "Run volta unit tests");
+    const test_step = b.step("test", "Run roche unit tests");
     test_step.dependOn(&run_unit_tests.step);
 }

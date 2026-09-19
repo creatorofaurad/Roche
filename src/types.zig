@@ -1,4 +1,4 @@
-//! volta: Core Primitives & EVM Type Definitions
+//! roche: Core Primitives & EVM Type Definitions
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");

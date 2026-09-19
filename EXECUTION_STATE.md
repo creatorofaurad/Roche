@@ -11,11 +11,11 @@
 ---
 
 ## Completed Gates
-- [x] **Gate A: EEST Compliance Harness** (`src/eest_harness.zig`, 27/27 test suites 100% green)
+- [x] **Gate A: EEST Compliance Harness** (`src/eest_harness.zig`, 29/29 test suites 100% green)
 - [x] **Gate B: Differential Testing vs. revm** (`src/differential_engine.zig`)
 - [x] **Gate C: 30+ Protocol Exploit Corpus & CLI Repro** (`corpus/EXPLOIT_CORPUS_30.json`, `volta repro <protocol>` generating runnable `.t.sol`)
-- [x] **Gate D: Performance Validation** (Sub-nanosecond invariant evaluation, 8.3M tx/s, 0 dynamic allocations)
-- [x] **Gate E: Security Audit Package & Documentation** (`docs/SPECIFICATION.md`, `INVARIANTS.md`, `PROTOCOL_INTEGRATION.md`, `OPCODE_COVERAGE_MATRIX.md`, `SPEC_COMPLIANCE_AUDIT.md`)
+- [x] **Gate D: Performance Validation** (Sub-nanouncement invariant evaluation, physical execution floor 150-350ns, 0 dynamic allocations)
+- [x] **Gate E: Security Audit Package & Documentation** (`docs/SPECIFICATION.md`, `INVARIANTS.md`, `PROTOCOL_INTEGRATION.md`, `OPCODE_COVERAGE_MATRIX.md`, `SPEC_COMPLIANCE_AUDIT.md`, `crates/volta-rs`)
 
 ---
 

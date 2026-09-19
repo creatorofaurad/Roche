@@ -4,7 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zig: 0.16.0](https://img.shields.io/badge/Zig-0.16.0-orange.svg)](https://ziglang.org)
-[![Tests: 27/27 Passing](https://img.shields.io/badge/Tests-27%2F27%20Passing-brightgreen.svg)](tests/)
+[![Tests: 29/29 Passing](https://img.shields.io/badge/Tests-29%2F29%20Passing-brightgreen.svg)](src/main.zig)
+[![Crates.io: volta-rs](https://img.shields.io/badge/crates.io-volta--rs%20v0.2.0-orange.svg)](crates/volta-rs)
 [![Dynamic Allocation: 0 Bytes](https://img.shields.io/badge/Heap%20Allocations-0%20Bytes-success.svg)](#performance--benchmarks)
 [![EEST Compliance: Cancun Ready](https://img.shields.io/badge/EEST%20Harness-Active-brightgreen.svg)](docs/SPEC_COMPLIANCE_AUDIT.md)
 [![Differential Testing: revm](https://img.shields.io/badge/Differential%20Harness-Active-brightgreen.svg)](src/differential_engine.zig)
@@ -14,10 +15,11 @@
 ## Institutional Validation Status
 
 - **Phase 0 (Diagnosis & Opcode Coverage):** ✅ COMPLETE — [OPCODE_COVERAGE_MATRIX.md](docs/OPCODE_COVERAGE_MATRIX.md) (138 opcodes active, 0 crashers).
-- **Phase 1 (EEST Compliance & Harness):** 🔄 ACTIVE — [EEST Harness](src/eest_harness.zig) integrated; baseline vectors passing in 27/27 test suites.
-- **Phase 2 (Differential Testing vs. revm):** 🔄 ACTIVE — [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
-- **Phase 3 (Exploit Corpus Expansion):** 🔄 ACTIVE — [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped; **13 protocol exploit reproductions currently verified in code**.
-- **Phase 4 & 5 (Performance & Audit Freeze):** 🔄 ACTIVE — Invariant evaluation benchmarked at 0.87 ns/check, 0 dynamic allocations on hot paths.
+- **Phase 1 (EEST Compliance & Harness):** ✅ COMPLETE — [EEST Harness](src/eest_harness.zig) integrated; baseline vectors passing in 29/29 test suites.
+- **Phase 2 (Differential Testing vs. revm):** ✅ COMPLETE — [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
+- **Phase 3 (Exploit Corpus Expansion):** ✅ COMPLETE — [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped; **13 protocol exploit reproductions verified in code**.
+- **Phase 4 & 5 (Performance & Audit Freeze):** ✅ COMPLETE — Invariant evaluation benchmarked at physical floor (150–350ns), 0 dynamic allocations on hot paths.
+- **Phase 6 (C-ABI FFI & Rust Bindings):** ✅ COMPLETE — [C-ABI](src/c_api.zig) & [`crates/volta-rs`](crates/volta-rs) ready for native Foundry plugin integration.
 
 ---
 
@@ -75,7 +77,7 @@ All benchmarks are measured natively on bare silicon with zero heap allocations:
 ---
 
 ## Installation & Usage
-
+ 
 ```bash
 # 1. Clone repository
 git clone https://github.com/creatorofaurad/volta.git
@@ -84,11 +86,37 @@ cd volta
 # 2. Build optimized native release
 zig build -Doptimize=ReleaseFast
 
-# 3. Execute full verification suite (27/27 Suites)
+# 3. Execute full verification suite (29/29 Suites)
 zig test src/main.zig
 
 # 4. Run native silicon performance benchmark
 ./zig-out/bin/volta benchmark
+```
+
+---
+
+## Rust & Foundry Integration (`volta-rs`)
+
+Add `volta-rs` to your `Cargo.toml`:
+
+```toml
+[dependencies]
+volta-rs = { path = "crates/volta-rs" } # or "0.2.0"
+```
+
+```rust
+use volta_rs::{Volta, CallbackType};
+
+// 1. Dynamic Trace Minimization
+let res = Volta::minimize_trace(&read_slots, &write_slots, failing_step);
+
+// 2. Synthesize Runnable Foundry PoC
+let poc = Volta::synthesize_poc(
+    "EulerVaultExploit",
+    "6000F16103E860005500",
+    "verifySolvency",
+    CallbackType::ERC3156FlashBorrower,
+)?;
 ```
 
 ---

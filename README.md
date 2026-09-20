@@ -10,6 +10,8 @@
 [![Coverage: 29/29 Invariants](https://img.shields.io/badge/Invariants-29%2F29%20Passing-success.svg)]()
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/License-MIT%20%2F%20Apache--2.0-blue.svg)]()
 
+> **Architected & Engineered by Charles (15 y/o Lead Systems Architect) in collaboration with SOTA LLM Multi-Agent Swarms (Gemini / Claude).**
+
 **Engineered in Pure Zig 0.16.0 with Direct Win32 / POSIX Kernel Syscalls and Zero Dynamic Heap Allocation.**
 
 [**Live Interactive Terminal**](https://roche-nine.vercel.app/) &nbsp;|&nbsp; [**Formal Architecture**](ARCHITECTURE.md) &nbsp;|&nbsp; [**Institutional Grant Package**](ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md) &nbsp;|&nbsp; [**Verification Audit**](VERIFICATION_AUDIT.md)

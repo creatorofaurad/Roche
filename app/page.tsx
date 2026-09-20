@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { Terminal, Shield, ArrowUpRight, CheckCircle2, ChevronRight, Copy, Check, Cpu, Zap, Activity, FileCheck, Layers, GitBranch, Lock, BarChart3, Mail, Calendar } from "lucide-react";
@@ -49,7 +49,7 @@ export default function InstitutionalLanding() {
 
           <div className="flex items-center gap-3">
             <a
-              href="mailto:contact@roche.dev?subject=Roche%20Technical%20Call%20Request"
+              href="mailto:srijaan@proton.me?subject=Roche%20Technical%20Call%20Request"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition-colors"
             >
               <Calendar className="w-3.5 h-3.5" />
@@ -90,13 +90,13 @@ export default function InstitutionalLanding() {
 
             {/* Subheading */}
             <p className="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
-              Zero-allocation EVM formal invariant verification engine in pure Zig 0.16. Evaluates <strong className="text-white">1.84M state transitions/second</strong> and proves SMT array storage invariants in <strong className="text-white">&lt; 2.0µs</strong> with 0 memory leaks.
+              Zero-allocation EVM formal invariant verification engine in pure Zig 0.16. Evaluates <strong className="text-white">1.84M state transitions/second</strong> and proves SMT array storage invariants in <strong className="text-white">&lt; 2.0Âµs</strong> with 0 memory leaks.
             </p>
 
             {/* Remarkable Credibility Tag */}
             <div className="text-xs font-mono text-zinc-500 flex items-center gap-2">
               <span className="text-white font-semibold">Engineered by Charles (Age 15)</span>
-              <span>•</span>
+              <span>â€¢</span>
               <a href="https://github.com/creatorofaurad/Roche/blob/main/VERIFICATION_AUDIT.md" target="_blank" rel="noopener noreferrer" className="text-zinc-300 hover:text-white underline underline-offset-4">
                 29/29 Independent Verification Test Suites Passing
               </a>
@@ -105,7 +105,7 @@ export default function InstitutionalLanding() {
             {/* Two Primary CTAs */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <a
-                href="mailto:contact@roche.dev?subject=Roche%20Technical%20Pilot%20Request"
+                href="mailto:srijaan@proton.me?subject=Roche%20Technical%20Pilot%20Request"
                 className="flex items-center justify-center gap-2 px-6 py-3.5 rounded bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all shadow-lg"
               >
                 <Calendar className="w-4 h-4" />
@@ -163,8 +163,8 @@ export default function InstitutionalLanding() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-zinc-200 font-semibold">
-                    <span>• Uniswap v4 (Hook Isolation)</span>
-                    <span className="text-emerald-400">[0.8µs PROVED]</span>
+                    <span>â€¢ Uniswap v4 (Hook Isolation)</span>
+                    <span className="text-emerald-400">[0.8Âµs PROVED]</span>
                   </div>
                   <div className="text-[11px] text-zinc-500 pl-3">
                     Invariant: TSTORE transient state cross-hook memory boundary holds.
@@ -173,8 +173,8 @@ export default function InstitutionalLanding() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-zinc-200 font-semibold">
-                    <span>• Curve Stableswap (D-Invariant)</span>
-                    <span className="text-emerald-400">[1.1µs PROVED]</span>
+                    <span>â€¢ Curve Stableswap (D-Invariant)</span>
+                    <span className="text-emerald-400">[1.1Âµs PROVED]</span>
                   </div>
                   <div className="text-[11px] text-zinc-500 pl-3">
                     Invariant: Virtual price strictly monotonic under extreme imbalance.
@@ -183,8 +183,8 @@ export default function InstitutionalLanding() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-zinc-200 font-semibold">
-                    <span>• Euler V2 (EVK Sub-Vaults)</span>
-                    <span className="text-emerald-400">[1.4µs PROVED]</span>
+                    <span>â€¢ Euler V2 (EVK Sub-Vaults)</span>
+                    <span className="text-emerald-400">[1.4Âµs PROVED]</span>
                   </div>
                   <div className="text-[11px] text-zinc-500 pl-3">
                     Invariant: Bid/Ask pricing divergence bounded against oracle shock.
@@ -281,11 +281,11 @@ export default function InstitutionalLanding() {
               <Zap className="w-6 h-6 text-white mb-4" />
               <h3 className="text-base font-bold text-white mb-2">Real-Time Invariant Proofs</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Sub-2µs formal SMT array theory solver (McCarthy store-select semantics) directly proving complex storage slot taints without heuristics.
+                Sub-2Âµs formal SMT array theory solver (McCarthy store-select semantics) directly proving complex storage slot taints without heuristics.
               </p>
             </div>
             <div className="pt-4 mt-4 border-t border-zinc-900 font-mono text-[11px] text-zinc-500">
-              Latency: &lt; 2.0µs / Proof
+              Latency: &lt; 2.0Âµs / Proof
             </div>
           </div>
 
@@ -455,7 +455,7 @@ export default function InstitutionalLanding() {
               </div>
             </div>
             <a
-              href="mailto:contact@roche.dev?subject=Protocol%20Security%20Pilot%20Request"
+              href="mailto:srijaan@proton.me?subject=Protocol%20Security%20Pilot%20Request"
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition-colors"
             >
               <Calendar className="w-4 h-4" />
@@ -484,7 +484,7 @@ export default function InstitutionalLanding() {
               </div>
             </div>
             <a
-              href="mailto:contact@roche.dev?subject=Audit%20Firm%20Partnership%20Discussion"
+              href="mailto:srijaan@proton.me?subject=Audit%20Firm%20Partnership%20Discussion"
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded bg-zinc-900 border border-zinc-700 text-white font-semibold text-xs hover:bg-zinc-800 transition-colors"
             >
               <Mail className="w-4 h-4" />
@@ -502,7 +502,7 @@ export default function InstitutionalLanding() {
               </p>
               <div className="space-y-2 mb-6 text-xs font-mono text-zinc-300">
                 <div className="flex items-center gap-2">
-                  <span className="text-white font-bold">&bull;</span> Foundation Grants: $40K–$100K Scope
+                  <span className="text-white font-bold">&bull;</span> Foundation Grants: $40Kâ€“$100K Scope
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-white font-bold">&bull;</span> OP Stack & Nitro Pre-Sequencer Plugins
@@ -513,7 +513,7 @@ export default function InstitutionalLanding() {
               </div>
             </div>
             <a
-              href="mailto:contact@roche.dev?subject=Ecosystem%20Grant%20/%20Investment%20Discussion"
+              href="mailto:srijaan@proton.me?subject=Ecosystem%20Grant%20/%20Investment%20Discussion"
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded bg-zinc-900 border border-zinc-700 text-white font-semibold text-xs hover:bg-zinc-800 transition-colors"
             >
               <ArrowUpRight className="w-4 h-4" />
@@ -559,8 +559,8 @@ export default function InstitutionalLanding() {
               <tr>
                 <td className="p-4 text-white font-bold">Execution Speed</td>
                 <td className="p-4 text-emerald-400 font-bold">1.84M state transitions/s</td>
-                <td className="p-4 text-zinc-500">~2,000–10,000 execs/s</td>
-                <td className="p-4 text-zinc-300">180x–900x faster execution</td>
+                <td className="p-4 text-zinc-500">~2,000â€“10,000 execs/s</td>
+                <td className="p-4 text-zinc-300">180xâ€“900x faster execution</td>
               </tr>
               <tr>
                 <td className="p-4 text-white font-bold">SMT Proof Latency</td>
@@ -609,7 +609,7 @@ export default function InstitutionalLanding() {
               Built From Scratch. Proven Mathematically.
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-              "I built Roche because the entire Web3 security stack is bottlenecked by bloated, interpreted runtimes and probabilistic fuzzers that waste millions of compute cycles guessing inputs. By dropping straight down to bare silicon—leveraging AVX2 SIMD registers, McCarthy store-select SMT logic, and zero heap allocations—we make formal protocol verification as fast as native compilation."
+              "I built Roche because the entire Web3 security stack is bottlenecked by bloated, interpreted runtimes and probabilistic fuzzers that waste millions of compute cycles guessing inputs. By dropping straight down to bare siliconâ€”leveraging AVX2 SIMD registers, McCarthy store-select SMT logic, and zero heap allocationsâ€”we make formal protocol verification as fast as native compilation."
             </p>
             <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
               Roche is fully engineered, independently verified across 29 test suites, and open-source. The code is public, the proofs are reproducible, and the engine is ready for production deployment.
@@ -624,10 +624,10 @@ export default function InstitutionalLanding() {
                 Inspect GitHub Repository &rarr;
               </a>
               <a
-                href="mailto:contact@roche.dev"
+                href="mailto:srijaan@proton.me"
                 className="text-xs font-mono text-zinc-400 hover:text-white"
               >
-                contact@roche.dev
+                srijaan@proton.me
               </a>
             </div>
           </div>
@@ -650,8 +650,8 @@ export default function InstitutionalLanding() {
             <a href="https://github.com/creatorofaurad/Roche/blob/main/VERIFICATION_AUDIT.md" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               Verification Audit
             </a>
-            <a href="mailto:contact@roche.dev" className="hover:text-white transition-colors">
-              contact@roche.dev
+            <a href="mailto:srijaan@proton.me" className="hover:text-white transition-colors">
+              srijaan@proton.me
             </a>
           </div>
         </div>

@@ -1,19 +1,18 @@
 [package]
 name = "roche-rs"
-version = "0.2.0"
+version = "1.0.0"
 edition = "2021"
-authors = ["Charles <creatorofaurad>"]
-description = "Native Rust bindings & Foundry plugin for Roche: Bare-Silicon EVM Trace Minimizer & Roche Limit Invariant Prover"
+authors = ["Charles <srijaan@proton.me>"]
+description = "Rust FFI bindings for Roche bare-silicon EVM formal invariant verification and fuzzing engine"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/creatorofaurad/roche"
-keywords = ["ethereum", "evm", "fuzzing", "foundry", "security"]
+repository = "https://github.com/creatorofaurad/Roche"
+readme = "README.md"
+keywords = ["ethereum", "evm", "fuzzer", "formal-verification", "security"]
 categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
 
-[dependencies]
-# Zero required external dependencies for core FFI bindings
-
-[dev-dependencies]
-
 [lib]
-name = "roche_rs"
 crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+libc = "0.2"
+hex = "0.4"

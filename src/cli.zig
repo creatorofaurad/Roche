@@ -1,4 +1,4 @@
-﻿//! cli.zig: ROCHE High-Performance Command Line Interface & PoC Generator
+//! cli.zig: ROCHE High-Performance Command Line Interface & PoC Generator
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -286,6 +286,8 @@ pub const CliHandler = struct {
             \\    \x1b[36maudit\x1b[0m <hex>             Run 22-detector static CFG taint analysis
             \\    \x1b[36mfuzz\x1b[0m  <hex>             Run stateful multi-call fuzzer with AFL coverage
             \\    \x1b[36msynth\x1b[0m <hex>             Synthesize runnable Foundry .t.sol exploit PoC
+            \\    \x1b[36mfork\x1b[0m  <rpc> <addr>      Stream live mainnet fork state via Win32 JSON-RPC
+            \\    \x1b[36meest-validate\x1b[0m             Validate EVM engine against Cancun/Prague fixtures
             \\    \x1b[36mgauntlet\x1b[0m                Execute 10,000-test in-sample gauntlet & walk-forward arena
             \\    \x1b[36mbenchmark\x1b[0m               Run nanosecond-scale execution latency benchmark
             \\    \x1b[36mversion\x1b[0m                 Print version and compiler architecture
@@ -293,6 +295,8 @@ pub const CliHandler = struct {
             \\
             \\  \x1b[1mEXAMPLES:\x1b[0m
             \\    roche audit 0x6000F16103E860005500
+            \\    roche fork http://localhost:8545 0x000000000004444c5dc75cB358380D2e3dE08A90
+            \\    roche eest-validate
             \\    roche fuzz 0x6000F160005500 --runs 50000
             \\    roche synth 0x6000F16103E860005500
             \\    roche gauntlet

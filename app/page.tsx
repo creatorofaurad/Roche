@@ -2,43 +2,42 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Shield,
-  Zap,
   Terminal,
   Cpu,
   Layers,
-  CheckCircle2,
-  ExternalLink,
-  ChevronRight,
   ArrowRight,
-  BarChart3,
-  Flame,
-  Code2,
-  FileCheck,
-  Globe2,
-  Lock,
   GitBranch,
-  RefreshCw,
   Mail,
   Copy,
-  Check
+  Check,
+  Zap,
+  Activity,
+  ShieldAlert,
+  Binary,
+  Flame,
+  Radio,
+  ExternalLink
 } from "lucide-react";
 
-export default function RocheLandingPage() {
-  const [activeTab, setActiveTab] = useState<"uniswap" | "aave" | "curve">("uniswap");
-  const [benchmarkView, setBenchmarkView] = useState<"speed" | "accuracy" | "memory">("speed");
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+export default function RocheMaximalistLanding() {
   const [copiedCode, setCopiedCode] = useState(false);
+  const [selectedBenchmark, setSelectedBenchmark] = useState<"roche" | "echidna" | "slither">("roche");
+  const [counterCount, setCounterCount] = useState({
+    execs: 118764,
+    tests: 29,
+    allocs: 0,
+    exploits: 13
+  });
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // 1. Interactive Transaction Flow Canvas Background
+  // 1. Neon Supercomputer Grid Wave Animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animId: number;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
@@ -49,713 +48,546 @@ export default function RocheLandingPage() {
     };
     window.addEventListener("resize", handleResize);
 
-    // Particle / Block Flow Items
-    interface FlowNode {
-      x: number;
-      y: number;
-      speed: number;
-      size: number;
-      label: string;
-      passed: boolean;
-      pulse: number;
-    }
+    let time = 0;
 
-    const labels = ["TSTORE", "MCOPY", "0x4444...V4", "AAVE_RAY", "SLOAD", "SSTORE", "SMT_OK", "AVX2"];
-    const nodes: FlowNode[] = [];
-    const count = Math.min(24, Math.floor(width / 60));
-
-    for (let i = 0; i < count; i++) {
-      nodes.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        speed: 0.4 + Math.random() * 0.8,
-        size: 3 + Math.random() * 3,
-        label: labels[Math.floor(Math.random() * labels.length)],
-        passed: Math.random() > 0.1,
-        pulse: Math.random() * Math.PI,
-      });
-    }
-
-    const render = () => {
-      ctx.fillStyle = "rgba(8, 11, 24, 0.25)";
+    const drawGrid = () => {
+      time += 0.02;
+      ctx.fillStyle = "#120024";
       ctx.fillRect(0, 0, width, height);
 
-      // Subtle Grid
-      ctx.strokeStyle = "rgba(0, 102, 255, 0.04)";
+      const gridSize = 40;
       ctx.lineWidth = 1;
-      const gridSize = 48;
+
+      // Vertical pulsing grid lines
       for (let x = 0; x < width; x += gridSize) {
+        const intensity = Math.sin(x * 0.01 + time) * 0.5 + 0.5;
+        ctx.strokeStyle = `rgba(0, 240, 255, ${0.08 + intensity * 0.12})`;
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
+
+      // Horizontal wave grid lines
       for (let y = 0; y < height; y += gridSize) {
+        const wave = Math.sin(y * 0.02 - time * 1.5) * 4;
+        ctx.strokeStyle = `rgba(255, 0, 110, ${0.07 + Math.sin(y * 0.01 + time) * 0.08})`;
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
+        ctx.moveTo(0, y + wave);
+        ctx.lineTo(width, y + wave);
         ctx.stroke();
       }
 
-      // Render flowing execution blocks
-      nodes.forEach((node) => {
-        node.x += node.speed;
-        node.pulse += 0.03;
-        if (node.x > width + 100) {
-          node.x = -100;
-          node.y = Math.random() * height;
-        }
+      // Floating instruction packets
+      const packetCount = 8;
+      for (let i = 0; i < packetCount; i++) {
+        const px = ((i * 180 + time * 60) % (width + 100)) - 50;
+        const py = (i * 90 + Math.sin(time + i) * 30) % height;
+        ctx.fillStyle = i % 2 === 0 ? "#39ff14" : "#ffff00";
+        ctx.fillRect(px, py, 12, 3);
+      }
 
-        // Draw node line connection
-        ctx.strokeStyle = "rgba(0, 102, 255, 0.12)";
-        ctx.beginPath();
-        ctx.moveTo(node.x - 30, node.y);
-        ctx.lineTo(node.x + 30, node.y);
-        ctx.stroke();
-
-        // Node Glow
-        const glow = Math.sin(node.pulse) * 4 + 6;
-        ctx.fillStyle = node.passed ? "#0066ff" : "#00f0ff";
-        ctx.shadowBlur = glow;
-        ctx.shadowColor = "#0066ff";
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // Label
-        ctx.font = "9px 'Fira Code', monospace";
-        ctx.fillStyle = "rgba(140, 170, 255, 0.4)";
-        ctx.fillText(node.label, node.x - 15, node.y - 10);
-      });
-
-      animationFrameId = requestAnimationFrame(render);
+      animId = requestAnimationFrame(drawGrid);
     };
 
-    render();
+    drawGrid();
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animId);
     };
   }, []);
 
-  const copyQuickstart = () => {
+  const copyCommand = () => {
     navigator.clipboard.writeText("git clone https://github.com/creatorofaurad/Roche.git && cd Roche && zig build -Doptimize=ReleaseFast");
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const capabilities = [
-    {
-      id: 1,
-      title: "Zero-Allocation EVM",
-      tag: "0 BYTES DYNAMIC RAM",
-      desc: "Pre-allocated 64-byte hardware cache-aligned memory slabs. Eliminates OS malloc/free jitter entirely.",
-      code: "const stack: [1024]types.U256 align(64) = undefined;\nconst memory: [65536]u8 align(64) = undefined;\n// 0 heap allocations across 1,000,000 passes",
-    },
-    {
-      id: 2,
-      title: "118K+ Execs / Second",
-      tag: "AVX2 SIMD ACCELERATION",
-      desc: "256-bit SIMD integer vectorization (@Vector(4, u64)) evaluating carry propagation on bare silicon.",
-      code: "const v_a: @Vector(4, u64) = stack_a.limbs;\nconst v_b: @Vector(4, u64) = stack_b.limbs;\nconst sum = v_a +% v_b;",
-    },
-    {
-      id: 3,
-      title: "Foundry Test Synthesis",
-      tag: "AUTOMATED .T.SOL POCS",
-      desc: "Automatically compresses multi-step state violations into minimal, runnable Foundry regression suites.",
-      code: "roche synth --bytecode 0x608060... --out test/PoC.t.sol\nforge test --match-contract RochePoCTest -vvvv",
-    },
-    {
-      id: 4,
-      title: "McCarthy Rollback Rings",
-      tag: "O(1) REVERT JOURNALS",
-      desc: "Circular undo ring buffers provide O(1) state rollbacks for EIP-1153 transient storage and subcall frames.",
-      code: "pub fn rollback(self: *Storage, checkpoint: usize) void {\n  self.head = checkpoint;\n  self.transient_map.clear();\n}",
-    },
-    {
-      id: 5,
-      title: "100% EEST Conformance",
-      tag: "CANCUN & PRAGUE READY",
-      desc: "Ingests and mechanically passes canonical Ethereum Foundation execution-spec-tests fixtures.",
-      code: "roche eest-validate\n// [+] Cancun/Prague Fixtures: 100% Compliance",
-    },
-    {
-      id: 6,
-      title: "Live Mainnet Forking",
-      tag: "WIN32 SOCKET RPC",
-      desc: "Streams live state transitions directly from Anvil/Geth JSON-RPC nodes with zero third-party client bloat.",
-      code: "roche fork http://localhost:8545 0x0000...PoolManager\n// [✓] Invariant Status: SUCCESS",
-    },
-  ];
-
   return (
-    <div className="relative min-h-screen bg-[#080b18] text-slate-100 font-sans selection:bg-[#0066ff] selection:text-white overflow-x-hidden">
-      {/* 1. Background Canvas */}
-      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-80" />
+    <div className="relative min-h-screen bg-[#120024] text-white font-mono selection:bg-[#ff006e] selection:text-black overflow-x-hidden">
+      {/* Dynamic Background Canvas */}
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-90" />
 
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 border-b border-blue-900/30 bg-[#080b18]/85 backdrop-blur-md px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      {/* TOP SYSTEM STATUS BAR */}
+      <div className="relative z-50 bg-[#ff006e] text-black font-extrabold text-[11px] px-4 py-1.5 flex items-center justify-between uppercase tracking-widest border-b-2 border-black">
+        <div className="flex items-center gap-3">
+          <span className="bg-black text-[#39ff14] px-1.5 py-0.5 font-black">SYS_OK</span>
+          <span>ROCHE BARE-SILICON EVM KERNEL // ZIG 0.16.0 // AVX2 256-BIT SIMD</span>
+        </div>
+        <div className="hidden sm:flex items-center gap-4">
+          <span className="bg-black text-[#00f0ff] px-1.5 py-0.5">HEAP: 0 BYTES</span>
+          <span className="bg-black text-[#ffff00] px-1.5 py-0.5">THROUGHPUT: 118,764 EXEC/S</span>
+        </div>
+      </div>
+
+      {/* TOP NAVBAR */}
+      <header className="relative z-40 bg-[#1a0033]/90 border-b-4 border-[#00f0ff] px-6 py-4 backdrop-blur-md">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">
+            <div className="bg-[#00f0ff] text-black font-black text-2xl px-3 py-1 border-2 border-black shadow-[4px_4px_0px_#ff006e]">
               R
             </div>
-            <span className="font-mono font-bold text-lg tracking-wider text-white">ROCHE</span>
-            <span className="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded-full bg-blue-950/80 border border-blue-500/30 text-blue-400">
-              v1.0.0-ReleaseFast
-            </span>
+            <div>
+              <span className="text-2xl font-black tracking-tighter text-white">ROCHE</span>
+              <span className="ml-2 text-xs text-[#39ff14] font-bold">:: BARE_SILICON</span>
+            </div>
           </div>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-            <a href="#capabilities" className="hover:text-blue-400 transition-colors">Capabilities</a>
-            <a href="#roche-limit" className="hover:text-blue-400 transition-colors">The Roche Limit</a>
-            <a href="#exploits" className="hover:text-blue-400 transition-colors">Exploits</a>
-            <a href="#benchmarks" className="hover:text-blue-400 transition-colors">Benchmarks</a>
-            <a href="#integrations" className="hover:text-blue-400 transition-colors">Integrations</a>
-          </nav>
 
           <div className="flex items-center gap-4">
             <a
               href="https://github.com/creatorofaurad/Roche"
               target="_blank"
               rel="noreferrer"
-              className="text-xs font-mono px-3.5 py-2 rounded-lg border border-slate-700 hover:border-blue-500 text-slate-300 hover:text-white transition-all flex items-center gap-2"
+              className="bg-[#ff006e] hover:bg-[#ff0080] text-white font-black text-xs px-4 py-2.5 border-2 border-black shadow-[3px_3px_0px_#00f0ff] uppercase transition-transform active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1.5"
             >
-              <GitBranch className="w-3.5 h-3.5 text-blue-400" />
-              GitHub
+              <GitBranch className="w-4 h-4" />
+              GITHUB
             </a>
             <a
               href="mailto:srijaan@proton.me"
-              className="text-xs font-semibold px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md shadow-blue-600/30 flex items-center gap-1.5"
+              className="bg-[#00f0ff] hover:bg-[#39ff14] text-black font-black text-xs px-4 py-2.5 border-2 border-black shadow-[3px_3px_0px_#ff006e] uppercase transition-transform active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1.5"
             >
-              Schedule Demo
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Mail className="w-4 h-4" />
+              DEMO / AUDIT
             </a>
           </div>
         </div>
       </header>
 
-      {/* 2. Hero Section */}
-      <section className="relative z-10 pt-24 pb-20 px-6 max-w-6xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-500/40 text-blue-300 text-xs font-mono mb-8 backdrop-blur-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          Passing 29/29 Master Formal Invariant Suites on Bare Silicon
-        </div>
-
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.1]">
-          Find Your DeFi Protocol's <br />
-          <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">
-            Breaking Point.
-          </span>
-        </h1>
-
-        <p className="mt-6 text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-          Zero-allocation, bare-silicon EVM state-differential fuzzer and formal invariant verifier.
-          Engineered in pure Zig 0.16.0 with AVX2 SIMD executing <span className="text-blue-400 font-semibold">118,764 execs/sec</span>.
-        </p>
-
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="https://github.com/creatorofaurad/Roche"
-            target="_blank"
-            rel="noreferrer"
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-base shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
-          >
-            <GitBranch className="w-5 h-5" />
-            View GitHub Repository
-          </a>
-          <a
-            href="mailto:srijaan@proton.me"
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 font-medium text-base transition-all flex items-center justify-center gap-2"
-          >
-            <Mail className="w-5 h-5 text-blue-400" />
-            Request Protocol Audit
-          </a>
-        </div>
-
-        {/* Quickstart Command Bar */}
-        <div className="mt-12 max-w-2xl mx-auto p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-left font-mono text-xs text-slate-400">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <span className="text-blue-500 font-bold">$</span>
-            <span className="truncate text-slate-300">
-              git clone https://github.com/creatorofaurad/Roche.git && cd Roche && zig build -Doptimize=ReleaseFast
-            </span>
+      {/* 1. HERO SECTION (Massive Typography, No Whitespace) */}
+      <section className="relative z-10 pt-12 pb-16 px-6 max-w-[1400px] mx-auto">
+        <div className="border-4 border-[#39ff14] bg-[#1a0033]/95 p-8 sm:p-12 shadow-[12px_12px_0px_#ff006e]">
+          <div className="inline-block bg-[#ffff00] text-black font-black text-xs px-3 py-1 mb-6 uppercase tracking-wider">
+            HIGH-THROUGHPUT FORMAL INVARIANT VERIFIER &amp; STATE FUZZER
           </div>
-          <button
-            onClick={copyQuickstart}
-            className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
-          >
-            {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-          </button>
-        </div>
 
-        <div className="mt-8 text-xs text-slate-500 flex items-center justify-center gap-6">
-          <span>⚡ 0 Bytes Dynamic Memory</span>
-          <span>•</span>
-          <span>🛡️ 100% EEST Conformance</span>
-          <span>•</span>
-          <span>⚖️ Automated Foundry PoCs</span>
-        </div>
-      </section>
+          <h1 className="text-6xl sm:text-8xl md:text-9xl font-black tracking-tighter text-white leading-none">
+            ROCHE
+          </h1>
 
-      {/* 3. The Roche Limit Metaphor Section */}
-      <section id="roche-limit" className="relative z-10 py-20 px-6 border-y border-blue-900/20 bg-slate-950/40">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="text-xs font-mono uppercase tracking-widest text-blue-400 mb-2">Architectural Foundation</div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-              Every Protocol Has a <br />
-              <span className="text-blue-400">Roche Limit.</span>
-            </h2>
-            <p className="mt-4 text-slate-300 leading-relaxed text-sm sm:text-base">
-              In astrophysics, the <strong>Roche Limit</strong> is the minimum orbital distance at which a celestial body, held together only by its own gravity, disintegrates under tidal forces.
-            </p>
-            <p className="mt-3 text-slate-400 leading-relaxed text-sm sm:text-base">
-              In DeFi, multi-million dollar flash-loans, dynamic hooks, and cross-chain composability act as gravitational tidal forces. When an economic protocol reaches extreme mathematical boundaries, state corruption is inevitable.
-            </p>
-            <div className="mt-6 p-4 rounded-xl bg-blue-950/30 border border-blue-500/20 text-xs font-mono text-blue-300">
-              Roche calculates and enforces the exact boundary beyond which your protocol cannot be destabilized.
+          <div className="mt-4 text-2xl sm:text-4xl font-extrabold text-[#00f0ff] tracking-tight">
+            ZERO-ALLOCATION EVM INVARIANT ENGINE
+          </div>
+
+          <p className="mt-6 text-base sm:text-xl text-slate-200 font-medium max-w-4xl leading-relaxed">
+            Stop fuzzing at 1,000 execs/sec in bloated garbage-collected runtimes. Roche is engineered in pure Zig 0.16.0 with direct Win32/POSIX system calls, executing state transitions on bare silicon.
+          </p>
+
+          {/* COLORFUL STATS STRIP */}
+          <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-4 bg-[#ff006e] text-white border-2 border-black shadow-[4px_4px_0px_#000000]">
+              <div className="text-3xl sm:text-4xl font-black">118,764</div>
+              <div className="text-xs uppercase font-bold mt-1 text-black">EXECS / SECOND</div>
+            </div>
+            <div className="p-4 bg-[#00f0ff] text-black border-2 border-black shadow-[4px_4px_0px_#000000]">
+              <div className="text-3xl sm:text-4xl font-black">0 BYTES</div>
+              <div className="text-xs uppercase font-bold mt-1 text-slate-900">DYNAMIC HEAP RAM</div>
+            </div>
+            <div className="p-4 bg-[#39ff14] text-black border-2 border-black shadow-[4px_4px_0px_#000000]">
+              <div className="text-3xl sm:text-4xl font-black">29 / 29</div>
+              <div className="text-xs uppercase font-bold mt-1 text-slate-900">TEST SUITES PASSING</div>
+            </div>
+            <div className="p-4 bg-[#ffff00] text-black border-2 border-black shadow-[4px_4px_0px_#000000]">
+              <div className="text-3xl sm:text-4xl font-black">PRODUCTION</div>
+              <div className="text-xs uppercase font-bold mt-1 text-slate-900">BARE-SILICON CORE</div>
             </div>
           </div>
 
-          <div className="relative p-8 rounded-2xl bg-gradient-to-b from-blue-950/40 to-slate-900/80 border border-blue-500/20 flex flex-col items-center justify-center text-center">
-            <div className="relative w-48 h-48 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border border-dashed border-blue-500/30 animate-spin" style={{ animationDuration: "20s" }} />
-              <div className="absolute w-36 h-36 rounded-full border border-blue-400/20" />
-              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-400 shadow-2xl shadow-blue-500/50 flex items-center justify-center font-bold text-white text-xs font-mono">
-                CORE
-              </div>
-              <div className="absolute -right-4 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded bg-red-950/80 border border-red-500/40 text-[10px] font-mono text-red-300">
-                Tidal Boundary
-              </div>
-            </div>
-            <div className="mt-6 font-mono text-xs text-slate-400">
-              d = R · (2 · ρ_M / ρ_m)^(1/3)
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Core Capabilities (6 Interactive Cards) */}
-      <section id="capabilities" className="relative z-10 py-24 px-6 max-w-6xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="text-xs font-mono uppercase tracking-widest text-blue-400 mb-2">Silicon Architecture</div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">Six Hardened Invariants</h2>
-          <p className="mt-3 text-slate-400 text-sm">Click any card to inspect the bare-silicon implementation.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {capabilities.map((cap) => (
-            <div
-              key={cap.id}
-              onClick={() => setExpandedCard(expandedCard === cap.id ? null : cap.id)}
-              className={`cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
-                expandedCard === cap.id
-                  ? "bg-blue-950/60 border-blue-400 shadow-xl shadow-blue-500/20"
-                  : "bg-slate-900/50 hover:bg-slate-900/80 border-slate-800 hover:border-blue-500/50"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                  <Cpu className="w-5 h-5" />
-                </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950 border border-blue-500/30 text-blue-300">
-                  {cap.tag}
-                </span>
-              </div>
-
-              <h3 className="text-lg font-bold text-white">{cap.title}</h3>
-              <p className="mt-2 text-xs text-slate-400 leading-relaxed">{cap.desc}</p>
-
-              {expandedCard === cap.id ? (
-                <div className="mt-4 pt-4 border-t border-blue-500/20 font-mono text-[11px] text-blue-200 bg-slate-950/90 p-3 rounded-lg overflow-x-auto">
-                  <pre>{cap.code}</pre>
-                </div>
-              ) : (
-                <div className="mt-4 text-[11px] font-mono text-blue-400 flex items-center gap-1">
-                  Inspect Code <ChevronRight className="w-3 h-3" />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 5. Real Exploit Reproductions (Tabs) */}
-      <section id="exploits" className="relative z-10 py-20 px-6 border-y border-blue-900/20 bg-slate-950/60">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="text-xs font-mono uppercase tracking-widest text-blue-400 mb-2">Automated Witnesses</div>
-            <h2 className="text-3xl font-bold text-white">Discovered Invariant Violations</h2>
-            <p className="mt-2 text-slate-400 text-sm">Real execution state traces minimized into reproducible counter-examples.</p>
-          </div>
-
-          <div className="flex items-center justify-center gap-2 p-1.5 rounded-xl bg-slate-900 border border-slate-800 max-w-md mx-auto mb-8">
-            <button
-              onClick={() => setActiveTab("uniswap")}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "uniswap" ? "bg-blue-600 text-white shadow-md" : "text-slate-400 hover:text-white"
-              }`}
-            >
-              Uniswap V4
-            </button>
-            <button
-              onClick={() => setActiveTab("aave")}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "aave" ? "bg-blue-600 text-white shadow-md" : "text-slate-400 hover:text-white"
-              }`}
-            >
-              Aave V3
-            </button>
-            <button
-              onClick={() => setActiveTab("curve")}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "curve" ? "bg-blue-600 text-white shadow-md" : "text-slate-400 hover:text-white"
-              }`}
-            >
-              Curve StableSwap
-            </button>
-          </div>
-
-          <div className="p-8 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-2xl">
-            {activeTab === "uniswap" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs font-mono">
-                    High Severity • CWE-400
-                  </span>
-                  <span className="text-xs font-mono text-slate-500">Target: PoolManager.unlock()</span>
-                </div>
-                <h3 className="text-xl font-bold text-white">Dynamic Fee Hook Gas Siphon & Reentrancy Gap</h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  Unbounded tick iteration loops in dynamic fee hooks allow malicious callers to deplete 63/64th gas, leaving transient storage locks in an un-reset dirty state.
-                </p>
-                <div className="p-4 rounded-xl bg-slate-950 font-mono text-xs text-blue-300 border border-slate-800">
-                  <div className="text-slate-500">// Roche Causal Minimizer Witness (4 opcodes):</div>
-                  <div>SLOAD(0x04) -&gt; DUP2 -&gt; ADD -&gt; SSTORE(0x04)</div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "aave" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs font-mono">
-                    High Severity • CWE-190
-                  </span>
-                  <span className="text-xs font-mono text-slate-500">Target: IsolationModeLogic.sol</span>
-                </div>
-                <h3 className="text-xl font-bold text-white">Isolation Mode Debt Ceiling Ray Update Lag</h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  Rapid liquidation and re-borrow cycles in the same block desynchronize the reserve interest index from debt adjustments, allowing debt caps to be breached by fractional ray margins.
-                </p>
-                <div className="p-4 rounded-xl bg-slate-950 font-mono text-xs text-blue-300 border border-slate-800">
-                  <div className="text-slate-500">// Formal Invariant SMT Assertion:</div>
-                  <div>require(totalDebt &lt;= debtCeiling, "ISOLATION_MODE_EXCEEDED");</div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "curve" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs font-mono">
-                    Medium Severity • CWE-682
-                  </span>
-                  <span className="text-xs font-mono text-slate-500">Target: Curve StableSwap-NG</span>
-                </div>
-                <h3 className="text-xl font-bold text-white">Newton-Raphson Convergence Truncation</h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  Precision loss in virtual price calculation when swapping across asymmetrical decimals (18 vs 6) allows cyclical arbitrage extraction under low liquidity.
-                </p>
-                <div className="p-4 rounded-xl bg-slate-950 font-mono text-xs text-blue-300 border border-slate-800">
-                  <div className="text-slate-500">// Invariant Verification Status:</div>
-                  <div>verifyCurveVirtualPriceConservation(1_000_000, 900_000, 50) =&gt; FAILS (Delta &gt; Max)</div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Performance Benchmarks */}
-      <section id="benchmarks" className="relative z-10 py-24 px-6 max-w-5xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="text-xs font-mono uppercase tracking-widest text-blue-400 mb-2">Empirical Verification</div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">72.2x Faster Than Alternatives</h2>
-          <p className="mt-2 text-slate-400 text-sm">Measured on Intel Core i7-13700H @ 5.0 GHz with DCE Protection.</p>
-        </div>
-
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <button
-            onClick={() => setBenchmarkView("speed")}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold ${
-              benchmarkView === "speed" ? "bg-blue-600 text-white" : "bg-slate-900 text-slate-400 hover:text-white"
-            }`}
-          >
-            Throughput (Execs/s)
-          </button>
-          <button
-            onClick={() => setBenchmarkView("accuracy")}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold ${
-              benchmarkView === "accuracy" ? "bg-blue-600 text-white" : "bg-slate-900 text-slate-400 hover:text-white"
-            }`}
-          >
-            False Positives (%)
-          </button>
-          <button
-            onClick={() => setBenchmarkView("memory")}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold ${
-              benchmarkView === "memory" ? "bg-blue-600 text-white" : "bg-slate-900 text-slate-400 hover:text-white"
-            }`}
-          >
-            Dynamic RAM (MB)
-          </button>
-        </div>
-
-        <div className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-6">
-          {benchmarkView === "speed" && (
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1">
-                  <span className="font-bold text-blue-400">Roche (Pure Zig AVX2)</span>
-                  <span className="text-white font-bold">118,764 execs/sec (72.2x)</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full" style={{ width: "100%" }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                  <span>Echidna v2.2 (Haskell)</span>
-                  <span>1,420 execs/sec</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-slate-600 rounded-full" style={{ width: "1.4%" }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                  <span>Slither v0.10 (Python AST)</span>
-                  <span>Static AST (No Dynamic Fuzzing)</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-slate-700 rounded-full" style={{ width: "0.5%" }} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {benchmarkView === "accuracy" && (
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1">
-                  <span className="font-bold text-emerald-400">Roche (SMT Verified)</span>
-                  <span className="text-emerald-400 font-bold">0.0% False Positives</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: "0%" }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                  <span>Echidna v2.2</span>
-                  <span>4.2% False Positives</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-amber-500 rounded-full" style={{ width: "15%" }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                  <span>Slither v0.10</span>
-                  <span>28.5% False Positives</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-red-500 rounded-full" style={{ width: "70%" }} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {benchmarkView === "memory" && (
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1">
-                  <span className="font-bold text-blue-400">Roche (Fixed Slab)</span>
-                  <span className="text-white font-bold">0 MB Dynamic Heap</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: "0%" }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                  <span>Slither (Python Runtime)</span>
-                  <span>180 MB</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-slate-600 rounded-full" style={{ width: "33%" }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                  <span>Echidna (Haskell GC)</span>
-                  <span>540 MB</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-full bg-slate-700 rounded-full" style={{ width: "100%" }} />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 7. Technical Specs Counter Grid */}
-      <section className="relative z-10 py-16 px-6 border-y border-blue-900/20 bg-slate-950/80">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
-            <div className="text-3xl sm:text-4xl font-extrabold text-blue-400 font-mono">29 / 29</div>
-            <div className="mt-2 text-xs text-slate-400 uppercase tracking-wider font-semibold">Invariant Test Suites</div>
-          </div>
-          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
-            <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">0 Bytes</div>
-            <div className="mt-2 text-xs text-slate-400 uppercase tracking-wider font-semibold">Dynamic Heap RAM</div>
-          </div>
-          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
-            <div className="text-3xl sm:text-4xl font-extrabold text-cyan-400 font-mono">118,764</div>
-            <div className="mt-2 text-xs text-slate-400 uppercase tracking-wider font-semibold">Execs / Second</div>
-          </div>
-          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
-            <div className="text-3xl sm:text-4xl font-extrabold text-indigo-400 font-mono">100%</div>
-            <div className="mt-2 text-xs text-slate-400 uppercase tracking-wider font-semibold">EEST Conformance</div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. Integration Paths */}
-      <section id="integrations" className="relative z-10 py-24 px-6 max-w-6xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="text-xs font-mono uppercase tracking-widest text-blue-400 mb-2">Ecosystem Deployment</div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">Three Integration Tracks</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-blue-500/50 transition-all">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-6">
-                <Shield className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Protocol Security Teams</h3>
-              <p className="mt-3 text-xs text-slate-400 leading-relaxed">
-                Integrate Roche directly into your GitHub Actions CI/CD pipeline. Automatically generate Foundry `.t.sol` tests for PR invariant regressions.
-              </p>
-              <div className="mt-4 text-xs font-mono text-emerald-400">Free 3-Month Integration Pilot</div>
-            </div>
+          {/* BIG RAW CTAS */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-4">
             <a
-              href="mailto:srijaan@proton.me?subject=Protocol%20Pilot%20Request"
-              className="mt-8 w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold text-center transition-all shadow-md shadow-blue-600/20"
-            >
-              Schedule Pilot Call
-            </a>
-          </div>
-
-          <div className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-blue-500/50 transition-all">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-6">
-                <Terminal className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Audit & Formal Firms</h3>
-              <p className="mt-3 text-xs text-slate-400 leading-relaxed">
-                Accelerate audit throughput by 70x using our zero-overhead Rust C-ABI bridge (`crates/roche-rs`). White-label reporting ready.
-              </p>
-              <div className="mt-4 text-xs font-mono text-blue-400">Dedicated Rust FFI & C-ABI</div>
-            </div>
-            <a
-              href="mailto:srijaan@proton.me?subject=Audit%20Firm%20Partnership"
-              className="mt-8 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold text-center transition-all border border-slate-700"
-            >
-              Discuss Partnership
-            </a>
-          </div>
-
-          <div className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-blue-500/50 transition-all">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6">
-                <Globe2 className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Grant Committees</h3>
-              <p className="mt-3 text-xs text-slate-400 leading-relaxed">
-                Review our formal $500k Ethereum Foundation ESP Trillion Dollar Security proposal and inspect zero-malloc proofs.
-              </p>
-              <div className="mt-4 text-xs font-mono text-cyan-400">EF ESP 1TS Ready</div>
-            </div>
-            <a
-              href="https://github.com/creatorofaurad/Roche/blob/main/ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md"
+              href="https://github.com/creatorofaurad/Roche"
               target="_blank"
               rel="noreferrer"
-              className="mt-8 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold text-center transition-all border border-slate-700 flex items-center justify-center gap-1.5"
+              className="flex-1 py-5 bg-[#ff006e] hover:bg-[#ff0080] text-white font-black text-center text-lg uppercase border-3 border-black shadow-[6px_6px_0px_#00f0ff] flex items-center justify-center gap-2"
             >
-              View Grant Package <ExternalLink className="w-3.5 h-3.5" />
+              <GitBranch className="w-6 h-6" />
+              CLONE ON GITHUB (FREE / OPEN SOURCE)
             </a>
+            <a
+              href="mailto:srijaan@proton.me"
+              className="flex-1 py-5 bg-[#00f0ff] hover:bg-[#39ff14] text-black font-black text-center text-lg uppercase border-3 border-black shadow-[6px_6px_0px_#ffff00] flex items-center justify-center gap-2"
+            >
+              <Mail className="w-6 h-6" />
+              SCHEDULE PROTOCOL DEMO
+            </a>
+          </div>
+
+          {/* RAW CLI RUNNER BAR */}
+          <div className="mt-8 bg-black p-4 border-2 border-[#39ff14] flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-[#39ff14] truncate font-mono">
+              <span className="text-[#ffff00] font-bold">&gt;&gt;&gt;</span>
+              <span className="truncate">git clone https://github.com/creatorofaurad/Roche.git &amp;&amp; cd Roche &amp;&amp; zig build -Doptimize=ReleaseFast</span>
+            </div>
+            <button
+              onClick={copyCommand}
+              className="ml-4 px-3 py-1.5 bg-[#39ff14] text-black font-bold text-xs uppercase flex items-center gap-1 hover:bg-[#ffff00]"
+            >
+              {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedCode ? "COPIED" : "COPY"}
+            </button>
           </div>
         </div>
       </section>
 
-      {/* 9. Institutional Trust & Founder Footprint */}
-      <section className="relative z-10 py-20 px-6 border-t border-blue-900/20 bg-slate-950/60">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div>
-            <div className="text-xs font-mono uppercase tracking-widest text-blue-400 mb-1">Systems Architecture</div>
-            <h3 className="text-2xl font-bold text-white">Engineered by Charles (Lead Architect)</h3>
-            <p className="mt-2 text-xs text-slate-400 max-w-lg leading-relaxed">
-              15-year-old bare-silicon systems engineer focusing on zero-allocation EVM compilers, high-dimensional Ramanujan expanders, and SMT formal invariant provers.
+      {/* 2. THE ROCHE LIMIT (Full Bleed Maximalist Explainer) */}
+      <section className="relative z-10 border-y-4 border-black grid grid-cols-1 md:grid-cols-2">
+        <div className="bg-[#1a0033] p-10 sm:p-16 border-b-4 md:border-b-0 md:border-r-4 border-black">
+          <div className="inline-block bg-[#39ff14] text-black px-2 py-1 text-xs font-black mb-4">
+            CELESTIAL ASTROPHYSICS
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-black text-[#39ff14] leading-tight">
+            THE ROCHE LIMIT: TIDAL DESTRUCTION
+          </h2>
+          <p className="mt-6 text-slate-200 text-sm sm:text-base leading-relaxed">
+            In orbital mechanics, the <strong>Roche Limit</strong> is the exact radial boundary where a celestial body's internal gravitational cohesion is overwhelmed by the tidal pull of a larger mass.
+          </p>
+          <div className="mt-6 p-4 bg-black border-2 border-[#39ff14] text-xs font-mono text-[#39ff14]">
+            d = R · (2 · ρ_M / ρ_m)^(1/3) // GRAVITATIONAL DISINTEGRATION THRESHOLD
+          </div>
+        </div>
+
+        <div className="bg-[#ff006e] p-10 sm:p-16 text-black">
+          <div className="inline-block bg-black text-[#00f0ff] px-2 py-1 text-xs font-black mb-4">
+            DEFI ECONOMIC PARALLEL
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-black text-black leading-tight">
+            EVERY PROTOCOL HAS A BREAKING POINT
+          </h2>
+          <p className="mt-6 text-black font-semibold text-sm sm:text-base leading-relaxed">
+            Flash-loans, dynamic hooks, and cross-chain composability exert brutal economic tidal forces. When an invariant boundary is breached, multi-million dollar liquidity cascades disintegrate in seconds.
+          </p>
+          <div className="mt-6 p-4 bg-black text-[#00f0ff] font-mono text-xs border-2 border-black font-bold">
+            ROCHE IDENTIFIES THE EXACT INVARIANT BOUNDARY BEFORE MAINNET DEPLOYMENT.
+          </div>
+        </div>
+      </section>
+
+      {/* 3. CORE CAPABILITIES (6 Full-Width High-Impact Color Blocks) */}
+      <section className="relative z-10 border-b-4 border-black">
+        {/* Block 1: Cyan */}
+        <div className="bg-[#00f0ff] text-black p-8 sm:p-12 border-b-4 border-black flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="bg-black text-[#00f0ff] text-xs font-black px-2 py-0.5">INVARIANT 01</span>
+            <h3 className="text-3xl sm:text-5xl font-black tracking-tight mt-2">ZERO-ALLOCATION EXECUTION</h3>
+            <p className="mt-2 text-sm sm:text-base font-bold text-slate-900">
+              0 Bytes dynamic memory allocation on hot execution paths. Pre-allocated 64-byte hardware cache-aligned memory slabs eliminate OS heap malloc/free jitter entirely.
             </p>
-            <div className="mt-4 flex items-center gap-4 text-xs font-mono text-slate-400">
-              <a href="mailto:srijaan@proton.me" className="hover:text-blue-400">srijaan@proton.me</a>
-              <span>•</span>
-              <a href="https://github.com/creatorofaurad/Roche" target="_blank" rel="noreferrer" className="hover:text-blue-400">
-                github.com/creatorofaurad/Roche
-              </a>
-            </div>
           </div>
+          <div className="bg-black text-[#00f0ff] p-4 font-mono text-xs border-2 border-black w-full md:w-auto">
+            const stack: [1024]U256 align(64) = undefined;
+          </div>
+        </div>
 
-          <div className="p-4 rounded-xl bg-blue-950/40 border border-blue-500/30 text-center">
-            <div className="text-xs font-mono text-slate-400">Independent Verification</div>
-            <div className="mt-1 text-sm font-bold text-emerald-400 flex items-center justify-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" /> 100% Unconditional Pass
-            </div>
-            <div className="mt-1 text-[11px] font-mono text-slate-500">Audited by Yelena • Sept 20, 2026</div>
+        {/* Block 2: Magenta */}
+        <div className="bg-[#ff006e] text-white p-8 sm:p-12 border-b-4 border-black flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="bg-black text-[#ff006e] text-xs font-black px-2 py-0.5">INVARIANT 02</span>
+            <h3 className="text-3xl sm:text-5xl font-black tracking-tight mt-2">118K+ EXECUTIONS PER SECOND</h3>
+            <p className="mt-2 text-sm sm:text-base font-bold text-white">
+              Single-threaded Zig engine compiled with ReleaseFast and 256-bit AVX2 SIMD integer vectorization. Outperforms Python and Haskell fuzzers by 72.2x.
+            </p>
+          </div>
+          <div className="bg-black text-[#39ff14] p-4 font-mono text-xs border-2 border-black w-full md:w-auto">
+            const sum = @Vector(4, u64) +% @Vector(4, u64);
+          </div>
+        </div>
+
+        {/* Block 3: Lime Green */}
+        <div className="bg-[#39ff14] text-black p-8 sm:p-12 border-b-4 border-black flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="bg-black text-[#39ff14] text-xs font-black px-2 py-0.5">INVARIANT 03</span>
+            <h3 className="text-3xl sm:text-5xl font-black tracking-tight mt-2">AUTOMATIC EXPLOIT SYNTHESIS</h3>
+            <p className="mt-2 text-sm sm:text-base font-bold text-slate-900">
+              Generates runnable Foundry <code className="bg-black text-[#39ff14] px-1">.t.sol</code> regression tests directly from minimized execution traces with zero manual boilerplate.
+            </p>
+          </div>
+          <div className="bg-black text-[#ffff00] p-4 font-mono text-xs border-2 border-black w-full md:w-auto">
+            roche synth --name ExploitPoC --bytecode 0x...
+          </div>
+        </div>
+
+        {/* Block 4: Electric Yellow */}
+        <div className="bg-[#ffff00] text-black p-8 sm:p-12 border-b-4 border-black flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="bg-black text-[#ffff00] text-xs font-black px-2 py-0.5">INVARIANT 04</span>
+            <h3 className="text-3xl sm:text-5xl font-black tracking-tight mt-2">MCCARTHY STORAGE ROLLBACK</h3>
+            <p className="mt-2 text-sm sm:text-base font-bold text-slate-900">
+              O(1) deterministic state checkpoint and recovery journals for EIP-1153 transient storage and recursive external subcall failure isolation.
+            </p>
+          </div>
+          <div className="bg-black text-[#00f0ff] p-4 font-mono text-xs border-2 border-black w-full md:w-auto">
+            select(store(S, k, v), k) == v; // O(1) Rollback
+          </div>
+        </div>
+
+        {/* Block 5: Orange */}
+        <div className="bg-[#ff6b35] text-white p-8 sm:p-12 border-b-4 border-black flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="bg-black text-[#ff6b35] text-xs font-black px-2 py-0.5">INVARIANT 05</span>
+            <h3 className="text-3xl sm:text-5xl font-black tracking-tight mt-2">EEST CANCUN/PRAGUE COMPLIANCE</h3>
+            <p className="mt-2 text-sm sm:text-base font-bold text-white">
+              100% verified against canonical Ethereum Foundation execution-spec-tests fixtures (MCOPY, TSTORE/TLOAD, SELFDESTRUCT, RJUMP).
+            </p>
+          </div>
+          <div className="bg-black text-[#39ff14] p-4 font-mono text-xs border-2 border-black w-full md:w-auto">
+            roche eest-validate // 100.0% CONFORMANCE
+          </div>
+        </div>
+
+        {/* Block 6: Deep Red */}
+        <div className="bg-[#ff2d00] text-white p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="bg-black text-[#ff2d00] text-xs font-black px-2 py-0.5">INVARIANT 06</span>
+            <h3 className="text-3xl sm:text-5xl font-black tracking-tight mt-2">LIVE WIN32 SOCKET RPC STREAMING</h3>
+            <p className="mt-2 text-sm sm:text-base font-bold text-white">
+              Direct TCP socket connections to local Anvil and mainnet fork nodes using native kernel handles with zero third-party HTTP client libraries.
+            </p>
+          </div>
+          <div className="bg-black text-[#00f0ff] p-4 font-mono text-xs border-2 border-black w-full md:w-auto">
+            roche fork http://localhost:8545 0x...V4Pool
           </div>
         </div>
       </section>
 
-      {/* 10. Footer */}
-      <footer className="relative z-10 border-t border-slate-800 bg-[#080b18] px-6 py-8 text-center text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>© 2026 Roche Invariant Infrastructure. MIT OR Apache-2.0 License.</div>
-          <div className="flex items-center gap-6">
-            <a href="https://github.com/creatorofaurad/Roche" target="_blank" rel="noreferrer" className="hover:text-blue-400">
-              GitHub
+      {/* 4. REAL EXPLOITS (Maximalist 3-Card Visual Showcase) */}
+      <section className="relative z-10 py-16 px-6 max-w-[1400px] mx-auto">
+        <div className="mb-10">
+          <div className="inline-block bg-[#00f0ff] text-black font-black text-xs px-2 py-1 uppercase">
+            REPRODUCED PROTOCOL ANOMALIES
+          </div>
+          <h2 className="text-4xl sm:text-6xl font-black text-white mt-2">REAL EXPLOIT REPRODUCTIONS</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1: Cyan Uniswap */}
+          <div className="p-8 bg-[#1a0033] border-4 border-[#00f0ff] shadow-[8px_8px_0px_#00f0ff] flex flex-col justify-between">
+            <div>
+              <div className="text-xs font-black text-[#00f0ff] uppercase tracking-wider">UNISWAP V4 HOOK LEAK</div>
+              <h3 className="text-2xl font-black text-white mt-2">TRANSIENT STORAGE GAS SIPHON</h3>
+              <p className="mt-4 text-xs text-slate-300 leading-relaxed">
+                Unbounded loop execution inside dynamic fee hooks triggers out-of-gas before clearing EIP-1153 lock slots.
+              </p>
+              <div className="mt-6 p-3 bg-black border border-[#00f0ff] text-[11px] text-[#00f0ff] font-mono">
+                MINIMIZED WITNESS (4 OPCODES):<br />
+                SLOAD -&gt; DUP2 -&gt; ADD -&gt; SSTORE
+              </div>
+            </div>
+            <a
+              href="https://github.com/creatorofaurad/Roche/blob/main/MAINNET_FORK_ANALYSIS.md"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 py-3 bg-[#ff006e] text-white font-black text-xs uppercase text-center border-2 border-black hover:bg-[#ff0080]"
+            >
+              VIEW FULL TRACE REPORT
             </a>
-            <a href="https://github.com/creatorofaurad/Roche/blob/main/VERIFICATION_AUDIT.md" target="_blank" rel="noreferrer" className="hover:text-blue-400">
-              Verification Audit
+          </div>
+
+          {/* Card 2: Magenta Aave */}
+          <div className="p-8 bg-[#1a0033] border-4 border-[#ff006e] shadow-[8px_8px_0px_#ff006e] flex flex-col justify-between">
+            <div>
+              <div className="text-xs font-black text-[#ff006e] uppercase tracking-wider">AAVE V3 ISOLATION MODE</div>
+              <h3 className="text-2xl font-black text-white mt-2">DEBT CEILING RAY OVERFLOW</h3>
+              <p className="mt-4 text-xs text-slate-300 leading-relaxed">
+                Same-block repay/re-borrow cycles desynchronize index updates, exceeding isolation debt ceilings by fractional ray amounts.
+              </p>
+              <div className="mt-6 p-3 bg-black border border-[#ff006e] text-[11px] text-[#ff006e] font-mono">
+                INVARIANT BREACH DETECTED:<br />
+                totalDebt &gt; debtCeiling (Ray lag)
+              </div>
+            </div>
+            <a
+              href="https://github.com/creatorofaurad/Roche/blob/main/AAVE_TESTNET_AUDIT_REPORT.md"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 py-3 bg-[#00f0ff] text-black font-black text-xs uppercase text-center border-2 border-black hover:bg-[#39ff14]"
+            >
+              VIEW AUDIT REPORT
             </a>
-            <a href="https://github.com/creatorofaurad/Roche/blob/main/SECURITY.md" target="_blank" rel="noreferrer" className="hover:text-blue-400">
-              Security Policy
+          </div>
+
+          {/* Card 3: Lime Curve */}
+          <div className="p-8 bg-[#1a0033] border-4 border-[#39ff14] shadow-[8px_8px_0px_#39ff14] flex flex-col justify-between">
+            <div>
+              <div className="text-xs font-black text-[#39ff14] uppercase tracking-wider">CURVE STABLESWAP-NG</div>
+              <h3 className="text-2xl font-black text-white mt-2">NEWTON-RAPHSON TRUNCATION</h3>
+              <p className="mt-4 text-xs text-slate-300 leading-relaxed">
+                Precision loss across asymmetric token decimal scaling (18 vs 6) enables continuous extraction in low-liquidity pools.
+              </p>
+              <div className="mt-6 p-3 bg-black border border-[#39ff14] text-[11px] text-[#39ff14] font-mono">
+                VIRTUAL PRICE DROP:<br />
+                Delta &gt; 0.50% Max Allowed
+              </div>
+            </div>
+            <a
+              href="https://github.com/creatorofaurad/Roche/blob/main/BALANCER_TESTNET_AUDIT_REPORT.md"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 py-3 bg-[#ffff00] text-black font-black text-xs uppercase text-center border-2 border-black hover:bg-[#ff006e] hover:text-white"
+            >
+              VIEW POOL PROOF
             </a>
-            <a href="mailto:srijaan@proton.me" className="hover:text-blue-400">
-              Contact
+          </div>
+        </div>
+      </section>
+
+      {/* 5. BENCHMARKS (Data Maximalism Matrix) */}
+      <section className="relative z-10 py-16 px-6 border-y-4 border-black bg-[#1a0033]">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="mb-8">
+            <div className="inline-block bg-[#ffff00] text-black font-black text-xs px-2 py-1 uppercase">
+              EMPIRICAL HARDWARE BENCHMARKS
+            </div>
+            <h2 className="text-4xl sm:text-6xl font-black text-white mt-2">ROCHE vs ALTERNATIVES</h2>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-4 border-black font-mono">
+              <thead className="bg-[#ff006e] text-black font-black text-xs sm:text-sm uppercase">
+                <tr>
+                  <th className="p-4 border-r-2 border-black">EVM FRAMEWORK</th>
+                  <th className="p-4 border-r-2 border-black">THROUGHPUT (EXECS/SEC)</th>
+                  <th className="p-4 border-r-2 border-black">MEMORY OVERHEAD</th>
+                  <th className="p-4 border-r-2 border-black">FALSE POSITIVES</th>
+                  <th className="p-4">INVARIANT TYPE</th>
+                </tr>
+              </thead>
+              <tbody className="bg-black text-xs sm:text-sm">
+                <tr className="border-b-2 border-slate-800 bg-[#00f0ff]/10">
+                  <td className="p-4 font-black text-[#00f0ff] border-r-2 border-slate-800">ROCHE v1.0 (Pure Zig)</td>
+                  <td className="p-4 font-black text-[#39ff14] border-r-2 border-slate-800">118,764 / sec (72.2x)</td>
+                  <td className="p-4 font-black text-[#00f0ff] border-r-2 border-slate-800">0 MB (Fixed Slab)</td>
+                  <td className="p-4 font-black text-[#39ff14] border-r-2 border-slate-800">0.0% (SMT Proved)</td>
+                  <td className="p-4 font-black text-[#ffff00]">Dynamic State + Invariant</td>
+                </tr>
+                <tr className="border-b-2 border-slate-800">
+                  <td className="p-4 text-slate-300 border-r-2 border-slate-800">Echidna v2.2 (Haskell)</td>
+                  <td className="p-4 text-slate-400 border-r-2 border-slate-800">1,420 / sec</td>
+                  <td className="p-4 text-[#ff006e] border-r-2 border-slate-800">540 MB (GC Heap)</td>
+                  <td className="p-4 text-[#ff6b35] border-r-2 border-slate-800">4.2%</td>
+                  <td className="p-4 text-slate-400">Property Fuzzing</td>
+                </tr>
+                <tr>
+                  <td className="p-4 text-slate-300 border-r-2 border-slate-800">Slither v0.10 (Python)</td>
+                  <td className="p-4 text-slate-400 border-r-2 border-slate-800">Static AST Only</td>
+                  <td className="p-4 text-[#ff006e] border-r-2 border-slate-800">180 MB (Python)</td>
+                  <td className="p-4 text-[#ff2d00] border-r-2 border-slate-800">28.5%</td>
+                  <td className="p-4 text-slate-400">Static Detectors Only</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. INTEGRATION PATHS (Maximalist Parallel Tracks) */}
+      <section className="relative z-10 border-b-4 border-black grid grid-cols-1 md:grid-cols-3">
+        {/* Track 1: Cyan */}
+        <div className="bg-[#00f0ff] text-black p-10 sm:p-14 border-b-4 md:border-b-0 md:border-r-4 border-black flex flex-col justify-between">
+          <div>
+            <span className="bg-black text-[#00f0ff] text-xs font-black px-2 py-0.5">TRACK 01</span>
+            <h3 className="text-3xl font-black mt-3">FOR PROTOCOL TEAMS</h3>
+            <ul className="mt-6 space-y-3 font-bold text-xs sm:text-sm">
+              <li>• Free 3-Month Automated Invariant CI/CD Pilot</li>
+              <li>• Automated Foundry .t.sol Exploit Synthesis</li>
+              <li>• Sub-minute PR regression checking</li>
+            </ul>
+          </div>
+          <a
+            href="mailto:srijaan@proton.me?subject=Protocol%20Pilot"
+            className="mt-8 py-4 bg-[#ff006e] text-white font-black text-center text-xs uppercase border-2 border-black hover:bg-black hover:text-[#00f0ff]"
+          >
+            SCHEDULE PILOT CALL
+          </a>
+        </div>
+
+        {/* Track 2: Magenta */}
+        <div className="bg-[#ff006e] text-white p-10 sm:p-14 border-b-4 md:border-b-0 md:border-r-4 border-black flex flex-col justify-between">
+          <div>
+            <span className="bg-black text-[#ff006e] text-xs font-black px-2 py-0.5">TRACK 02</span>
+            <h3 className="text-3xl font-black mt-3">FOR AUDIT FIRMS</h3>
+            <ul className="mt-6 space-y-3 font-bold text-xs sm:text-sm">
+              <li>• Zero-overhead Rust FFI &amp; C-ABI Bindings</li>
+              <li>• 70x faster trace minimization and triage</li>
+              <li>• Custom white-label client audit reporting</li>
+            </ul>
+          </div>
+          <a
+            href="mailto:srijaan@proton.me?subject=Audit%20Firm%20Integration"
+            className="mt-8 py-4 bg-[#00f0ff] text-black font-black text-center text-xs uppercase border-2 border-black hover:bg-black hover:text-[#ff006e]"
+          >
+            DISCUSS PARTNERSHIP
+          </a>
+        </div>
+
+        {/* Track 3: Lime */}
+        <div className="bg-[#39ff14] text-black p-10 sm:p-14 flex flex-col justify-between">
+          <div>
+            <span className="bg-black text-[#39ff14] text-xs font-black px-2 py-0.5">TRACK 03</span>
+            <h3 className="text-3xl font-black mt-3">FOR GRANTS &amp; BUILDERS</h3>
+            <ul className="mt-6 space-y-3 font-bold text-xs sm:text-sm">
+              <li>• $500K Ethereum Foundation ESP 1TS Proposal</li>
+              <li>• 100% Open Source (MIT / Apache-2.0)</li>
+              <li>• Pure Zig 0.16.0 Bare-Silicon Core</li>
+            </ul>
+          </div>
+          <a
+            href="https://github.com/creatorofaurad/Roche/blob/main/ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-8 py-4 bg-[#ffff00] text-black font-black text-center text-xs uppercase border-2 border-black hover:bg-black hover:text-[#39ff14]"
+          >
+            VIEW GRANT DOSSIER
+          </a>
+        </div>
+      </section>
+
+      {/* 7. SOCIAL PROOF & INDEPENDENT VERIFICATION */}
+      <section className="relative z-10 py-16 px-6 bg-[#1a0033] max-w-[1400px] mx-auto text-center">
+        <div className="border-4 border-[#ffff00] p-8 sm:p-12 bg-black shadow-[10px_10px_0px_#ffff00]">
+          <div className="text-xs font-black text-[#39ff14] uppercase tracking-widest">
+            INDEPENDENT SYSTEMS AUDIT CERTIFICATION
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-black text-white mt-3">
+            100% UNCONDITIONAL PASS
+          </h2>
+          <p className="mt-4 text-xs sm:text-sm text-slate-300 max-w-2xl mx-auto">
+            Audited on bare silicon by <strong>Yelena (Systems Architect)</strong> on September 20, 2026. All 29 invariant suites passed with 0 bytes dynamic heap memory leaks.
+          </p>
+
+          <div className="mt-6">
+            <a
+              href="https://github.com/creatorofaurad/Roche/blob/main/VERIFICATION_AUDIT.md"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block text-[#ffff00] font-black text-sm uppercase underline decoration-2 underline-offset-4 hover:text-[#ff006e]"
+            >
+              [READ COMPLETE VERIFICATION_AUDIT.MD ON GITHUB]
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. FOOTER / CONTACT */}
+      <footer className="relative z-10 border-t-4 border-black bg-black px-6 py-12 text-center text-xs">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-left">
+            <div className="text-xl font-black text-white">ROCHE :: BARE-SILICON EVM</div>
+            <div className="text-slate-400 mt-1 font-bold">
+              Engineered by Charles (Lead Architect, Age 15) • MIT OR Apache-2.0 License
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-6 font-bold">
+            <a href="mailto:srijaan@proton.me" className="text-[#00f0ff] hover:text-[#39ff14]">
+              srijaan@proton.me
+            </a>
+            <a href="https://github.com/creatorofaurad/Roche" target="_blank" rel="noreferrer" className="text-[#ff006e] hover:text-[#ffff00]">
+              github.com/creatorofaurad/Roche
+            </a>
+            <a href="https://github.com/creatorofaurad/Roche/blob/main/SECURITY.md" target="_blank" rel="noreferrer" className="text-[#ffff00] hover:text-white">
+              SECURITY.MD
             </a>
           </div>
         </div>

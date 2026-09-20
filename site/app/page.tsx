@@ -158,8 +158,13 @@ export default function RocheMaximalistLanding() {
       {/* 1. HERO SECTION (Massive Typography, No Whitespace) */}
       <section className="relative z-10 pt-12 pb-16 px-6 max-w-[1400px] mx-auto">
         <div className="border-4 border-[#39ff14] bg-[#1a0033]/95 p-8 sm:p-12 shadow-[12px_12px_0px_#ff006e]">
-          <div className="inline-block bg-[#ffff00] text-black font-black text-xs px-3 py-1 mb-6 uppercase tracking-wider">
-            HIGH-THROUGHPUT FORMAL INVARIANT VERIFIER &amp; STATE FUZZER
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <div className="inline-block bg-[#ffff00] text-black font-black text-xs px-3 py-1 uppercase tracking-wider border-2 border-black">
+              HIGH-THROUGHPUT FORMAL INVARIANT VERIFIER &amp; STATE FUZZER
+            </div>
+            <div className="inline-block bg-[#ff006e] text-white font-black text-xs px-3 py-1 uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_#00f0ff]">
+              BUILT BY 15-YEAR-OLD ARCHITECT + AUTONOMOUS LLM MULTI-AGENT SWARM
+            </div>
           </div>
 
           <h1 className="text-6xl sm:text-8xl md:text-9xl font-black tracking-tighter text-white leading-none">
@@ -575,7 +580,7 @@ export default function RocheMaximalistLanding() {
           <div className="text-left">
             <div className="text-xl font-black text-white">ROCHE :: BARE-SILICON EVM</div>
             <div className="text-slate-400 mt-1 font-bold">
-              Engineered by Charles (Lead Architect, Age 15) • MIT OR Apache-2.0 License
+              Engineered by Charles (Lead Systems Architect, Age 15) in synergy with SOTA LLM Multi-Agent Intelligence • MIT OR Apache-2.0
             </div>
           </div>
 

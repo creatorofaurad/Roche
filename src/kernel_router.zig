@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ROCHE SILICON KERNEL: Institutional Zero-Heap CLI & Kernel Router
 // Invariant: Zero Heap Allocation | OS-Level MMap | Zig 0.16.0
 // ============================================================================
@@ -70,13 +70,12 @@ pub fn bindInterruptHandlers() void {
     if (builtin.os.tag == .windows) {
         _ = SetConsoleCtrlHandler(win32ConsoleHandler, 1);
     } else {
+        // POSIX sigaction for Linux and macOS targets
         const posix = std.posix;
-        var act = posix.Sigaction{
-            .handler = .{ .handler = handleSigIntPosix },
-            .mask = posix.empty_sigset,
-            .flags = 0,
-        };
-        posix.sigaction(posix.SIG.INT, &act, null) catch {};
+        var act: posix.Sigaction = std.mem.zeroes(posix.Sigaction);
+        act.handler = .{ .handler = @ptrCast(&handleSigIntPosix) };
+        act.flags = 0;
+        posix.sigaction(posix.SIG.INT, &act, null);
     }
 }
 

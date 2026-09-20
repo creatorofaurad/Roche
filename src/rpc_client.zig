@@ -1,43 +1,44 @@
-//! rpc_client.zig: Bare-Silicon Win32 / POSIX JSON-RPC Client for EVM Fork State
+//! rpc_client.zig: Bare-Silicon Cross-Platform JSON-RPC Client for EVM Fork State
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
-//! Connects to Anvil/Hardhat/Geth endpoints, requests bytecode and storage slots,
-//! and parses JSON-RPC responses into pre-allocated memory slabs.
+//! Supports Win32 ws2_32 on Windows and std.posix sockets on Linux / macOS.
 
 const std = @import("std");
 const builtin = @import("builtin");
 const types = @import("types.zig");
 
-// Win32 ws2_32 extern bindings for Windows socket networking
-const AF_INET: c_int = 2;
-const SOCK_STREAM: c_int = 1;
-const IPPROTO_TCP: c_int = 6;
-const INVALID_SOCKET: usize = ~@as(usize, 0);
-const SOCKET_ERROR: c_int = -1;
+// --- Win32 ws2_32 declarations (compiled conditionally) ---
+const win32 = struct {
+    pub const AF_INET: c_int = 2;
+    pub const SOCK_STREAM: c_int = 1;
+    pub const IPPROTO_TCP: c_int = 6;
+    pub const INVALID_SOCKET: usize = ~@as(usize, 0);
+    pub const SOCKET_ERROR: c_int = -1;
 
-const WSADATA = extern struct {
-    wVersion: u16,
-    wHighVersion: u16,
-    szDescription: [257]u8,
-    szSystemStatus: [129]u8,
-    iMaxSockets: u16,
-    iMaxUdpDg: u16,
-    lpVendorInfo: ?*anyopaque,
+    pub const WSADATA = extern struct {
+        wVersion: u16,
+        wHighVersion: u16,
+        szDescription: [257]u8,
+        szSystemStatus: [129]u8,
+        iMaxSockets: u16,
+        iMaxUdpDg: u16,
+        lpVendorInfo: ?*anyopaque,
+    };
+
+    pub const sockaddr_in = extern struct {
+        sin_family: i16 = 2,
+        sin_port: u16,
+        sin_addr: u32,
+        sin_zero: [8]u8 = [_]u8{0} ** 8,
+    };
+
+    pub extern "ws2_32" fn WSAStartup(wVersionRequired: u16, lpWSAData: *WSADATA) callconv(.winapi) c_int;
+    pub extern "ws2_32" fn WSACleanup() callconv(.winapi) c_int;
+    pub extern "ws2_32" fn socket(af: c_int, socket_type: c_int, protocol: c_int) callconv(.winapi) usize;
+    pub extern "ws2_32" fn connect(s: usize, name: *const sockaddr_in, namelen: c_int) callconv(.winapi) c_int;
+    pub extern "ws2_32" fn send(s: usize, buf: [*]const u8, len: c_int, flags: c_int) callconv(.winapi) c_int;
+    pub extern "ws2_32" fn recv(s: usize, buf: [*]u8, len: c_int, flags: c_int) callconv(.winapi) c_int;
+    pub extern "ws2_32" fn closesocket(s: usize) callconv(.winapi) c_int;
 };
-
-const sockaddr_in = extern struct {
-    sin_family: i16 = 2,
-    sin_port: u16,
-    sin_addr: u32,
-    sin_zero: [8]u8 = [_]u8{0} ** 8,
-};
-
-extern "ws2_32" fn WSAStartup(wVersionRequired: u16, lpWSAData: *WSADATA) callconv(.winapi) c_int;
-extern "ws2_32" fn WSACleanup() callconv(.winapi) c_int;
-extern "ws2_32" fn socket(af: c_int, socket_type: c_int, protocol: c_int) callconv(.winapi) usize;
-extern "ws2_32" fn connect(s: usize, name: *const sockaddr_in, namelen: c_int) callconv(.winapi) c_int;
-extern "ws2_32" fn send(s: usize, buf: [*]const u8, len: c_int, flags: c_int) callconv(.winapi) c_int;
-extern "ws2_32" fn recv(s: usize, buf: [*]u8, len: c_int, flags: c_int) callconv(.winapi) c_int;
-extern "ws2_32" fn closesocket(s: usize) callconv(.winapi) c_int;
 
 pub const MAX_RPC_RESPONSE_LEN: usize = 65536;
 pub const MAX_STORAGE_SLOTS: usize = 256;
@@ -107,36 +108,33 @@ pub const RpcClient = struct {
         return byte_len;
     }
 
-    /// Fetch real contract state via Win32 raw socket JSON-RPC
+    /// Fetch real contract state via OS raw sockets (Win32 on Windows, POSIX on Linux/macOS)
     pub fn fetch_fork_state(self: *RpcClient, addr_hex: []const u8, block: u64) !ForkState {
         var state = ForkState.init([_]u8{0} ** 20, block);
 
         if (builtin.os.tag == .windows) {
-            var wsa: WSADATA = undefined;
-            if (WSAStartup(0x0202, &wsa) != 0) {
-                // Fallback to offline mock if network unavailable
+            var wsa: win32.WSADATA = undefined;
+            if (win32.WSAStartup(0x0202, &wsa) != 0) {
                 return self.mock_fetch_state(addr_hex, block);
             }
-            defer _ = WSACleanup();
+            defer _ = win32.WSACleanup();
 
-            const sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-            if (sock == INVALID_SOCKET) {
+            const sock = win32.socket(win32.AF_INET, win32.SOCK_STREAM, win32.IPPROTO_TCP);
+            if (sock == win32.INVALID_SOCKET) {
                 return self.mock_fetch_state(addr_hex, block);
             }
-            defer _ = closesocket(sock);
+            defer _ = win32.closesocket(sock);
 
-            var server_addr: sockaddr_in = .{
+            var server_addr: win32.sockaddr_in = .{
                 .sin_family = 2,
                 .sin_port = @byteSwap(self.endpoint_port),
                 .sin_addr = 0x0100007F, // 127.0.0.1
             };
 
-            if (connect(sock, &server_addr, @sizeOf(sockaddr_in)) == SOCKET_ERROR) {
-                // Node unreachable; gracefully fallback to simulation context
+            if (win32.connect(sock, &server_addr, @sizeOf(win32.sockaddr_in)) == win32.SOCKET_ERROR) {
                 return self.mock_fetch_state(addr_hex, block);
             }
 
-            // Construct HTTP POST JSON-RPC payload
             var req_buf: [1024]u8 = undefined;
             const payload = std.fmt.bufPrint(
                 &req_buf,
@@ -144,11 +142,41 @@ pub const RpcClient = struct {
                 .{ self.endpoint_port, 70 + addr_hex.len, addr_hex, block },
             ) catch return self.mock_fetch_state(addr_hex, block);
 
-            _ = send(sock, payload.ptr, @intCast(payload.len), 0);
-            const bytes_rx = recv(sock, &self.rx_buffer, @intCast(self.rx_buffer.len), 0);
+            _ = win32.send(sock, payload.ptr, @intCast(payload.len), 0);
+            const bytes_rx = win32.recv(sock, &self.rx_buffer, @intCast(self.rx_buffer.len), 0);
 
             if (bytes_rx > 0) {
                 const rx_slice = self.rx_buffer[0..@intCast(bytes_rx)];
+                if (parseJsonResult(rx_slice, &state.bytecode_buffer)) |len| {
+                    state.bytecode_len = len;
+                    return state;
+                }
+            }
+        } else {
+            // Standard POSIX socket networking for Linux / macOS
+            const posix = std.posix;
+            const sock = posix.socket(posix.AF.INET, posix.SOCK.STREAM, posix.IPPROTO.TCP) catch {
+                return self.mock_fetch_state(addr_hex, block);
+            };
+            defer posix.close(sock);
+
+            const addr = std.net.Address.initIp4([4]u8{ 127, 0, 0, 1 }, self.endpoint_port);
+            posix.connect(sock, &addr.any, addr.getOsSockLen()) catch {
+                return self.mock_fetch_state(addr_hex, block);
+            };
+
+            var req_buf: [1024]u8 = undefined;
+            const payload = std.fmt.bufPrint(
+                &req_buf,
+                "POST / HTTP/1.1\r\nHost: 127.0.0.1:{d}\r\nContent-Type: application/json\r\nContent-Length: {d}\r\nConnection: close\r\n\r\n{{\"jsonrpc\":\"2.0\",\"method\":\"eth_getCode\",\"params\":[\"{s}\",\"{x}\"],\"id\":1}}",
+                .{ self.endpoint_port, 70 + addr_hex.len, addr_hex, block },
+            ) catch return self.mock_fetch_state(addr_hex, block);
+
+            _ = posix.write(sock, payload) catch {};
+            const bytes_rx = posix.read(sock, &self.rx_buffer) catch 0;
+
+            if (bytes_rx > 0) {
+                const rx_slice = self.rx_buffer[0..bytes_rx];
                 if (parseJsonResult(rx_slice, &state.bytecode_buffer)) |len| {
                     state.bytecode_len = len;
                     return state;
@@ -174,3 +202,18 @@ pub const RpcClient = struct {
         return state;
     }
 };
+
+test "RPC Client: Hex Extraction and Result Parsing" {
+    const sample_rpc_response =
+        "HTTP/1.1 200 OK\r\n" ++
+        "Content-Type: application/json\r\n" ++
+        "\r\n" ++
+        "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x6080604052348015600f57600080fd5b5000\"}";
+
+    var out_buf: [256]u8 = undefined;
+    const len = RpcClient.parseJsonResult(sample_rpc_response, &out_buf);
+    try std.testing.expect(len != null);
+    try std.testing.expectEqual(@as(usize, 18), len.?);
+    try std.testing.expectEqual(@as(u8, 0x60), out_buf[0]);
+    try std.testing.expectEqual(@as(u8, 0x80), out_buf[1]);
+}

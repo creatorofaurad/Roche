@@ -1,4 +1,4 @@
-﻿//! live_protocol_tests.zig: Comprehensive Real-World Protocol Attack Suite for ROCHE
+//! live_protocol_tests.zig: Comprehensive Real-World Protocol Attack Suite for ROCHE
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -352,5 +352,43 @@ test "Live Target 13: Enzyme Blue Single Asset Redemption Queue & GAV Conservati
 
     const defective_redemption = invariants.InvariantEngine.verifyRedemptionConservation(100, 120, 1_500_000_000_000_000_000);
     try std.testing.expect(!defective_redemption);
+}
+
+// =================================================================================================
+// 13. COINBASE TIER 0: cbETH ExchangeRateUpdater Temporal & Truncation Invariant Suite
+// Simulates: ExchangeRateUpdater.updateExchangeRate with rate-limited boundaries and temporal gaps
+// =================================================================================================
+pub const CBETH_EXCHANGERATE_UPDATER_BYTECODE = [_]u8{
+    // Slot 0: lastExchangeRate = 1.05e18 (PUSH8 0x0E901BB6C4140000, PUSH1 0x00, SSTORE)
+    0x67, 0x0E, 0x90, 0x1B, 0xB6, 0xC4, 0x14, 0x00, 0x00, 0x60, 0x00, 0x55,
+    // Slot 1: lastUpdateTimestamp = 1,700,000,000 (PUSH4 0x65549000, PUSH1 0x01, SSTORE)
+    0x63, 0x65, 0x54, 0x90, 0x00, 0x60, 0x01, 0x55,
+    // Slot 2: proposedExchangeRate = 1.08e18 (PUSH8 0x0EFA7E484CC00000, PUSH1 0x02, SSTORE)
+    0x67, 0x0E, 0xFA, 0x7E, 0x48, 0x4C, 0xC0, 0x00, 0x00, 0x60, 0x02, 0x55,
+    0x00,
+};
+
+test "Live Target 14: Coinbase cbETH ExchangeRateUpdater Rate-Limit & Truncation Invariant" {
+    // 1. Direct rate jump boundary validation on SMT prover
+    const r_old: u256 = 1_050_000_000_000_000_000;      // 1.05e18
+    const r_proposed: u256 = 1_080_000_000_000_000_000; // 1.08e18 (approx 10,285 bps > 10,100 bps limit)
+
+    // Coinbase cbETH invariant: max allowed increase per 24h epoch is 100 bps (10,100 bps threshold)
+    // SMT prover flags rate breach: 10,285 bps > 10,100 bps
+    const is_valid_rate_jump = invariants.InvariantEngine.verifyLiquidStakingExchangeRate(r_proposed, r_old, 10100);
+    try std.testing.expect(!is_valid_rate_jump);
+
+    // 2. Round-trip identity invariant: Mint cbETH with 10 ETH at R=1.05e18, burn back at R=1.05e18
+    // cbETH_minted = (10e18 * 1e18) / 1.05e18 = 9523809523809523809 wei
+    // ETH_redeemed = (9523809523809523809 * 1.05e18) / 1e18 = 9999999999999999999 wei (1 wei truncation loss to user)
+    const eth_in: u256 = 10_000_000_000_000_000_000;
+    const r_scale: u256 = 1_000_000_000_000_000_000;
+    const cbeth_minted: u256 = (eth_in * r_scale) / r_old;
+    const eth_out: u256 = (cbeth_minted * r_old) / r_scale;
+
+    // Protocol solvency invariant: eth_out must never exceed eth_in (no unbacked ETH drain)
+    try std.testing.expect(eth_out <= eth_in);
+    // Truncation bound: loss strictly <= 1 wei per individual redemption action
+    try std.testing.expect((eth_in - eth_out) <= 1);
 }
 

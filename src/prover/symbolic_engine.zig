@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Halmos Symbolic EVM Interval Domain Solver
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Halmos Symbolic EVM Interval Domain Solver
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -62,3 +62,4 @@ pub const SymbolicStackFrame = struct {
         return self.stack[self.sp];
     }
 };
+

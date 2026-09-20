@@ -1,4 +1,4 @@
-# Volta Formal Invariant Proof Sketches & Reference Oracles
+﻿# ROCHE Formal Invariant Proof Sketches & Reference Oracles
 
 **Document Status:** Production Reference  
 **Scope:** 17 Protocol Invariant Families  
@@ -31,3 +31,4 @@
 - **State Variables:** $\text{GAV}_t, \text{GAV}_{t+1}$.
 - **Oracle Predicate:** $\text{GAV}_{t+1} \ge \text{GAV}_t - \text{AllowedOutflows}$.
 - **Adversarial Failure Mode:** Unaccounted slippage or adapter rebalancing skimming.
+

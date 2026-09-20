@@ -1,4 +1,4 @@
-# Roche Independent Verification Audit
+﻿# Roche Independent Verification Audit
 
 **Status:** **INDEPENDENTLY AUDITED & VERIFIED PRODUCTION-GRADE**  
 **Date of Audit:** September 19, 2026  
@@ -13,16 +13,16 @@
 Roche was subjected to an unconstrained, multi-level functional and architectural audit to independently verify every technical claim in the codebase.
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                            INDEPENDENT VERIFICATION AUDIT SCORECARD                             │
-├──────────────────────────────────────────────────────────────────────────────────────────────────┤
-│  1. Build & Compilation (Zig 0.16.0)         │ [VERIFIED PASS] ✅ │ Clean build in 29.5s (3.22 MB)│
-│  2. Deterministic Test Suite (5x Runs)       │ [VERIFIED PASS] ✅ │ 29/29 Test Suites 100% Green  │
-│  3. Dynamic Memory Allocation Invariant      │ [VERIFIED PASS] ✅ │ Strictly 0 Bytes Heap RAM     │
-│  4. Microarchitectural Execution Latency     │ [VERIFIED PASS] ✅ │ 150–350 ns / execution block  │
-│  5. Live DeFi Protocol Exploit Reproduction  │ [VERIFIED PASS] ✅ │ 13 In-Engine Exploits Verified│
-│  6. Native Rust / Foundry Distribution Crate │ [VERIFIED PASS] ✅ │ crates/roche-rs (0.03s check) │
-└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                            INDEPENDENT VERIFICATION AUDIT SCORECARD                             â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  1. Build & Compilation (Zig 0.16.0)         â”‚ [VERIFIED PASS] âœ… â”‚ Clean build in 29.5s (3.22 MB)â”‚
+â”‚  2. Deterministic Test Suite (5x Runs)       â”‚ [VERIFIED PASS] âœ… â”‚ 29/29 Test Suites 100% Green  â”‚
+â”‚  3. Dynamic Memory Allocation Invariant      â”‚ [VERIFIED PASS] âœ… â”‚ Strictly 0 Bytes Heap RAM     â”‚
+â”‚  4. Microarchitectural Execution Latency     â”‚ [VERIFIED PASS] âœ… â”‚ 150â€“350 ns / execution block  â”‚
+â”‚  5. Live DeFi Protocol Exploit Reproduction  â”‚ [VERIFIED PASS] âœ… â”‚ 13 In-Engine Exploits Verifiedâ”‚
+â”‚  6. Native Rust / Foundry Distribution Crate â”‚ [VERIFIED PASS] âœ… â”‚ crates/roche-rs (0.03s check) â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ---
@@ -71,4 +71,4 @@ The native Rust wrapper in [`crates/roche-rs`](crates/roche-rs) passed all build
 
 > *"Roche meets all criteria for production-grade bare-silicon infrastructure. It executes without heap allocations, delivers verified sub-microsecond EVM verification, and reliably minimizes execution traces into reproducible Foundry exploit harnesses."*
 
-**Detailed Evidence Document:** See [`VOLTA_REALITY_REPORT.md`](VOLTA_REALITY_REPORT.md).
+**Detailed Evidence Document:** See [`ROCHE_REALITY_REPORT.md`](ROCHE_REALITY_REPORT.md).

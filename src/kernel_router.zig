@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Institutional Zero-Heap CLI & Kernel Router
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Institutional Zero-Heap CLI & Kernel Router
 // Invariant: Zero Heap Allocation | OS-Level MMap | Zig 0.16.0
 // ============================================================================
 
@@ -55,7 +55,7 @@ extern "kernel32" fn SetConsoleCtrlHandler(
 fn win32ConsoleHandler(ctrl_type: u32) callconv(.winapi) i32 {
     _ = ctrl_type;
     sigint_triggered.store(true, .seq_cst);
-    std.debug.print("\n\x1b[31;1m[VOLTA KERNEL] SIGINT Trapped. Halting workers & synthesizing partial trace...\x1b[0m\n", .{});
+    std.debug.print("\n\x1b[31;1m[ROCHE KERNEL] SIGINT Trapped. Halting workers & synthesizing partial trace...\x1b[0m\n", .{});
     return 1;
 }
 
@@ -63,7 +63,7 @@ fn win32ConsoleHandler(ctrl_type: u32) callconv(.winapi) i32 {
 fn handleSigIntPosix(sig: c_int) callconv(.c) void {
     _ = sig;
     sigint_triggered.store(true, .seq_cst);
-    std.debug.print("\n\x1b[31;1m[VOLTA KERNEL] SIGINT Trapped. Halting workers & synthesizing partial trace...\x1b[0m\n", .{});
+    std.debug.print("\n\x1b[31;1m[ROCHE KERNEL] SIGINT Trapped. Halting workers & synthesizing partial trace...\x1b[0m\n", .{});
 }
 
 pub fn bindInterruptHandlers() void {
@@ -127,7 +127,7 @@ pub fn mapTargetFile(path: []const u8) ![]align(64) const u8 {
 
 // 4. Zero-Heap VT100 Telemetry Dashboard
 pub fn printTelemetry(cycles: u64, coverage: u16, throughput: u64) void {
-    std.debug.print("\x1b[1A\x1b[2K\x1b[36m[VOLTA]\x1b[0m Cycles: \x1b[1m{d}\x1b[0m | Edges: \x1b[33m{d}/65536\x1b[0m | Speed: \x1b[32m{d} tx/sec\x1b[0m\n", .{ cycles, coverage, throughput });
+    std.debug.print("\x1b[1A\x1b[2K\x1b[36m[ROCHE]\x1b[0m Cycles: \x1b[1m{d}\x1b[0m | Edges: \x1b[33m{d}/65536\x1b[0m | Speed: \x1b[32m{d} tx/sec\x1b[0m\n", .{ cycles, coverage, throughput });
 }
 
 test "Kernel Router: Exit Codes & Signal Registration" {

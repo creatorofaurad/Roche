@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of 4naly3er Loop Gas & SLOAD Cache Optimizer
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of 4naly3er Loop Gas & SLOAD Cache Optimizer
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -48,3 +48,4 @@ pub const GasLoopOptimizer = struct {
         return self.opportunities[0..self.opportunity_count];
     }
 };
+

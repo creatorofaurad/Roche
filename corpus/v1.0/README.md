@@ -1,6 +1,6 @@
-# Volta Invariant Regression Corpus v1.0
+﻿# ROCHE Invariant Regression Corpus v1.0
 
-This directory contains versioned, machine-readable invariant test cases and attack traces for **Volta Milestone 1**.
+This directory contains versioned, machine-readable invariant test cases and attack traces for **ROCHE Milestone 1**.
 
 ## Corpus Summary (100+ Total Cases)
 
@@ -14,8 +14,9 @@ This directory contains versioned, machine-readable invariant test cases and att
 | `historical_exploits.json` | 15+ | Euler V2, Uniswap V4 hook drain, Ethena PSM, Balancer reentrancy | Verified |
 
 ## Execution
-All corpus test cases are natively executed and formally verified in Volta's test runner:
+All corpus test cases are natively executed and formally verified in ROCHE's test runner:
 
 ```bash
 zig test src/live_protocol_tests.zig
 ```
+

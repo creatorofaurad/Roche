@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Eveem Proxy & Interface Pattern Classifier
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Eveem Proxy & Interface Pattern Classifier
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -32,3 +32,4 @@ pub const ProxyClassifier = struct {
         return false;
     }
 };
+

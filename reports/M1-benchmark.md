@@ -1,9 +1,9 @@
-# Volta Milestone 1 Benchmark & Methodology Report
+﻿# ROCHE Milestone 1 Benchmark & Methodology Report
 
 **Version:** 1.0.0  
 **Target Milestone:** Milestone 1 (Invariant IR, Canonical State Model & Foundry Synthesis)  
 **Compiler:** Zig 0.16.0 (`ReleaseFast`)  
-**Repository:** [github.com/creatorofaurad/volta](https://github.com/creatorofaurad/volta)  
+**Repository:** [github.com/creatorofaurad/ROCHE](https://github.com/creatorofaurad/ROCHE)  
 
 ---
 
@@ -42,7 +42,7 @@ Compiler & Build Profile:
 
 ```text
 ===================================================================================================
-                         VOLTA NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       
+                         ROCHE NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       
 ===================================================================================================
 
 Iterations:          100,000 continuous evaluation passes
@@ -55,7 +55,7 @@ Invariant IR Evaluation (AMM)        < 1.00 ns         1.42 ns        > 1,000,00
 EIP-1153 TSTORE/TLOAD Operations       1.31 ns         2.10 ns          765,696,784 ops/s     0 bytes
 AVX2 SIMD Vectorized Invariant Math    6.23 ns         9.85 ns          160,642,570 ops/s     0 bytes
 State Rollback (O(1) Journal)          2.85 ns         4.40 ns          350,877,192 ops/s     0 bytes
-Foundry .t.sol Code-Gen Synthesis      4.12 μs         6.80 μs              242,718 ops/s     0 bytes
+Foundry .t.sol Code-Gen Synthesis      4.12 Î¼s         6.80 Î¼s              242,718 ops/s     0 bytes
 ---------------------------------------------------------------------------------------------------------
 Reproducibility:     zig run -O ReleaseFast src/benchmark_harness.zig
 ===================================================================================================
@@ -79,8 +79,8 @@ To reproduce these exact measurements on any physical x86_64 machine:
 
 ```bash
 # Clone repository
-git clone https://github.com/creatorofaurad/volta.git
-cd volta
+git clone https://github.com/creatorofaurad/ROCHE.git
+cd ROCHE
 
 # Run physical hardware benchmark harness
 zig run -O ReleaseFast src/benchmark_harness.zig
@@ -88,3 +88,4 @@ zig run -O ReleaseFast src/benchmark_harness.zig
 # Run all 21 unit and production exploit verification tests
 zig test src/live_protocol_tests.zig
 ```
+

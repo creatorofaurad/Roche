@@ -1,4 +1,4 @@
-# Roche
+﻿# Roche
 
 **Built by Charles, a 15-year-old systems architect.**
 
@@ -21,12 +21,12 @@ Part of a broader portfolio of production infrastructure, cryptanalytic engines,
 
 ## Institutional Validation Status
 
-- **Phase 0 (Diagnosis & Opcode Coverage):** ✅ COMPLETE — [OPCODE_COVERAGE_MATRIX.md](docs/OPCODE_COVERAGE_MATRIX.md) (138 opcodes active, 0 crashers).
-- **Phase 1 (EEST Compliance & Harness):** ✅ COMPLETE — [EEST Harness](src/eest_harness.zig) integrated; baseline vectors passing in 29/29 test suites.
-- **Phase 2 (Differential Testing vs. revm):** ✅ COMPLETE — [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
-- **Phase 3 (Exploit Corpus Expansion):** ✅ COMPLETE — [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped; **13 protocol exploit reproductions verified in code**.
-- **Phase 4 & 5 (Performance & Audit Freeze):** ✅ COMPLETE — Invariant evaluation benchmarked at physical floor (150–350ns), 0 dynamic allocations on hot paths.
-- **Phase 6 (C-ABI FFI & Rust Bindings):** ✅ COMPLETE — [C-ABI](src/c_api.zig) & [`crates/roche-rs`](crates/roche-rs) ready for native Foundry plugin integration.
+- **Phase 0 (Diagnosis & Opcode Coverage):** âœ… COMPLETE â€” [OPCODE_COVERAGE_MATRIX.md](docs/OPCODE_COVERAGE_MATRIX.md) (138 opcodes active, 0 crashers).
+- **Phase 1 (EEST Compliance & Harness):** âœ… COMPLETE â€” [EEST Harness](src/eest_harness.zig) integrated; baseline vectors passing in 29/29 test suites.
+- **Phase 2 (Differential Testing vs. revm):** âœ… COMPLETE â€” [Differential Adapter](src/differential_engine.zig) verifying bitwise state transitions.
+- **Phase 3 (Exploit Corpus Expansion):** âœ… COMPLETE â€” [30-Protocol Corpus](corpus/EXPLOIT_CORPUS_30.json) mapped; **13 protocol exploit reproductions verified in code**.
+- **Phase 4 & 5 (Performance & Audit Freeze):** âœ… COMPLETE â€” Invariant evaluation benchmarked at physical floor (150â€“350ns), 0 dynamic allocations on hot paths.
+- **Phase 6 (C-ABI FFI & Rust Bindings):** âœ… COMPLETE â€” [C-ABI](src/c_api.zig) & [`crates/roche-rs`](crates/roche-rs) ready for native Foundry plugin integration.
 
 ---
 
@@ -46,8 +46,8 @@ Traditional smart contract security workflows suffer from fragmentation and trac
 - **Trace Bloat:** Stateful fuzzers routinely flag invariant violations 30 to 100 calls deep. More than 80% of those transactions are irrelevant noise, forcing auditors to spend hours manually bisecting call graphs.
 - **Unverified Invariant State:** Standard property test assertions execute at contract boundaries rather than at the individual opcode transition level.
 
-### The Volta Architecture
-Volta consolidates disassembly, static taint analysis, symbolic path exploration, invariant checking, and test-case minimization into a **single native binary** written in pure Zig:
+### The ROCHE Architecture
+ROCHE consolidates disassembly, static taint analysis, symbolic path exploration, invariant checking, and test-case minimization into a **single native binary** written in pure Zig:
 - **Zero Heap Allocations ($0\text{ bytes}$):** All execution stacks, 128 KB memory pages, journals, and graphs operate within deterministic, preallocated 64-byte cache-aligned static buffers.
 - **RAW Dynamic Dependency Slicing:** Prunes non-causal transaction noise in $O(V+E)$ via sub-word Read-After-Write state dependency DAG traversal.
 - **Hierarchical Delta-Debugging ($O(N \log N)$):** Bisects causal failing transaction sequences down to 1-minimal counterexamples.
@@ -78,7 +78,7 @@ All benchmarks are measured natively on bare silicon with zero heap allocations:
 | **Invariant Evaluation Engine** | **0.87 ns** / check | $1,149,425,287\text{ checks/s}$ | **0 Bytes (0 heap calls)** |
 | **Transient Storage (TSTORE/TLOAD)** | **1.31 ns** / op | $763,358,778\text{ ops/s}$ | **0 Bytes (0 heap calls)** |
 | **Full EVM Transaction Cycle** | **120.48 ns** / tx | **8,300,132 tx/s** | **0 Bytes (0 heap calls)** |
-| **Trace Minimization (HDD Bisection)** | **1.74 µs** / pass | $574,712\text{ bisect/s}$ | **0 Bytes (0 heap calls)** |
+| **Trace Minimization (HDD Bisection)** | **1.74 Âµs** / pass | $574,712\text{ bisect/s}$ | **0 Bytes (0 heap calls)** |
 | **AVX2 SIMD Coverage Acceleration** | **6.73x** vs. scalar | 32 edges / instruction | **0 Bytes (0 heap calls)** |
 
 ---

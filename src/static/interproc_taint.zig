@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Wake Inter-Procedural Taint & Sink Tracker
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Wake Inter-Procedural Taint & Sink Tracker
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -56,3 +56,4 @@ pub const InterprocTaintEngine = struct {
         return false;
     }
 };
+

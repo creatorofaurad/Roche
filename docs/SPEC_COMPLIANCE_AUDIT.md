@@ -1,4 +1,4 @@
-# Volta Specification Compliance & Execution Contract
+﻿# ROCHE Specification Compliance & Execution Contract
 
 **Document Status:** Frozen  
 **Target Specification:** Ethereum Yellow Paper (Cancun / EIP-7692 / Prague Scope)  
@@ -8,7 +8,7 @@
 
 ## 1. The Execution Contract
 
-Volta evaluates smart contract state machines under the following explicit execution contract:
+ROCHE evaluates smart contract state machines under the following explicit execution contract:
 
 ### 1.1 Memory & Stack Bounds
 - **Stack Depth:** Fixed 1024 256-bit words (`types.MAX_STACK_DEPTH`). PUSH past 1024 triggers deterministic `STACK_OVERFLOW`; POP on empty triggers `STACK_UNDERFLOW`.
@@ -35,7 +35,8 @@ Volta evaluates smart contract state machines under the following explicit execu
 
 ## 2. Invariant Discovery vs. Standard EVM Runtimes
 
-Volta is not designed as a general-purpose block producer; it is designed as an **invariant verification engine**. Its core execution invariants guarantee:
+ROCHE is not designed as a general-purpose block producer; it is designed as an **invariant verification engine**. Its core execution invariants guarantee:
 - Bitwise deterministic replay on all state transitions.
 - Sub-nanosecond ($<1.00\text{ ns}$) invariant assertion checks after every state-modifying instruction.
 - Automated trace delta-debugging ($O(N \log N)$) to emit minimal Foundry `.t.sol` reproduction suites.
+

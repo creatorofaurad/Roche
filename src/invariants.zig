@@ -1,4 +1,4 @@
-//! volta: Halmos & Pierre Symbolic Invariant Provers & Protocol-Agnostic Invariant Engine
+﻿//! ROCHE: Halmos & Pierre Symbolic Invariant Provers & Protocol-Agnostic Invariant Engine
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -179,7 +179,7 @@ pub const InvariantEngine = struct {
         return (block_timestamp - oracle_updated_at) <= max_staleness_seconds;
     }
 
-    /// 8. EIP-1153 Invariant: Transient Storage Isolation Invariant (∀ k, Select(S_transient, k) == 0 at transaction exit)
+    /// 8. EIP-1153 Invariant: Transient Storage Isolation Invariant (âˆ€ k, Select(S_transient, k) == 0 at transaction exit)
     pub fn verifyTransientStorageCleanBoundary(transient_storage: *const storage_mod.TransientStorage) bool {
         return transient_storage.verifyCleanBoundary();
     }

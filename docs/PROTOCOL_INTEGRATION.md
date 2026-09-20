@@ -1,6 +1,6 @@
-# Volta Protocol Integration Guide: Continuous CI/CD Invariant Defense
+﻿# ROCHE Protocol Integration Guide: Continuous CI/CD Invariant Defense
 
-This guide provides DeFi engineering teams with instructions for integrating Volta into their local development workflows and GitHub Actions CI pipelines.
+This guide provides DeFi engineering teams with instructions for integrating ROCHE into their local development workflows and GitHub Actions CI pipelines.
 
 ---
 
@@ -8,8 +8,8 @@ This guide provides DeFi engineering teams with instructions for integrating Vol
 
 ```bash
 # Clone and build native binary
-git clone https://github.com/creatorofaurad/volta.git
-cd volta
+git clone https://github.com/creatorofaurad/ROCHE.git
+cd ROCHE
 zig build -Doptimize=ReleaseFast
 
 # Add to system PATH
@@ -22,34 +22,34 @@ export PATH="$PATH:$(pwd)/zig-out/bin"
 
 ### Audit Bytecode with 22 Detectors
 ```bash
-volta audit path/to/Contract.bin
+ROCHE audit path/to/Contract.bin
 ```
 
 ### Stateful Fuzzing with AFL Coverage Maps
 ```bash
-volta fuzz path/to/Contract.bin --runs 50000
+ROCHE fuzz path/to/Contract.bin --runs 50000
 ```
 
 ### Reproduce Exploit Traces to Minimal Foundry Tests
 ```bash
-volta repro euler
-volta repro uniswap
-volta repro curve
+ROCHE repro euler
+ROCHE repro uniswap
+ROCHE repro curve
 ```
 
 ---
 
 ## 3. GitHub Actions CI/CD Integration
 
-Add the following workflow to `.github/workflows/volta-gate.yml` in your protocol repository:
+Add the following workflow to `.github/workflows/ROCHE-gate.yml` in your protocol repository:
 
 ```yaml
-name: Volta Continuous Invariant Gate
+name: ROCHE Continuous Invariant Gate
 
 on: [push, pull_request]
 
 jobs:
-  volta-gate:
+  ROCHE-gate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -59,13 +59,14 @@ jobs:
         with:
           version: 0.16.0
 
-      - name: Install Volta
+      - name: Install ROCHE
         run: |
-          git clone https://github.com/creatorofaurad/volta.git /tmp/volta
-          cd /tmp/volta && zig build -Doptimize=ReleaseFast
-          sudo cp zig-out/bin/volta /usr/local/bin/
+          git clone https://github.com/creatorofaurad/ROCHE.git /tmp/ROCHE
+          cd /tmp/ROCHE && zig build -Doptimize=ReleaseFast
+          sudo cp zig-out/bin/ROCHE /usr/local/bin/
 
       - name: Run Invariant Gauntlet
         run: |
-          volta gauntlet
+          ROCHE gauntlet
 ```
+

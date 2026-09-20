@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Scribble/Harvey Out-of-Band State Invariant
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Scribble/Harvey Out-of-Band State Invariant
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -51,3 +51,4 @@ pub const ScribbleRuntimeChecker = struct {
         return true;
     }
 };
+

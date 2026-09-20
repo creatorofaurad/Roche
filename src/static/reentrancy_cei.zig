@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Aderyn Reentrancy State Change Detector
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Aderyn Reentrancy State Change Detector
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -55,3 +55,4 @@ pub const CEIScanner = struct {
         return self.violations[0..self.violation_count];
     }
 };
+

@@ -1,20 +1,20 @@
-# Volta Universal One-Line Installer for Windows
-# Usage: irm https://raw.githubusercontent.com/creatorofaurad/volta/main/install.ps1 | iex
+﻿# ROCHE Universal One-Line Installer for Windows
+# Usage: irm https://raw.githubusercontent.com/creatorofaurad/ROCHE/main/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
 Write-Host @"
 `e[38;2;0;255;136m
-╦  ╦╔═╗╦  ╔╦╗╔═╗
-╚╗╔╝║ ║║   ║ ╠═╣
- ╚╝ ╚═╝╩═╝ ╩ ╩ ╩  v1.0.0-beta
+â•¦  â•¦â•”â•â•—â•¦  â•”â•¦â•—â•”â•â•—
+â•šâ•—â•”â•â•‘ â•‘â•‘   â•‘ â• â•â•£
+ â•šâ• â•šâ•â•â•©â•â• â•© â•© â•©  v1.0.0-beta
 The Bare-Silicon EVM Security Suite
 `e[0m
 "@
 
-$voltaDir = "$env:USERPROFILE\.volta\bin"
-if (-not (Test-Path $voltaDir)) {
-    New-Item -ItemType Directory -Path $voltaDir -Force | Out-Null
+$ROCHEDir = "$env:USERPROFILE\.ROCHE\bin"
+if (-not (Test-Path $ROCHEDir)) {
+    New-Item -ItemType Directory -Path $ROCHEDir -Force | Out-Null
 }
 
 Write-Host "[*] Checking for native Zig environment..." -ForegroundColor Cyan
@@ -25,27 +25,27 @@ if (-not $hasZig) {
     winget install zig.zig -e --accept-source-agreements --accept-package-agreements
 }
 
-Write-Host "[*] Compiling & Installing Volta to $voltaDir..." -ForegroundColor Cyan
+Write-Host "[*] Compiling & Installing ROCHE to $ROCHEDir..." -ForegroundColor Cyan
 if (Test-Path ".\build.zig") {
     zig build -Doptimize=ReleaseFast
-    Copy-Item ".\zig-out\bin\volta.exe" "$voltaDir\volta.exe" -Force
+    Copy-Item ".\zig-out\bin\ROCHE.exe" "$ROCHEDir\ROCHE.exe" -Force
 } else {
     # If installed remotely, clone and build
-    $tempDir = [System.IO.Path]::GetTempPath() + "volta_build_" + [System.Guid]::NewGuid().ToString().Substring(0,8)
-    git clone https://github.com/creatorofaurad/volta.git $tempDir
+    $tempDir = [System.IO.Path]::GetTempPath() + "ROCHE_build_" + [System.Guid]::NewGuid().ToString().Substring(0,8)
+    git clone https://github.com/creatorofaurad/ROCHE.git $tempDir
     Push-Location $tempDir
     zig build -Doptimize=ReleaseFast
-    Copy-Item ".\zig-out\bin\volta.exe" "$voltaDir\volta.exe" -Force
+    Copy-Item ".\zig-out\bin\ROCHE.exe" "$ROCHEDir\ROCHE.exe" -Force
     Pop-Location
     Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
 }
 
 # Add to User PATH
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-if ($userPath -notlike "*$voltaDir*") {
-    [Environment]::SetEnvironmentVariable("Path", "$userPath;$voltaDir", "User")
-    $env:Path += ";$voltaDir"
+if ($userPath -notlike "*$ROCHEDir*") {
+    [Environment]::SetEnvironmentVariable("Path", "$userPath;$ROCHEDir", "User")
+    $env:Path += ";$ROCHEDir"
 }
 
-Write-Host "[✓] Volta successfully installed to $voltaDir\volta.exe!" -ForegroundColor Green
-Write-Host "Run 'volta help' to get started." -ForegroundColor Gray
+Write-Host "[âœ“] ROCHE successfully installed to $ROCHEDir\ROCHE.exe!" -ForegroundColor Green
+Write-Host "Run 'ROCHE help' to get started." -ForegroundColor Gray

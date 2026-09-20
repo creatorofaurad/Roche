@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Manticore Depth-First Branch Explorer
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Manticore Depth-First Branch Explorer
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -46,3 +46,4 @@ pub const DepthFirstBranchExplorer = struct {
         return self.branch_stack[self.stack_ptr];
     }
 };
+

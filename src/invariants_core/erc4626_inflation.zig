@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Solmate ERC-4626 Share Inflation & Rounding Prover
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Solmate ERC-4626 Share Inflation & Rounding Prover
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -41,3 +41,4 @@ pub const ERC4626InflationProver = struct {
         return true;
     }
 };
+

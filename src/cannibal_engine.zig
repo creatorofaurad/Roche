@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: 19/19 Unified Modular Cannibal Engine Root
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: 19/19 Unified Modular Cannibal Engine Root
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -34,7 +34,7 @@ pub const proxy_classifier = @import("decompile/proxy_classifier.zig");
 pub const scribble_runtime = @import("invariants_core/scribble_runtime.zig");
 pub const erc4626_inflation = @import("invariants_core/erc4626_inflation.zig");
 
-test "Volta 19/19 Modular Cannibal Engine Integration" {
+test "ROCHE 19/19 Modular Cannibal Engine Integration" {
     // 1. Slither CFG Dominator
     var cfg = cfg_dominator.CFGDominatorEngine.init();
     const n0 = cfg.addNode(0, 10, .{ .has_external_call = true }).?;
@@ -142,3 +142,4 @@ test "Volta 19/19 Modular Cannibal Engine Integration" {
     const vault = erc4626_inflation.ERC4626InflationProver.init(1000, 1000);
     try std.testing.expect(vault.verifyInflationResistance(100, 500));
 }
+

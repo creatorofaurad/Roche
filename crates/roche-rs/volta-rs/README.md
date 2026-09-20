@@ -1,12 +1,12 @@
-# `volta-rs`
+﻿# `ROCHE-rs`
 
 [![Crates.io](https://img.shields.io/badge/crates.io-v0.2.0-orange.svg)](https://crates.io)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
 [![Engine](https://img.shields.io/badge/engine-Zig%200.16.0-green.svg)](https://ziglang.org)
 
-**Native Rust FFI Bindings and Foundry Trace Reduction Plugin for Volta.**
+**Native Rust FFI Bindings and Foundry Trace Reduction Plugin for ROCHE.**
 
-Volta is an institutional-grade bare-silicon EVM stateful verification and dynamic trace reduction engine engineered in Pure Zig 0.16.0 with **0 dynamic heap allocations**.
+ROCHE is an institutional-grade bare-silicon EVM stateful verification and dynamic trace reduction engine engineered in Pure Zig 0.16.0 with **0 dynamic heap allocations**.
 
 ---
 
@@ -25,7 +25,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-volta-rs = "0.2.0"
+ROCHE-rs = "0.2.0"
 ```
 
 ---
@@ -34,14 +34,14 @@ volta-rs = "0.2.0"
 
 ### 1. Dynamic Trace Minimization
 ```rust
-use volta_rs::{Volta, CTraceResult};
+use ROCHE_rs::{ROCHE, CTraceResult};
 
 fn main() {
     let read_slots = [0x00, 0x00, 0x100];
     let write_slots = [0x100, 0x200, 0x00];
     let failing_step = 2;
 
-    if let Some(res) = Volta::minimize_trace(&read_slots, &write_slots, failing_step) {
+    if let Some(res) = ROCHE::minimize_trace(&read_slots, &write_slots, failing_step) {
         println!("Trace reduced from {} to {} causal steps in {}ns", 
             res.original_steps, res.minimized_steps, res.elapsed_nanos);
     }
@@ -50,10 +50,10 @@ fn main() {
 
 ### 2. Automated Foundry PoC Synthesis
 ```rust
-use volta_rs::{Volta, CallbackType};
+use ROCHE_rs::{ROCHE, CallbackType};
 
 fn main() {
-    let poc = Volta::synthesize_poc(
+    let poc = ROCHE::synthesize_poc(
         "EulerVaultInsolvencyExploit",
         "6000F16103E860005500",
         "verifySolvency",
@@ -69,3 +69,4 @@ fn main() {
 ## License
 
 MIT OR Apache-2.0
+

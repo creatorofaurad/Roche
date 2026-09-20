@@ -1,11 +1,11 @@
-[package]
-name = "volta-rs"
+﻿[package]
+name = "ROCHE-rs"
 version = "0.2.0"
 edition = "2021"
 authors = ["Charles <creatorofaurad>"]
-description = "Native Rust bindings & Foundry plugin for Volta: Bare-Silicon EVM Trace Minimizer & SMT Prover"
+description = "Native Rust bindings & Foundry plugin for ROCHE: Bare-Silicon EVM Trace Minimizer & SMT Prover"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/creatorofaurad/volta"
+repository = "https://github.com/creatorofaurad/ROCHE"
 keywords = ["ethereum", "evm", "fuzzing", "foundry", "security"]
 categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
 
@@ -16,5 +16,6 @@ categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
 # Optional test utilities
 
 [lib]
-name = "volta_rs"
+name = "ROCHE_rs"
 crate-type = ["rlib", "cdylib"]
+

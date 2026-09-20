@@ -1,4 +1,4 @@
-name: Volta Bare-Silicon Verification Battery
+﻿name: ROCHE Bare-Silicon Verification Battery
 
 on:
   push:
@@ -19,16 +19,17 @@ jobs:
         with:
           version: 0.16.0
 
-      - name: Build Volta ReleaseFast Binary
+      - name: Build ROCHE ReleaseFast Binary
         run: zig build --release=fast
 
       - name: Execute 25-Suite Invariant & Verification Battery
         run: zig test src/main.zig
 
       - name: Execute Autonomous Exploit Synthesis Pipeline (Sandboxed)
-        run: ./zig-out/bin/volta orchestrate EulerVault 6000F16103E860005500 250
+        run: ./zig-out/bin/ROCHE orchestrate EulerVault 6000F16103E860005500 250
 
       - name: Verify Zero Dynamic Heap Allocation & Exit Code Contract
         run: |
-          ./zig-out/bin/volta audit 6000F16103E860005500
+          ./zig-out/bin/ROCHE audit 6000F16103E860005500
           echo "Verification suite passed with exit code 0."
+

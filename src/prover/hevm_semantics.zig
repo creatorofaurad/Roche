@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of HEVM Big-Step Semantics & SMT-LIB Encoder
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of HEVM Big-Step Semantics & SMT-LIB Encoder
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -47,3 +47,4 @@ pub const HEVMSemantics = struct {
         return true;
     }
 };
+

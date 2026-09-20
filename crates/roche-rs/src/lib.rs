@@ -1,4 +1,4 @@
-//! # roche-rs: Institutional EVM Verification & Roche Limit Trace Reduction Engine
+﻿//! # roche-rs: Institutional EVM Verification & Roche Limit Trace Reduction Engine
 //!
 //! Native Rust bindings for the bare-silicon **Roche** engine written in Pure Zig 0.16.0.
 //! Provides sub-microsecond EVM execution, dynamic RAW trace reduction, static security audits,
@@ -151,7 +151,7 @@ impl Roche {
 }
 
 // Backward-compatibility alias
-pub type Volta = Roche;
+pub type ROCHE = Roche;
 
 #[cfg(test)]
 mod tests {
@@ -201,3 +201,4 @@ mod tests {
         assert!(poc_str.contains("ArbitrumVaultExploit_AttackerHarness"));
     }
 }
+

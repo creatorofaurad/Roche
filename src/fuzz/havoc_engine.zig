@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Foundry Havoc Mutation & Invariant Strategy
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Foundry Havoc Mutation & Invariant Strategy
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -113,3 +113,4 @@ pub const HavocEngine = struct {
         }
     }
 };
+

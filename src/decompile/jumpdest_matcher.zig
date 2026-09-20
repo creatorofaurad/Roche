@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Heimdall SIMD Jump-Table Selector Matcher
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Heimdall SIMD Jump-Table Selector Matcher
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -52,3 +52,4 @@ pub const JumpdestMatcher = struct {
         return self.matches[0..self.match_count];
     }
 };
+

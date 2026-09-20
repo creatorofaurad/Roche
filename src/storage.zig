@@ -1,4 +1,4 @@
-//! volta: McCarthy Array Storage, Multi-Account World State & EIP-1153 Transient Storage
+﻿//! ROCHE: McCarthy Array Storage, Multi-Account World State & EIP-1153 Transient Storage
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 //! 40-Byte Compact WAL Journal Layout & Address-Indexed Fast Rollback.
 
@@ -160,7 +160,7 @@ pub const TransientStorage = struct {
         self.journal_len = 0;
     }
 
-    /// Formally verifies Transient Storage Isolation Invariant: ∀ k, Select(S_transient, k) == 0
+    /// Formally verifies Transient Storage Isolation Invariant: âˆ€ k, Select(S_transient, k) == 0
     pub inline fn verifyCleanBoundary(self: *const TransientStorage) bool {
         for (self.slots) |s| {
             if (s != 0) return false;

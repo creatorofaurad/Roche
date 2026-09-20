@@ -1,4 +1,4 @@
-//! Raw C-ABI bindings for Volta native engine.
+﻿//! Raw C-ABI bindings for ROCHE native engine.
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,17 +30,17 @@ pub enum CallbackType {
 }
 
 extern "C" {
-    /// Return current Volta engine semantic version string pointer
-    pub fn volta_c_version() -> *const std::os::raw::c_char;
+    /// Return current ROCHE engine semantic version string pointer
+    pub fn ROCHE_c_version() -> *const std::os::raw::c_char;
 
     /// Execute raw EVM bytecode in bare-silicon VM
-    pub fn volta_c_execute(bytecode_ptr: *const u8, bytecode_len: usize) -> u8;
+    pub fn ROCHE_c_execute(bytecode_ptr: *const u8, bytecode_len: usize) -> u8;
 
     /// Run full 22-detector static security audit suite on bytecode
-    pub fn volta_c_audit(bytecode_ptr: *const u8, bytecode_len: usize) -> u32;
+    pub fn ROCHE_c_audit(bytecode_ptr: *const u8, bytecode_len: usize) -> u32;
 
     /// Minimize an execution trace using RAW dynamic dependency slicing
-    pub fn volta_c_minimize_trace(
+    pub fn ROCHE_c_minimize_trace(
         step_count: u32,
         read_slots: *const u64,
         write_slots: *const u64,
@@ -49,7 +49,7 @@ extern "C" {
     ) -> u32;
 
     /// Synthesize a runnable Foundry Solidity PoC (.t.sol) into a caller-supplied buffer
-    pub fn volta_c_synthesize_poc(
+    pub fn ROCHE_c_synthesize_poc(
         test_name_ptr: *const u8,
         test_name_len: usize,
         target_hex_ptr: *const u8,
@@ -61,3 +61,4 @@ extern "C" {
         out_buf_max_len: usize,
     ) -> usize;
 }
+

@@ -1,4 +1,4 @@
-//! cli.zig: Volta High-Performance Command Line Interface & PoC Generator
+﻿//! cli.zig: ROCHE High-Performance Command Line Interface & PoC Generator
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -240,7 +240,7 @@ pub const CliHandler = struct {
         call.caller[1] = 0x37;
         _ = seq.addCall(call);
 
-        const poc = self.synth.synthesizePoC("VoltaInvariantBreach", hex_str, &seq, invariant_name);
+        const poc = self.synth.synthesizePoC("ROCHEInvariantBreach", hex_str, &seq, invariant_name);
         std.debug.print("\n\x1b[1;32m[*] Auto-Generated Foundry PoC (.t.sol):\x1b[0m\n\n{s}\n", .{poc});
     }
 
@@ -270,7 +270,7 @@ pub const CliHandler = struct {
 
         std.debug.print("  [+] Protocol Invariant: \x1b[36m{s}\x1b[0m\n", .{inv_name});
         std.debug.print("  [+] Bytecode Seed:      \x1b[90m0x{s}\x1b[0m\n", .{hex_str});
-        std.debug.print("  [+] Minimizing Trace:   \x1b[32m45 steps -> 2 causal steps (1.74 µs)\x1b[0m\n", .{});
+        std.debug.print("  [+] Minimizing Trace:   \x1b[32m45 steps -> 2 causal steps (1.74 Âµs)\x1b[0m\n", .{});
 
         self.runSynth(hex_str, inv_name);
     }
@@ -309,3 +309,4 @@ test "CLI: Hex Parsing & Audit Execution" {
     try std.testing.expect(ok);
     try std.testing.expectEqual(@as(usize, 10), handler.bytecode_len);
 }
+

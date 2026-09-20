@@ -40,7 +40,7 @@ Base needs native, sub-millisecond execution verification that matches the speed
 **Response:**
 Roche is an active, fully engineered engine with verified benchmarks:
 - **Core Engine Test Suite:** Passing **29/29 invariant test suites (100% Green)** with 0 memory leaks across AMM monotonicity, Euler V2 sub-vault solvency, and ERC-4626 rounding invariants.
-- **Audited Verification Architecture:** Documented at [`VERIFICATION_AUDIT.md`](file:///C:/Users/srija/Projects/volta/VERIFICATION_AUDIT.md).
+- **Audited Verification Architecture:** Documented at [`VERIFICATION_AUDIT.md`](file:///C:/Users/srija/Projects/ROCHE/VERIFICATION_AUDIT.md).
 - **Public Developer Hub:** Deployed and live at **https://roche-nine.vercel.app/**.
 - **Open-Source Repository:** Maintained at **https://github.com/creatorofaurad/Roche**.
 

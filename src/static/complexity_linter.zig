@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Solhint Complexity & Fallback Bounds Linter
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Solhint Complexity & Fallback Bounds Linter
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -41,3 +41,4 @@ pub const ComplexityLinter = struct {
         return self.warnings[0..self.warning_count];
     }
 };
+

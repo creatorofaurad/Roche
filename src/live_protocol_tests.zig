@@ -1,4 +1,4 @@
-//! live_protocol_tests.zig: Comprehensive Real-World Protocol Attack Suite for Volta
+﻿//! live_protocol_tests.zig: Comprehensive Real-World Protocol Attack Suite for ROCHE
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -153,7 +153,7 @@ pub const CONCENTRATED_LIQUIDITY_TICK_BREACH_BYTECODE = [_]u8{
 };
 
 test "Live Target 1: Euler V2 Vault Donation & Reentrancy Vulnerability Detection" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
 
     // 1. Static CFG & Slither-Style Taint Audit
     const audit = engine.audit(&EULER_VAULT_DONATION_BYTECODE);
@@ -171,7 +171,7 @@ test "Live Target 1: Euler V2 Vault Donation & Reentrancy Vulnerability Detectio
 }
 
 test "Live Target 2: Uniswap V4 Hook Pool Liquidity Drain (k invariant violation)" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&UNISWAP_V4_MALICIOUS_HOOK_BYTECODE);
 
     // Initial Expected k: 2,000,000 * 5,000,000 = 10,000,000,000,000
@@ -183,7 +183,7 @@ test "Live Target 2: Uniswap V4 Hook Pool Liquidity Drain (k invariant violation
 }
 
 test "Live Target 3: Ethena PSM ERC-4626 First-Deposit Share Inflation Barrier" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&ETHENA_PSM_SHARE_INFLATION_BYTECODE);
 
     // Invariant: Assets > 0 while Shares == 0 must trigger violation
@@ -192,7 +192,7 @@ test "Live Target 3: Ethena PSM ERC-4626 First-Deposit Share Inflation Barrier" 
 }
 
 test "Live Target 4: Flash Loan Arbitrage Callback Reentrancy & Deficit" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
 
     // Static Audit catches state write after external callback
     const audit = engine.audit(&FLASH_LOAN_REENTRANCY_BYTECODE);
@@ -227,7 +227,7 @@ test "Live Target 5: 10,000-Run Live Gauntlet on Real Protocol Attack Suite" {
 }
 
 test "Live Target 6: Master Protocol Insolvency & Bad-Debt Cascade Trap" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&LENDING_INSOLVENCY_CRASH_BYTECODE);
 
     const cash_reserve = engine.vm_core.storage.select(0);   // 1,000,000
@@ -244,7 +244,7 @@ test "Live Target 6: Master Protocol Insolvency & Bad-Debt Cascade Trap" {
 }
 
 test "Live Target 7: Curve LP Precision Truncation & Division Detection" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     const audit = engine.audit(&CURVE_PRECISION_TRUNCATION_BYTECODE);
     try std.testing.expect(audit.divide_before_multiply);
 
@@ -255,7 +255,7 @@ test "Live Target 7: Curve LP Precision Truncation & Division Detection" {
 }
 
 test "Live Target 8: Balancer Vault Read-Only Reentrancy Guard Trap" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     const audit = engine.audit(&BALANCER_READ_ONLY_REENTRANCY_BYTECODE);
     try std.testing.expect(audit.read_only_reentrancy);
 
@@ -265,7 +265,7 @@ test "Live Target 8: Balancer Vault Read-Only Reentrancy Guard Trap" {
 }
 
 test "Live Target 9: Perpetual Futures Margin Solvency Deficit Trap" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&PERP_MARGIN_DEFICIT_BYTECODE);
 
     const vault_backing = engine.vm_core.storage.select(0); // 7M
@@ -279,7 +279,7 @@ test "Live Target 9: Perpetual Futures Margin Solvency Deficit Trap" {
 }
 
 test "Live Target 10: Multichain Cross-Chain Bridge Token Conservation Trap" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&BRIDGE_CONSERVATION_BREACH_BYTECODE);
 
     const l1_locked = engine.vm_core.storage.select(0); // 1,000,000
@@ -292,7 +292,7 @@ test "Live Target 10: Multichain Cross-Chain Bridge Token Conservation Trap" {
 }
 
 test "Live Target 11: Liquid Staking LSD Exchange Rate Depeg Barrier" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&LSD_EXCHANGE_RATE_DEPEG_BYTECODE);
 
     const st_supply = engine.vm_core.storage.select(0); // 1,200,000
@@ -304,7 +304,7 @@ test "Live Target 11: Liquid Staking LSD Exchange Rate Depeg Barrier" {
 }
 
 test "Live Target 12: Concentrated Liquidity Tick Bounds Out-of-Range Violation" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
     _ = engine.execute(&CONCENTRATED_LIQUIDITY_TICK_BREACH_BYTECODE);
 
     const lower_sqrt_p = engine.vm_core.storage.select(0); // 1000
@@ -331,7 +331,7 @@ pub const ENZYME_BLUE_REDEMPTION_BYTECODE = [_]u8{
 };
 
 test "Live Target 13: Enzyme Blue Single Asset Redemption Queue & GAV Conservation" {
-    var engine = main_mod.VoltaEngine.init();
+    var engine = main_mod.ROCHEEngine.init();
 
     // 1. Static Audit: Check CEI on external adapter call
     const audit = engine.audit(&ENZYME_BLUE_REDEMPTION_BYTECODE);

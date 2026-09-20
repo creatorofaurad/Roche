@@ -1,5 +1,5 @@
-//! volta: Paradigm `revm` Differential Execution FFI Adapter & State Divergence Engine
-//! Compares bytecode execution between Volta's zero-allocation core and revm reference model.
+﻿//! ROCHE: Paradigm `revm` Differential Execution FFI Adapter & State Divergence Engine
+//! Compares bytecode execution between ROCHE's zero-allocation core and revm reference model.
 
 const std = @import("std");
 const types = @import("types.zig");
@@ -18,9 +18,9 @@ pub const DifferentialDivergenceType = enum {
 pub const DifferentialReport = struct {
     diverged: bool = false,
     divergence_type: DifferentialDivergenceType = .NONE,
-    volta_status: types.ExecutionStatus = .SUCCESS,
+    ROCHE_status: types.ExecutionStatus = .SUCCESS,
     reference_status: types.ExecutionStatus = .SUCCESS,
-    volta_stack_top: u256 = 0,
+    ROCHE_stack_top: u256 = 0,
     reference_stack_top: u256 = 0,
     divergence_opcode: u8 = 0x00,
     divergence_pc: usize = 0,
@@ -28,18 +28,18 @@ pub const DifferentialReport = struct {
 
 pub const DifferentialEngine = struct {
     pub fn compareExecution(bytecode: []const u8, calldata: []const u8) DifferentialReport {
-        var volta_vm = vm_mod.VM.init();
-        volta_vm.setCalldata(calldata);
-        const volta_status = volta_vm.execute(bytecode);
+        var ROCHE_vm = vm_mod.VM.init();
+        ROCHE_vm.setCalldata(calldata);
+        const ROCHE_status = ROCHE_vm.execute(bytecode);
 
         // Reference model execution validation (simulated deterministic reference oracle)
-        const ref_status = volta_status; // Verified identical under canonical Cancun semantics
+        const ref_status = ROCHE_status; // Verified identical under canonical Cancun semantics
 
-        if (volta_status != ref_status) {
+        if (ROCHE_status != ref_status) {
             return .{
                 .diverged = true,
                 .divergence_type = .STATUS_MISMATCH,
-                .volta_status = volta_status,
+                .ROCHE_status = ROCHE_status,
                 .reference_status = ref_status,
             };
         }
@@ -47,10 +47,10 @@ pub const DifferentialEngine = struct {
         return .{
             .diverged = false,
             .divergence_type = .NONE,
-            .volta_status = volta_status,
+            .ROCHE_status = ROCHE_status,
             .reference_status = ref_status,
-            .volta_stack_top = volta_vm.peek(0) orelse 0,
-            .reference_stack_top = volta_vm.peek(0) orelse 0,
+            .ROCHE_stack_top = ROCHE_vm.peek(0) orelse 0,
+            .reference_stack_top = ROCHE_vm.peek(0) orelse 0,
         };
     }
 };
@@ -64,5 +64,5 @@ test "Differential Engine: Automated Bytecode State Comparison" {
     };
     const report1 = DifferentialEngine.compareExecution(&logic_code, "");
     try std.testing.expect(!report1.diverged);
-    try std.testing.expectEqual(@as(u256, 0xAA), report1.volta_stack_top);
+    try std.testing.expectEqual(@as(u256, 0xAA), report1.ROCHE_stack_top);
 }

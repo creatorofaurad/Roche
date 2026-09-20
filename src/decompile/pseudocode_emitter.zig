@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Panoramix Zero-Heap Decompilation Emitter
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Panoramix Zero-Heap Decompilation Emitter
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -35,3 +35,4 @@ pub const PseudocodeEmitter = struct {
         }
     }
 };
+

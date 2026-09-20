@@ -1,4 +1,4 @@
-//! volta: C-ABI Dynamic FFI Bridge for Rust (volta-rs) & Foundry Integration
+﻿//! ROCHE: C-ABI Dynamic FFI Bridge for Rust (ROCHE-rs) & Foundry Integration
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 //! Compliant with C calling conventions for seamless FFI interoperability.
 
@@ -44,7 +44,7 @@ pub export fn roche_c_version() [*:0]const u8 {
     return types.VERSION;
 }
 
-pub export fn volta_c_version() [*:0]const u8 {
+pub export fn ROCHE_c_version() [*:0]const u8 {
     return roche_c_version();
 }
 
@@ -57,7 +57,7 @@ pub export fn roche_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8
     return @intFromEnum(status);
 }
 
-pub export fn volta_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8 {
+pub export fn ROCHE_c_execute(bytecode_ptr: [*]const u8, bytecode_len: usize) u8 {
     return roche_c_execute(bytecode_ptr, bytecode_len);
 }
 
@@ -79,7 +79,7 @@ pub export fn roche_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 
     return mask;
 }
 
-pub export fn volta_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 {
+pub export fn ROCHE_c_audit(bytecode_ptr: [*]const u8, bytecode_len: usize) u32 {
     return roche_c_audit(bytecode_ptr, bytecode_len);
 }
 
@@ -119,7 +119,7 @@ pub export fn roche_c_minimize_trace(
     return @truncate(sliced.len);
 }
 
-pub export fn volta_c_minimize_trace(
+pub export fn ROCHE_c_minimize_trace(
     step_count: u32,
     read_slots: [*]const u64,
     write_slots: [*]const u64,
@@ -173,7 +173,7 @@ pub export fn roche_c_synthesize_poc(
     return poc.len;
 }
 
-pub export fn volta_c_synthesize_poc(
+pub export fn ROCHE_c_synthesize_poc(
     test_name_ptr: [*]const u8,
     test_name_len: usize,
     target_hex_ptr: [*]const u8,
@@ -202,14 +202,14 @@ pub export fn volta_c_synthesize_poc(
 // =================================================================================================
 
 test "C-ABI: Version, Execution & Static Audit Exports" {
-    const ver = volta_c_version();
+    const ver = ROCHE_c_version();
     try std.testing.expect(ver[0] != 0);
 
     const bytecode = [_]u8{ 0x60, 0x01, 0x60, 0x02, 0x01, 0x60, 0x00, 0x55, 0x00 };
-    const status = volta_c_execute(&bytecode, bytecode.len);
+    const status = ROCHE_c_execute(&bytecode, bytecode.len);
     try std.testing.expectEqual(@as(u8, 0), status); // SUCCESS = 0
 
-    const audit_mask = volta_c_audit(&bytecode, bytecode.len);
+    const audit_mask = ROCHE_c_audit(&bytecode, bytecode.len);
     _ = audit_mask;
 }
 
@@ -218,7 +218,7 @@ test "C-ABI: Dynamic Trace Minimizer & PoC Generation" {
     const write_slots = [_]u64{ 0x100, 0x200, 0x00 };
     var result: C_TraceResult = undefined;
 
-    const reduced = volta_c_minimize_trace(3, &read_slots, &write_slots, 2, &result);
+    const reduced = ROCHE_c_minimize_trace(3, &read_slots, &write_slots, 2, &result);
     try std.testing.expectEqual(@as(u32, 2), reduced);
     try std.testing.expectEqual(@as(u32, 2), result.minimized_steps);
 
@@ -227,7 +227,7 @@ test "C-ABI: Dynamic Trace Minimizer & PoC Generation" {
     const target_hex = "6000F16103E860005500";
     const inv_name = "verifySolvency";
 
-    const written = volta_c_synthesize_poc(
+    const written = ROCHE_c_synthesize_poc(
         test_name.ptr,
         test_name.len,
         target_hex.ptr,

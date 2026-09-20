@@ -1,5 +1,5 @@
-//! volta: Ethereum Execution Spec Tests (EEST) Automated Harness
-//! Deserializes standardized EEST JSON test vectors and executes state-transition assertions against Volta VM.
+﻿//! ROCHE: Ethereum Execution Spec Tests (EEST) Automated Harness
+//! Deserializes standardized EEST JSON test vectors and executes state-transition assertions against ROCHE VM.
 //! Enforces zero dynamic heap allocation during vector execution.
 
 const std = @import("std");

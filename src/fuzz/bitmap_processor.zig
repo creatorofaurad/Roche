@@ -1,5 +1,5 @@
-// ============================================================================
-// VOLTA SILICON KERNEL: Port of Echidna 64KB Coverage Processor & Minimizer
+﻿// ============================================================================
+// ROCHE SILICON KERNEL: Port of Echidna 64KB Coverage Processor & Minimizer
 // Invariant: Zero Heap Allocation | 64-Byte Cache Aligned | Zig 0.16.0
 // ============================================================================
 
@@ -52,3 +52,4 @@ pub const BitmapProcessor = struct {
         self.prev_loc = 0;
     }
 };
+

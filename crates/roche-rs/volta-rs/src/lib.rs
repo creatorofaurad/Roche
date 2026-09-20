@@ -1,6 +1,6 @@
-//! # volta-rs: Institutional EVM Verification & Trace Reduction Engine
+﻿//! # ROCHE-rs: Institutional EVM Verification & Trace Reduction Engine
 //!
-//! Native Rust bindings for the bare-silicon **Volta** engine written in Pure Zig 0.16.0.
+//! Native Rust bindings for the bare-silicon **ROCHE** engine written in Pure Zig 0.16.0.
 //! Provides sub-microsecond EVM execution, dynamic RAW trace reduction, static security audits,
 //! and automated Foundry PoC exploit synthesis with 0 dynamic heap allocations.
 
@@ -50,14 +50,14 @@ impl From<u8> for ExecutionStatus {
     }
 }
 
-/// Volta Native Engine Interface
-pub struct Volta;
+/// ROCHE Native Engine Interface
+pub struct ROCHE;
 
-impl Volta {
+impl ROCHE {
     /// Return the semantic version string of the underlying bare-silicon engine
     pub fn version() -> &'static str {
         unsafe {
-            let ptr = ffi::volta_c_version();
+            let ptr = ffi::ROCHE_c_version();
             if ptr.is_null() {
                 "unknown"
             } else {
@@ -66,12 +66,12 @@ impl Volta {
         }
     }
 
-    /// Execute bytecode directly on Volta bare-silicon VM
+    /// Execute bytecode directly on ROCHE bare-silicon VM
     pub fn execute(bytecode: &[u8]) -> ExecutionStatus {
         if bytecode.is_empty() {
             return ExecutionStatus::Success;
         }
-        let status = unsafe { ffi::volta_c_execute(bytecode.as_ptr(), bytecode.len()) };
+        let status = unsafe { ffi::ROCHE_c_execute(bytecode.as_ptr(), bytecode.len()) };
         ExecutionStatus::from(status)
     }
 
@@ -80,7 +80,7 @@ impl Volta {
         if bytecode.is_empty() {
             return 0;
         }
-        unsafe { ffi::volta_c_audit(bytecode.as_ptr(), bytecode.len()) }
+        unsafe { ffi::ROCHE_c_audit(bytecode.as_ptr(), bytecode.len()) }
     }
 
     /// Minimize a multi-step execution trace via RAW dynamic backward DAG reachability
@@ -103,7 +103,7 @@ impl Volta {
         };
 
         let reduced = unsafe {
-            ffi::volta_c_minimize_trace(
+            ffi::ROCHE_c_minimize_trace(
                 count,
                 read_slots.as_ptr(),
                 write_slots.as_ptr(),
@@ -128,7 +128,7 @@ impl Volta {
     ) -> Result<String, &'static str> {
         let mut buf = vec![0u8; 16384];
         let written = unsafe {
-            ffi::volta_c_synthesize_poc(
+            ffi::ROCHE_c_synthesize_poc(
                 test_name.as_ptr(),
                 test_name.len(),
                 target_bytecode_hex.as_ptr(),
@@ -155,22 +155,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_volta_version() {
-        let ver = Volta::version();
+    fn test_ROCHE_version() {
+        let ver = ROCHE::version();
         assert!(!ver.is_empty());
     }
 
     #[test]
-    fn test_volta_execution() {
+    fn test_ROCHE_execution() {
         let code = [0x60, 0x01, 0x60, 0x02, 0x01, 0x60, 0x00, 0x55, 0x00];
-        let status = Volta::execute(&code);
+        let status = ROCHE::execute(&code);
         assert_eq!(status, ExecutionStatus::Success);
     }
 
     #[test]
-    fn test_volta_audit() {
+    fn test_ROCHE_audit() {
         let code = [0x60, 0x01, 0x60, 0x02, 0x01, 0x60, 0x00, 0x55, 0x00];
-        let mask = Volta::audit(&code);
+        let mask = ROCHE::audit(&code);
         let _ = mask;
     }
 
@@ -178,7 +178,7 @@ mod tests {
     fn test_trace_minimizer() {
         let reads = [0x00, 0x00, 0x100];
         let writes = [0x100, 0x200, 0x00];
-        let res = Volta::minimize_trace(&reads, &writes, 2);
+        let res = ROCHE::minimize_trace(&reads, &writes, 2);
         assert!(res.is_some());
         let res = res.unwrap();
         assert_eq!(res.minimized_steps, 2);
@@ -186,7 +186,7 @@ mod tests {
 
     #[test]
     fn test_poc_synthesis() {
-        let poc = Volta::synthesize_poc(
+        let poc = ROCHE::synthesize_poc(
             "ArbitrumVaultExploit",
             "6000F16103E860005500",
             "verifySolvency",
@@ -198,3 +198,4 @@ mod tests {
         assert!(poc_str.contains("ArbitrumVaultExploit_AttackerHarness"));
     }
 }
+

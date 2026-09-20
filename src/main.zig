@@ -1,4 +1,4 @@
-//! volta: Unified Bare-Silicon EVM Formal Invariant & Security Suite
+﻿//! ROCHE: Unified Bare-Silicon EVM Formal Invariant & Security Suite
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -27,29 +27,29 @@ pub const VERSION = types.VERSION;
 
 pub var global_orchestrator: orchestrator.MasterOrchestrator align(64) = undefined;
 
-pub const VoltaEngine = struct {
+pub const ROCHEEngine = struct {
     vm_core: vm.VM = vm.VM.init(),
     cfg_core: cfg.ControlFlowGraph = .{},
     dict: fuzzer.DictionaryPool = fuzzer.DictionaryPool.init(),
 
-    pub fn init() VoltaEngine {
+    pub fn init() ROCHEEngine {
         return .{};
     }
 
     /// Run full static audit + dictionary extraction
-    pub fn audit(self: *VoltaEngine, bytecode: []const u8) detectors.DetectorResult {
+    pub fn audit(self: *ROCHEEngine, bytecode: []const u8) detectors.DetectorResult {
         self.cfg_core = cfg.ControlFlowGraph.build(bytecode);
         self.dict.extractFromBytecode(bytecode);
         return detectors.DetectorSuite.runAll(&self.cfg_core);
     }
 
     /// Execute bytecode with coverage feedback
-    pub fn execute(self: *VoltaEngine, bytecode: []const u8) types.ExecutionStatus {
+    pub fn execute(self: *ROCHEEngine, bytecode: []const u8) types.ExecutionStatus {
         return self.vm_core.execute(bytecode);
     }
 
     /// Verify Uniswap-style constant product AMM invariant
-    pub fn verifyAmm(self: *const VoltaEngine, min_k: u256) bool {
+    pub fn verifyAmm(self: *const ROCHEEngine, min_k: u256) bool {
         return invariants.InvariantEngine.verifyConstantProduct(&self.vm_core.storage, min_k);
     }
 };
@@ -75,7 +75,7 @@ pub fn main(init: std.process.Init) !void {
         std.debug.print("roche v{s} (bare-silicon x86_64 native)\n", .{VERSION});
     } else if (std.mem.eql(u8, command, "orchestrate") or std.mem.eql(u8, command, "pipeline")) {
         const target = args.next() orelse {
-            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing contract name or hex.\nUsage: volta orchestrate <name> <hex> [runs_per_thread]\n", .{});
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing contract name or hex.\nUsage: ROCHE orchestrate <name> <hex> [runs_per_thread]\n", .{});
             return;
         };
         const hex = args.next() orelse "6000F16103E860005500";
@@ -83,7 +83,7 @@ pub fn main(init: std.process.Init) !void {
         if (args.next()) |runs_str| {
             runs = std.fmt.parseInt(usize, runs_str, 10) catch 250;
         }
-        std.debug.print("\x1b[1;32m[*] Executing Volta Master Autonomous Exploit Synthesis Pipeline...\x1b[0m\n", .{});
+        std.debug.print("\x1b[1;32m[*] Executing ROCHE Master Autonomous Exploit Synthesis Pipeline...\x1b[0m\n", .{});
         global_orchestrator = orchestrator.MasterOrchestrator.init(4);
         const res = global_orchestrator.executeAutonomousPipeline(target, hex, runs);
         std.debug.print("  [+] Violations Detected:  \x1b[31m{d}\x1b[0m\n", .{res.violations_detected});
@@ -95,7 +95,7 @@ pub fn main(init: std.process.Init) !void {
         }
     } else if (std.mem.eql(u8, command, "audit")) {
         const target = args.next() orelse {
-            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex or file path.\nUsage: volta audit <hex|file>\n", .{});
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex or file path.\nUsage: ROCHE audit <hex|file>\n", .{});
             return;
         };
         if (!handler.parseHex(target) and !handler.readFile(target)) {
@@ -105,7 +105,7 @@ pub fn main(init: std.process.Init) !void {
         handler.runAudit();
     } else if (std.mem.eql(u8, command, "fuzz")) {
         const target = args.next() orelse {
-            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex or file path.\nUsage: volta fuzz <hex|file> [--runs N]\n", .{});
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex or file path.\nUsage: ROCHE fuzz <hex|file> [--runs N]\n", .{});
             return;
         };
         var runs: u32 = 10000;
@@ -123,19 +123,19 @@ pub fn main(init: std.process.Init) !void {
         handler.runFuzz(runs);
     } else if (std.mem.eql(u8, command, "synth")) {
         const target = args.next() orelse {
-            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex.\nUsage: volta synth <hex> [invariant_name]\n", .{});
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing bytecode hex.\nUsage: ROCHE synth <hex> [invariant_name]\n", .{});
             return;
         };
         const inv_name = args.next() orelse "verifyConstantProduct";
         handler.runSynth(target, inv_name);
     } else if (std.mem.eql(u8, command, "repro")) {
         const protocol = args.next() orelse {
-            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing protocol identifier.\nUsage: volta repro <euler|uniswap|ethena|curve|enzyme>\n", .{});
+            std.debug.print("\x1b[31m[ERROR]\x1b[0m Missing protocol identifier.\nUsage: ROCHE repro <euler|uniswap|ethena|curve|enzyme>\n", .{});
             return;
         };
         handler.runRepro(protocol);
     } else if (std.mem.eql(u8, command, "gauntlet")) {
-        std.debug.print("\x1b[1;32m[*] Executing Volta 10,000-Run In-Sample Gauntlet & Walk-Forward Protocol...\x1b[0m\n", .{});
+        std.debug.print("\x1b[1;32m[*] Executing ROCHE 10,000-Run In-Sample Gauntlet & Walk-Forward Protocol...\x1b[0m\n", .{});
         var arena_inst = arena.ArenaHarness.init(0x1337BEEFCAFE);
         const sample_amm = [_]u8{ 0x60, 0x01, 0x60, 0x00, 0x55, 0x00 };
         const sample_vault = [_]u8{ 0x60, 0x64, 0x60, 0x01, 0x55, 0x00 };
@@ -149,8 +149,8 @@ pub fn main(init: std.process.Init) !void {
         std.debug.print("  [+] Max Sequence Depth:       \x1b[35m{d} calls\x1b[0m\n", .{summary.max_sequence_depth});
         std.debug.print("  [+] Dynamic Memory Used:      \x1b[32m0 Bytes\x1b[0m\n", .{});
     } else if (std.mem.eql(u8, command, "benchmark")) {
-        std.debug.print("\x1b[1;32m[*] Running Volta Measured Execution Latency Benchmark (100,000 passes)...\x1b[0m\n", .{});
-        var engine = VoltaEngine.init();
+        std.debug.print("\x1b[1;32m[*] Running ROCHE Measured Execution Latency Benchmark (100,000 passes)...\x1b[0m\n", .{});
+        var engine = ROCHEEngine.init();
         const code = [_]u8{ 0x60, 0x01, 0x60, 0x02, 0x01, 0x60, 0x00, 0x55, 0x00 };
         const passes: usize = 100_000;
 

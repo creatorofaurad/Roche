@@ -1,4 +1,4 @@
-//! benchmark_harness.zig: Real-World Hardware Benchmarking Suite for Volta
+﻿//! benchmark_harness.zig: Real-World Hardware Benchmarking Suite for ROCHE
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -12,7 +12,7 @@ extern "kernel32" fn QueryPerformanceFrequency(lpFrequency: *i64) callconv(@impo
 pub fn main() !void {
     std.debug.print("\n", .{});
     std.debug.print("===================================================================================================\n", .{});
-    std.debug.print("                         VOLTA NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       \n", .{});
+    std.debug.print("                         ROCHE NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       \n", .{});
     std.debug.print("===================================================================================================\n\n", .{});
 
     const iterations: usize = 100000;
@@ -106,3 +106,4 @@ pub fn main() !void {
     std.debug.print("Telemetry Integrity Check:           inv_sink={d}, tstore_sink={d}, simd_sink={d:.1}\n", .{ dummy_inv, dummy_tstore, simd_sum });
     std.debug.print("===================================================================================================\n\n", .{});
 }
+

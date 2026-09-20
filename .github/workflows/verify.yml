@@ -1,4 +1,4 @@
-name: Volta Verification & Compliance Suite
+﻿name: ROCHE Verification & Compliance Suite
 
 on:
   push:
@@ -29,4 +29,5 @@ jobs:
         run: zig build -Doptimize=ReleaseFast
 
       - name: Execute Native Latency Benchmark
-        run: ./zig-out/bin/volta benchmark
+        run: ./zig-out/bin/ROCHE benchmark
+

@@ -1,4 +1,4 @@
-//! arena.zig: Volta High-Throughput 10,000-Test In-Sample Gauntlet & Walk-Forward Validation Engine
+﻿//! arena.zig: ROCHE High-Throughput 10,000-Test In-Sample Gauntlet & Walk-Forward Validation Engine
 //! Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -205,3 +205,4 @@ test "Arena: 10,000 In-Sample Gauntlet & Walk-Forward Protocol" {
     const wf_ok = arena_inst.runWalkForwardValidation(&unseen_pool);
     try std.testing.expect(wf_ok);
 }
+

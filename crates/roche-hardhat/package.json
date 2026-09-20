@@ -1,0 +1,25 @@
+{
+  "name": "hardhat-roche",
+  "version": "1.0.0",
+  "description": "Hardhat plugin for Roche bare-silicon EVM formal invariant verification and static auditing",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "author": "Charles <srijaan@proton.me>",
+  "license": "MIT",
+  "keywords": [
+    "hardhat",
+    "hardhat-plugin",
+    "ethereum",
+    "security",
+    "fuzzer",
+    "formal-verification",
+    "roche"
+  ],
+  "peerDependencies": {
+    "hardhat": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

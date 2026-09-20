@@ -1,0 +1,13 @@
+[package]
+name = "roche-foundry"
+version = "0.1.0"
+edition = "2021"
+authors = ["Charles <srijaan@proton.me>"]
+description = "Native Foundry Rust FFI bridge and automated Solidity PoC test synthesizer for Roche EVM"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+roche-rs = { path = "../roche-rs" }
+
+[lib]
+crate-type = ["cdylib", "rlib"]

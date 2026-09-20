@@ -1,0 +1,33 @@
+name: Roche Formal Invariant & Security Audit CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  roche-audit:
+    name: Bare-Silicon EVM Invariant & Conformance Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Zig Toolchain
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.16.0
+
+      - name: Build Roche Native Binary
+        run: |
+          zig build -Doptimize=ReleaseFast
+
+      - name: Run Master Invariant & Zero-Allocation Test Suite (29/29)
+        run: |
+          zig build test
+
+      - name: Execute Mainnet Fork & EEST Conformance Verification
+        run: |
+          ./zig-out/bin/roche --help

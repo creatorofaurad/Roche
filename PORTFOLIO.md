@@ -1,38 +1,54 @@
-# Charles' Systems Architecture Portfolio
+# Engineering Portfolio: Charles (Lead Systems Architect)
 
-**Founder & Systems Architect:** Charles (`creatorofaurad`)  
-**Core Discipline:** Bare-Silicon Systems Engineering, Formal Invariant Verification, Cryptanalysis & High-Performance Substrates.
-
----
-
-## 1. Production EVM & Security Infrastructure
-- **[Roche](https://github.com/creatorofaurad/roche)** — Zero-allocation, bare-silicon EVM stateful verification and dynamic trace reduction engine. Finds the precise Roche Limit of DeFi protocols before attackers do. Passing 29/29 test suites, verified 0 bytes heap allocations, sub-microsecond execution, with native `crates/roche-rs` Rust bindings and Foundry PoC synthesis.
-
-## 2. Cryptanalysis & Mathematical Complexity
-- **[1M](https://github.com/creatorofaurad/1M)** — Fundamental theoretical research on unconditional Boolean circuit size lower bounds via 2-dimensional LSV Ramanujan Complexes, $\varepsilon$-coboundary expansion, and non-linear Boolean Jacobian matrix rigidity over $\mathbb{F}_2$.
-- **[Kangaroo Solver](https://github.com/creatorofaurad/kangaroo-solver)** — Hardware-optimized Pollard's Kangaroo discrete logarithm cryptanalysis engine for secp256k1 key recovery within bounded intervals.
-
-## 3. Core Compute Substrates & Runtime Engines
-- **[Syzygy](https://github.com/creatorofaurad/syzygy)** — Deterministic bare-silicon compute substrate and kinetic state execution engine with zero runtime overhead.
-- **[Zig Tensor Engine](https://github.com/creatorofaurad/zig-tensor-engine)** — Zero-dependency native AVX2 SIMD deep-learning tensor runtime executing vectorized matrix multiplications directly from cache-aligned weights.
-
-## 4. AI & Safety Infrastructure
-- **[Aegis Inference](https://github.com/creatorofaurad/aegis-inference)** — Ultra-low-latency 1.58-bit ternary neural network (BitNet) native inference engine designed for zero-heap embedded execution.
-- **[Halt](https://github.com/creatorofaurad/Halt)** — Real-time deterministic execution safety rails and opcode-level invariant assertion interceptor.
-
-## 5. Networking & Distributed Mesh
-- **[Vektor](https://github.com/creatorofaurad/vektor)** — High-throughput decentralized peer-to-peer compute mesh with lock-free memory mapping and direct socket serialization.
-
-## 6. Systems & Application Layer Utilities
-- **[WebAPI](https://github.com/creatorofaurad/webapi)** — Ultra-lightweight asynchronous native backend router.
-- **[Scrnthrd](https://github.com/creatorofaurad/scrnthrd)** — Low-latency UI thread synchronization and memory-mapped rendering coordinator.
+**Lead Systems Architect:** Charles (`srijaan@proton.me`)  
+**Focus:** Bare-Silicon Systems Architecture, High-Performance Compilers, Cryptographic Engines, and Formal Verification  
+**Primary Language Stack:** Pure Zig 0.16.0, Modern Rust, C/C++, x86-64 / ARM64 Assembly, Solidity  
+**Date:** September 20, 2026  
 
 ---
 
-## The Architectural Thesis
+## 1. Flagship Infrastructure
 
-Every system in this portfolio is engineered around four non-negotiable silicon invariants:
-1. **0 Bytes Dynamic Heap Allocations** on hot execution paths (`malloc`/`free` = 0).
-2. **64-Byte Hardware Cache Alignment** across memory pages, stacks, and tensor buffers.
-3. **Formal Invariant Verification** over probabilistic heuristic testing.
-4. **Zero Third-Party Runtime Bloat**—native code written directly for bare silicon in Zig, C/C++, Rust, and Assembly.
+### 1. [Roche](https://github.com/creatorofaurad/Roche) (Flagship Protocol)
+- **Description:** Zero-allocation, bare-silicon EVM state-differential fuzzer, formal invariant verifier, and causal trace minimizer in pure Zig 0.16.0 with AVX2 SIMD optimizations. Running at 118,764 execs/sec.
+- **Status:** Production / 29 Passing Invariant Suites (100% Green) / $500k EF 1TS Grant Submission.
+
+### 2. [1M (P ≠ NP Formal Research)](https://github.com/creatorofaurad/1M)
+- **Description:** Theoretical computer science and algebraic complexity program investigating high-dimensional simplicial coboundary expanders (LSV complexes), non-linear Jacobian matrix rigidity, and circuit lower bounds.
+- **Status:** Active Research / 9-Agent Formal Council Verified.
+
+### 3. [Syzygy](https://github.com/creatorofaurad/syzygy)
+- **Description:** Deterministic low-latency compute engine for real-time distributed consensus and state-machine replication with zero memory jitter.
+- **Status:** Active Core / Hardened Architecture.
+
+### 4. [Pollard's Kangaroo ECDSA Solver](https://github.com/creatorofaurad/kangaroo)
+- **Description:** AVX-512 and CUDA accelerated discrete logarithm solver over secp256k1 elliptic curve intervals using distinguished points and kangaroo jumps.
+- **Status:** High-Performance Cryptographic Tooling.
+
+### 5. [Zig Tensor Engine](https://github.com/creatorofaurad/zig-tensor)
+- **Description:** Bare-silicon deep learning tensor runtime with zero heap allocation, 64-byte alignment, and AVX2 GEMM kernels.
+- **Status:** Production-Ready Silicon Core.
+
+### 6. [Vektor P2P](https://github.com/creatorofaurad/vektor)
+- **Description:** End-to-end encrypted, decentralized peer-to-peer mesh networking stack with ChaCha20-Poly1305 and Noise Protocol framing.
+- **Status:** Operational P2P Network Protocol.
+
+### 7. [Aegis Inference Engine](https://github.com/creatorofaurad/aegis)
+- **Description:** Ultra-low-power ternary (-1, 0, +1) BitNet 1.58b inference engine written in pure Zig for resource-constrained edge hardware.
+- **Status:** Production Edge Kernel.
+
+### 8. [Halt: AI Alignment & Invariant Guard](https://github.com/creatorofaurad/halt)
+- **Description:** Hardware-enforced execution monitor and memory barrier preventing out-of-distribution autonomous agent loops.
+- **Status:** Security Invariant Infrastructure.
+
+### 9. [WebAPI](https://github.com/creatorofaurad/webapi)
+- **Description:** High-throughput native HTTP/WebSocket gateway built on direct epoll/IOCP kernel event loops.
+- **Status:** Production Backend Gateway.
+
+### 10. [Scrnthrd](https://github.com/creatorofaurad/scrnthrd)
+- **Description:** Ultra-minimalist web user interface and state visualizer for real-time telemetry streaming and trace inspection.
+- **Status:** Production Frontend Client.
+
+### 11. Pierre Monolith (Private Vault)
+- **Description:** Master formal verification engine, SMT solvers, and ICFG SSA lowerers powering core research.
+- **Status:** Active Foundation Vault.

@@ -1,10 +1,10 @@
-# Project Volta: Bare-Silicon Formal Invariant Verification & Automated Test Reduction Harness
+﻿# Project ROCHE: Bare-Silicon Formal Invariant Verification & Automated Test Reduction Harness
 
 **Target Grant Program:** Octant Epoch 14 (Public Goods & Security Infrastructure)  
 **Total Funding Request:** $89,640 USD  
 **Timeline:** 6 Months (3 Verifiable Engineering Milestones)  
 **Lead Architect:** Srijan Mandal (Native Systems & Formal Verification Engineer)  
-**Repository:** [github.com/creatorofaurad/volta](https://github.com/creatorofaurad/volta) (MIT License)  
+**Repository:** [github.com/creatorofaurad/ROCHE](https://github.com/creatorofaurad/ROCHE) (MIT License)  
 **Language & Toolchain:** Pure Native Zig 0.16.0 (`ReleaseFast`)
 
 ---
@@ -16,26 +16,26 @@ Decentralized finance (DeFi) security teams and protocol auditors currently face
 1. **The Reproduction Bottleneck:** When stateful fuzzers (Echidna, Foundry Fuzz, Medusa) detect property violations across deep execution trees, they produce non-minimal, noisy transaction traces containing dozens of irrelevant calls. Human security researchers must spend days manually isolating the minimal bug-inducing call sequence.
 2. **Computational Overhead:** Mainstream formal and symbolic tooling (Certora, Halmos, Slither) rely on interpreted languages (Python, Java/JVM) with high memory footprints and garbage collection latency, making continuous sub-second invariant proving impossible in standard CI/CD deployment pipelines.
 
-**Volta resolves this bottleneck:** It is an open-source, bare-silicon EVM state verification and autonomous test-case synthesis engine written in pure native Zig 0.16.0. Volta executes without dynamic heap allocations on hot paths, evaluates 15 domain-specific economic invariants in $< 1.00\text{ ns}$, minimizes counterexample traces via $O(N \log N)$ hierarchical delta-debugging, and automatically emits standalone, compilable Foundry `.t.sol` reproduction files for responsible disclosure and authorized patch verification.
+**ROCHE resolves this bottleneck:** It is an open-source, bare-silicon EVM state verification and autonomous test-case synthesis engine written in pure native Zig 0.16.0. ROCHE executes without dynamic heap allocations on hot paths, evaluates 15 domain-specific economic invariants in $< 1.00\text{ ns}$, minimizes counterexample traces via $O(N \log N)$ hierarchical delta-debugging, and automatically emits standalone, compilable Foundry `.t.sol` reproduction files for responsible disclosure and authorized patch verification.
 
 ---
 
 ## 2. Defensive Security Mandate & Responsible Disclosure Policy
 
-Volta is engineered strictly as a defensive verification technology and security auditing tool. Its operational scope is constrained to:
+ROCHE is engineered strictly as a defensive verification technology and security auditing tool. Its operational scope is constrained to:
 
 - **Local Fork & Sandboxed Testing:** Reproducing vulnerabilities within local Anvil/Hardhat forks and private testnets.
 - **Pre-Deployment Protocol CI/CD:** Proving continuous solvency, share price monotonicity, and reentrancy barriers prior to mainnet contract deployment.
 - **Authorized Bug Bounty Verification:** Assisting white-hat security researchers operating within the explicit scope and written rules of Immunefi or protocol-sponsored bounty programs to produce minimal, non-destructive reproduction proofs.
 - **Academic & CTF Research:** Benchmarking formal invariant algorithms and delta-debugging methods against established open-source datasets.
 
-Volta does not interact with live blockchain networks without authorization, nor does it conduct uncoordinated exploitation.
+ROCHE does not interact with live blockchain networks without authorization, nor does it conduct uncoordinated exploitation.
 
 ---
 
 ## 3. Core Architectural Subsystems (19-Subsystem Framework)
 
-Volta integrates 19 modular subsystems into a single, high-performance binary:
+ROCHE integrates 19 modular subsystems into a single, high-performance binary:
 
 | Subsystem Category | Core Module | Algorithmic Mechanism | Defensive Purpose |
 | :--- | :--- | :--- | :--- |
@@ -63,7 +63,7 @@ Volta integrates 19 modular subsystems into a single, high-performance binary:
 
 ## 4. The 17 Mathematical Invariant Families
 
-Volta evaluates 17 domain-specific invariant families natively on every state transition:
+ROCHE evaluates 17 domain-specific invariant families natively on every state transition:
 
 1. **AMM Constant Product Monotonicity:** $x_1 \cdot y_1 \ge x_0 \cdot y_0$ (Uniswap V2/V4, SushiSwap).
 2. **Conservation of Token Supply:** $\sum \text{Balance}(u_i) \equiv \text{TotalSupply}$ (ERC-20, WETH).
@@ -91,7 +91,7 @@ Measurements conducted on consumer x86_64 silicon under `ReleaseFast` optimizati
 
 ```text
 ===================================================================================================
-                         VOLTA NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       
+                         ROCHE NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       
 ===================================================================================================
 
 Iterations:          100,000 continuous evaluation passes
@@ -128,7 +128,7 @@ The requested grant funding of **$89,640 USD** is structured across three verifi
 ### Milestone 2: Foundry & Halmos SMT Ecosystem Adapter ($30,597 USD)
 - **Duration:** 2 Months
 - **Deliverables:**
-  1. Bidirectional Foundry adapter: Translates `forge test` invariant configs directly into Volta's native zero-allocation IR.
+  1. Bidirectional Foundry adapter: Translates `forge test` invariant configs directly into ROCHE's native zero-allocation IR.
   2. Standalone `.t.sol` synthesizer optimization: Generates fully annotated, NatSpec-compliant Foundry reproduction suites.
   3. Interactive CLI terminal dashboard with live coverage bitmap visualization.
   4. Formal audit and verification guide for integration into protocol CI/CD workflows.
@@ -145,4 +145,4 @@ The requested grant funding of **$89,640 USD** is structured across three verifi
 
 ## 7. Institutional Impact & Open Source Value
 
-Volta directly advances the security posture of the Ethereum and Arbitrum ecosystems by providing a freely available, high-speed verification engine. By reducing the turnaround time for bug reproduction from hours to seconds, Volta empowers independent researchers, auditors, and development teams to detect and remediate protocol vulnerabilities before deployment.
+ROCHE directly advances the security posture of the Ethereum and Arbitrum ecosystems by providing a freely available, high-speed verification engine. By reducing the turnaround time for bug reproduction from hours to seconds, ROCHE empowers independent researchers, auditors, and development teams to detect and remediate protocol vulnerabilities before deployment.

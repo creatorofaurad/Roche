@@ -1,4 +1,4 @@
-# Volta: Complete Institutional System Documentation
+﻿# ROCHE: Complete Institutional System Documentation
 **Bare-Silicon EVM Invariant Prover & Autonomous Exploit Synthesis Engine**
 *Native Zig 0.16.0 | ReleaseFast | Zero Dynamic Heap Allocation | 64-Byte Cache Aligned*
 
@@ -13,8 +13,8 @@ Decentralized Finance (DeFi) security testing today is fractured across two mutu
 
 **The Operational Gap:** Protocol teams cannot verify complex, multi-transaction economic invariants continuously within standard sub-second CI/CD pipelines.
 
-### The Volta Solution
-Volta introduces a third paradigm: a zero-allocation, native EVM state verification and autonomous exploit synthesis engine engineered entirely in pure **Zig 0.16.0**. Volta unifies:
+### The ROCHE Solution
+ROCHE introduces a third paradigm: a zero-allocation, native EVM state verification and autonomous exploit synthesis engine engineered entirely in pure **Zig 0.16.0**. ROCHE unifies:
 - **Stateful Sequence Exploration:** Multi-core parallel havoc generation guided by 64KB AVX2 coverage bitmaps.
 - **Formal Invariant Verification:** Continuous mathematical evaluation of 15 domain-specific invariant families on every execution transition ($< 1.00\text{ ns}$ latency).
 - **Hierarchical Delta-Debugging (HDD):** Bisection reduction that compresses $N$-step failing traces down to the minimal essential 2-step exploit in $O(N \log N)$ replays.
@@ -22,7 +22,7 @@ Volta introduces a third paradigm: a zero-allocation, native EVM state verificat
 
 ### Core Performance Metrics
 
-| Metric / Dimension | Volta Silicon Measurement |
+| Metric / Dimension | ROCHE Silicon Measurement |
 | :--- | :--- |
 | **Invariant Evaluation Latency** | **$< 1.00\text{ ns}$** per operation ($> 1,000,000,000\text{ ops/sec}$) |
 | **EIP-1153 Transient Storage (`TSTORE`/`TLOAD`)** | **$1.31\text{ ns}$** per operation ($765,696,784\text{ ops/sec}$) |
@@ -31,9 +31,9 @@ Volta introduces a third paradigm: a zero-allocation, native EVM state verificat
 | **Trace Discovery to Runnable Foundry PoC** | **$< 2\text{ seconds}$** |
 | **Solvency Invariant False Positive Rate** | **$0.00\%$** (Conservative mathematical bounds) |
 
-### What Volta Is vs. What Volta Is Not
-- **Volta is NOT:** A replacement for integration testing harnesses (Foundry) or a generic unconstrained fuzzer.
-- **Volta IS:** The high-throughput mathematical verification layer between raw bytecode and an executable exploit reproduction. It detects invariant breaches, strips all non-essential noise, and outputs an executable `.t.sol` test file proving the bug.
+### What ROCHE Is vs. What ROCHE Is Not
+- **ROCHE is NOT:** A replacement for integration testing harnesses (Foundry) or a generic unconstrained fuzzer.
+- **ROCHE IS:** The high-throughput mathematical verification layer between raw bytecode and an executable exploit reproduction. It detects invariant breaches, strips all non-essential noise, and outputs an executable `.t.sol` test file proving the bug.
 
 ---
 
@@ -41,122 +41,122 @@ Volta introduces a third paradigm: a zero-allocation, native EVM state verificat
 
 ```
 +---------------------------------------------------------------------------------------------------+
-|                                     VOLTA EXECUTION PIPELINE                                      |
+|                                     ROCHE EXECUTION PIPELINE                                      |
 |                                                                                                   |
-|  [ Raw Bytecode / NVMe mmap ] ──> [ Zero-Allocation Deterministic EVM Core ]                      |
-|                                                     │                                             |
-|                                                     ▼                                             |
-|  [ Compact 40B Circular WAL ] <───> [ 64B Cache-Aligned Memory & McCarthy Storage ]               |
-|                                                     │                                             |
-|                                                     ▼                                             |
-|  [ Invariant Evaluator (15 Families) ] ──> [ Hierarchical Delta-Debugger (O(N log N)) ]           |
-|                                                     │                                             |
-|                                                     ▼                                             |
-|  [ Replay Verifier & State Check ] ────────> [ Auto-Synthesized Foundry (.t.sol) PoC ]             |
+|  [ Raw Bytecode / NVMe mmap ] â”€â”€> [ Zero-Allocation Deterministic EVM Core ]                      |
+|                                                     â”‚                                             |
+|                                                     â–¼                                             |
+|  [ Compact 40B Circular WAL ] <â”€â”€â”€> [ 64B Cache-Aligned Memory & McCarthy Storage ]               |
+|                                                     â”‚                                             |
+|                                                     â–¼                                             |
+|  [ Invariant Evaluator (15 Families) ] â”€â”€> [ Hierarchical Delta-Debugger (O(N log N)) ]           |
+|                                                     â”‚                                             |
+|                                                     â–¼                                             |
+|  [ Replay Verifier & State Check ] â”€â”€â”€â”€â”€â”€â”€â”€> [ Auto-Synthesized Foundry (.t.sol) PoC ]             |
 +---------------------------------------------------------------------------------------------------+
 ```
 
 ---
 
-### Subsystem 1: CFG Dominator Frontier Engine ([`src/static/cfg_dominator.zig`](file:///C:/Users/srija/Projects/volta/src/static/cfg_dominator.zig))
+### Subsystem 1: CFG Dominator Frontier Engine ([`src/static/cfg_dominator.zig`](file:///C:/Users/srija/Projects/ROCHE/src/static/cfg_dominator.zig))
 - **Purpose:** Construct control flow graphs, compute immediate dominators ($IDom(n)$), and evaluate dominance frontiers on bare silicon.
-- **Problem It Solves:** Replaces Slither’s 2-minute Python AST parse and gigabyte RAM footprint with an instantaneous static analysis pass.
+- **Problem It Solves:** Replaces Slitherâ€™s 2-minute Python AST parse and gigabyte RAM footprint with an instantaneous static analysis pass.
 - **Algorithm:** In-place iterative bitwise dominator tree construction across a fixed 512-node basic-block array:
   $$Dom(n) = \{n\} \cup \left( \bigcap_{p \in Pred(n)} Dom(p) \right)$$
 - **Zero-Allocation Guarantee:** All graph nodes, edge bitmasks, and dominator bitsets are stored in fixed `[512]BasicBlock` structures aligned to 64 bytes.
 - **Performance:** $< 15\,\mu\text{s}$ execution time for typical DeFi bytecodes.
 
-### Subsystem 2: Interprocedural Taint Engine ([`src/static/interproc_taint.zig`](file:///C:/Users/srija/Projects/volta/src/static/interproc_taint.zig))
+### Subsystem 2: Interprocedural Taint Engine ([`src/static/interproc_taint.zig`](file:///C:/Users/srija/Projects/ROCHE/src/static/interproc_taint.zig))
 - **Purpose:** Track user-controlled inputs through arithmetic and memory operations to critical state sinks.
 - **Problem It Solves:** Identifies unconstrained `CALLDATA` routing to `DELEGATECALL` targets, `SELFDESTRUCT`, or sensitive `SSTORE` slots without full symbolic execution.
 - **Algorithm:** 64-byte aligned bitmask matrix propagating taint tags ($T_{\text{calldata}}, T_{\text{origin}}, T_{\text{caller}}$) across opcode transfer functions:
   $$T_{\text{out}} = T_{\text{in1}} \lor T_{\text{in2}}$$
 - **Zero-Allocation Guarantee:** Stack and memory taint states are fixed 1024-word bitmasks.
 
-### Subsystem 3: CEI Reentrancy Scanner ([`src/static/reentrancy_cei.zig`](file:///C:/Users/srija/Projects/volta/src/static/reentrancy_cei.zig))
+### Subsystem 3: CEI Reentrancy Scanner ([`src/static/reentrancy_cei.zig`](file:///C:/Users/srija/Projects/ROCHE/src/static/reentrancy_cei.zig))
 - **Purpose:** Detect Checks-Effects-Interactions (CEI) pattern violations in disassembled bytecode.
 - **Problem It Solves:** Catches state updates occurring after external calls across inter-block execution paths.
 - **Algorithm:** Reachability matrix scanning for `SSTORE` opcodes reachable from basic blocks containing external calls (`CALL`, `DELEGATECALL`, `STATICCALL`).
 - **Coverage:** Full detection of classic, cross-function, and cross-contract reentrancy candidates.
 
-### Subsystem 4: Gas Loop Optimizer ([`src/static/gas_loop_analyzer.zig`](file:///C:/Users/srija/Projects/volta/src/static/gas_loop_analyzer.zig))
+### Subsystem 4: Gas Loop Optimizer ([`src/static/gas_loop_analyzer.zig`](file:///C:/Users/srija/Projects/ROCHE/src/static/gas_loop_analyzer.zig))
 - **Purpose:** Identify unbounded loop iterations dependent on dynamic state arrays.
 - **Problem It Solves:** Prevents out-of-gas griefing and denial-of-service vulnerabilities.
 - **Algorithm:** Linear bytecode scanner detecting backward jump targets (`JUMP`, `JUMPI`) lacking cached upper-bound storage comparisons.
 
-### Subsystem 5: Complexity Linter ([`src/static/complexity_linter.zig`](file:///C:/Users/srija/Projects/volta/src/static/complexity_linter.zig))
+### Subsystem 5: Complexity Linter ([`src/static/complexity_linter.zig`](file:///C:/Users/srija/Projects/ROCHE/src/static/complexity_linter.zig))
 - **Purpose:** Calculate bytecode-level cyclomatic complexity and risk profiles.
 - **Problem It Solves:** Pinpoints highly convoluted execution graphs prone to hidden edge-case logic bugs.
 - **Algorithm:** Evaluates McCabe cyclomatic complexity $M = E - N + 2P$ directly from disassembled jump tables and dispatch routes.
 
-### Subsystem 6: Havoc Mutation Engine ([`src/fuzz/havoc_engine.zig`](file:///C:/Users/srija/Projects/volta/src/fuzz/havoc_engine.zig))
+### Subsystem 6: Havoc Mutation Engine ([`src/fuzz/havoc_engine.zig`](file:///C:/Users/srija/Projects/ROCHE/src/fuzz/havoc_engine.zig))
 - **Purpose:** Generate high-entropy, state-mutating transaction sequences for fuzzing exploration.
 - **Problem It Solves:** Eliminates `revm`/Foundry heap allocations during mutation loops.
 - **Algorithm:** 256-bit SIMD in-place mutator using XORShift128+ PRNG applying dictionary splicing, boundary value insertion ($0, 1, 2^{256}-1$), and address permutation.
 - **Throughput:** Over $20,000,000$ mutations per second on single-core silicon.
 
-### Subsystem 7: AFL Coverage Processor ([`src/fuzz/bitmap_processor.zig`](file:///C:/Users/srija/Projects/volta/src/fuzz/bitmap_processor.zig))
+### Subsystem 7: AFL Coverage Processor ([`src/fuzz/bitmap_processor.zig`](file:///C:/Users/srija/Projects/ROCHE/src/fuzz/bitmap_processor.zig))
 - **Purpose:** Track edge transitions with hardware-accelerated feedback.
 - **Problem It Solves:** Replaces Haskell/Go unaligned memory bitmaps with cache-aligned SIMD structures.
 - **Algorithm:** 64KB shared edge bitmap using 256-bit AVX2 SIMD saturation counting (`@Vector(32, u8)`).
 - **Overhead:** $< 1\%$ CPU cycle cost per basic-block transition.
 
-### Subsystem 8: Parallel Worker Arena ([`src/fuzz/parallel_executor.zig`](file:///C:/Users/srija/Projects/volta/src/fuzz/parallel_executor.zig))
+### Subsystem 8: Parallel Worker Arena ([`src/fuzz/parallel_executor.zig`](file:///C:/Users/srija/Projects/ROCHE/src/fuzz/parallel_executor.zig))
 - **Purpose:** Coordinate multi-threaded parallel fuzzing across native CPU cores.
 - **Problem It Solves:** Bypasses OS context switching and Goroutine scheduler latency.
 - **Algorithm:** Native OS thread workers executing independent VM memory contexts with atomic work distribution and monotonic progress metrics.
 
-### Subsystem 9: On-Chain State Streamer ([`src/fuzz/onchain_stream.zig`](file:///C:/Users/srija/Projects/volta/src/fuzz/onchain_stream.zig))
+### Subsystem 9: On-Chain State Streamer ([`src/fuzz/onchain_stream.zig`](file:///C:/Users/srija/Projects/ROCHE/src/fuzz/onchain_stream.zig))
 - **Purpose:** Ingest live blockchain account state snapshots into memory for realistic fork testing.
 - **Problem It Solves:** Eliminates RPC round-trip network latency during fuzzing iterations.
 - **Algorithm:** Binary diff deserializer loading pre-cached account storage state directly into McCarthy storage overlay arrays.
 
-### Subsystem 10: Scribble Runtime Checker ([`src/invariants_core/scribble_runtime.zig`](file:///C:/Users/srija/Projects/volta/src/invariants_core/scribble_runtime.zig))
+### Subsystem 10: Scribble Runtime Checker ([`src/invariants_core/scribble_runtime.zig`](file:///C:/Users/srija/Projects/ROCHE/src/invariants_core/scribble_runtime.zig))
 - **Purpose:** Execute inline assertion hooks during bytecode execution.
 - **Problem It Solves:** Enables opcode-level invariant checking without source-code instrumentation overhead.
 - **Algorithm:** Zero-overhead function pointer hooks embedded directly into the EVM opcode dispatch jump table.
 
-### Subsystem 11: Certora TAC Engine ([`src/prover/cvl_smt_tac.zig`](file:///C:/Users/srija/Projects/volta/src/prover/cvl_smt_tac.zig))
+### Subsystem 11: Certora TAC Engine ([`src/prover/cvl_smt_tac.zig`](file:///C:/Users/srija/Projects/ROCHE/src/prover/cvl_smt_tac.zig))
 - **Purpose:** Lower EVM stack operations into Three-Address Code (TAC) for constraint analysis.
 - **Problem It Solves:** Bridges stack-machine bytecode to formal register-based SMT solvers.
 - **Algorithm:** Stack-to-register lowering transforming operations into $R_d \leftarrow R_s \text{ op } R_t$ across a static 1024-register pool.
 
-### Subsystem 12: Halmos Symbolic Engine ([`src/prover/symbolic_engine.zig`](file:///C:/Users/srija/Projects/volta/src/prover/symbolic_engine.zig))
+### Subsystem 12: Halmos Symbolic Engine ([`src/prover/symbolic_engine.zig`](file:///C:/Users/srija/Projects/ROCHE/src/prover/symbolic_engine.zig))
 - **Purpose:** Perform symbolic execution of EVM branch paths without Python/Z3 API latency.
 - **Problem It Solves:** Enables instant satisfiability testing of arithmetic conditions on stack data.
 - **Algorithm:** AST-free symbolic bitvector evaluation stack maintaining path constraint arrays in-place.
 
-### Subsystem 13: Manticore Multipath Fork Engine ([`src/prover/multipath_fork.zig`](file:///C:/Users/srija/Projects/volta/src/prover/multipath_fork.zig))
+### Subsystem 13: Manticore Multipath Fork Engine ([`src/prover/multipath_fork.zig`](file:///C:/Users/srija/Projects/ROCHE/src/prover/multipath_fork.zig))
 - **Purpose:** Fork execution states across conditional jump branches (`JUMPI`).
 - **Problem It Solves:** Eliminates expensive full-memory cloning during symbolic exploration.
 - **Algorithm:** Copy-on-write McCarthy storage diff trees enabling $O(1)$ state snapshotting and backtracking.
 
-### Subsystem 14: HEVM Formal Semantics ([`src/prover/hevm_semantics.zig`](file:///C:/Users/srija/Projects/volta/src/prover/hevm_semantics.zig))
+### Subsystem 14: HEVM Formal Semantics ([`src/prover/hevm_semantics.zig`](file:///C:/Users/srija/Projects/ROCHE/src/prover/hevm_semantics.zig))
 - **Purpose:** Enforce exact Yellow Paper, Cancun, and Prague opcode semantics.
 - **Problem It Solves:** Ensures absolute zero divergence against `go-ethereum` and `revm`.
 - **Implementation:** Explicit validation of `STATICCALL`, `DELEGATECALL`, `MCOPY`, `TSTORE`, `TLOAD`, and environmental opcodes.
 
-### Subsystem 15: Kontrol KCFG Stepper ([`src/prover/kontrol_kcfg.zig`](file:///C:/Users/srija/Projects/volta/src/prover/kontrol_kcfg.zig))
+### Subsystem 15: Kontrol KCFG Stepper ([`src/prover/kontrol_kcfg.zig`](file:///C:/Users/srija/Projects/ROCHE/src/prover/kontrol_kcfg.zig))
 - **Purpose:** Perform symbolic reachability graph traversal across contract states.
 - **Problem It Solves:** Formalizes step-by-step state transition proofs without K-Framework overhead.
 - **Algorithm:** Zero-allocation basic-block transition graph solver with path subsumption checks.
 
-### Subsystem 16: Heimdall Jumpdest Matcher ([`src/decompile/jumpdest_matcher.zig`](file:///C:/Users/srija/Projects/volta/src/decompile/jumpdest_matcher.zig))
+### Subsystem 16: Heimdall Jumpdest Matcher ([`src/decompile/jumpdest_matcher.zig`](file:///C:/Users/srija/Projects/ROCHE/src/decompile/jumpdest_matcher.zig))
 - **Purpose:** Extract function selectors and dispatch boundaries from raw bytecode.
 - **Problem It Solves:** Replaces slow regular-expression decompilation with native SIMD scanning.
 - **Algorithm:** 256-bit AVX2 vectorized byte scanner identifying `PUSH4` + `EQ` + `JUMPI` dispatch patterns in $< 100\text{ ns}$.
 
-### Subsystem 17: Panoramix Pseudocode Emitter ([`src/decompile/pseudocode_emitter.zig`](file:///C:/Users/srija/Projects/volta/src/decompile/pseudocode_emitter.zig))
+### Subsystem 17: Panoramix Pseudocode Emitter ([`src/decompile/pseudocode_emitter.zig`](file:///C:/Users/srija/Projects/ROCHE/src/decompile/pseudocode_emitter.zig))
 - **Purpose:** Decompile bytecode execution graphs into readable high-level representation.
 - **Problem It Solves:** Generates human-auditable logic flows directly during automated analysis.
 - **Algorithm:** Stack-to-High-Level-IR transformation emitting formatted text into pre-allocated static buffers.
 
-### Subsystem 18: Eveem Proxy Classifier ([`src/decompile/proxy_classifier.zig`](file:///C:/Users/srija/Projects/volta/src/decompile/proxy_classifier.zig))
+### Subsystem 18: Eveem Proxy Classifier ([`src/decompile/proxy_classifier.zig`](file:///C:/Users/srija/Projects/ROCHE/src/decompile/proxy_classifier.zig))
 - **Purpose:** Classify smart contract proxy architectures and resolve implementation slots.
 - **Problem It Solves:** Automates proxy pattern triage for upgradeable protocol stacks.
 - **Patterns Detected:** EIP-1967 (`_IMPLEMENTATION_SLOT`), EIP-1822 (UUPS), EIP-1167 (Minimal Clones).
 
-### Subsystem 19: ERC-4626 Inflation Prover ([`src/invariants_core/erc4626_inflation.zig`](file:///C:/Users/srija/Projects/volta/src/invariants_core/erc4626_inflation.zig))
+### Subsystem 19: ERC-4626 Inflation Prover ([`src/invariants_core/erc4626_inflation.zig`](file:///C:/Users/srija/Projects/ROCHE/src/invariants_core/erc4626_inflation.zig))
 - **Purpose:** Formally verify vault resistance against first-depositor share inflation attacks.
 - **Problem It Solves:** Catches vault rounding drains prior to protocol deployment.
 - **Algorithm:** Proves monotonicity of $\text{previewDeposit}(a)$ and asserts $\text{TotalAssets} > 0 \implies \text{TotalShares} > 0$.
@@ -165,7 +165,7 @@ Volta introduces a third paradigm: a zero-allocation, native EVM state verificat
 
 # SECTION 3: THE 15 INVARIANT FAMILIES (Mathematical Foundation)
 
-Volta formalizes 15 domain-specific invariant families in [`src/invariants.zig`](file:///C:/Users/srija/Projects/volta/src/invariants.zig):
+ROCHE formalizes 15 domain-specific invariant families in [`src/invariants.zig`](file:///C:/Users/srija/Projects/ROCHE/src/invariants.zig):
 
 ### 1. AMM Constant Product Monotonicity
 $$\text{Invariant: } k_{\text{after}} = x_1 \cdot y_1 \ge x_0 \cdot y_0 = k_{\text{before}}$$
@@ -246,7 +246,7 @@ $$\text{Invariant: } \text{InVaultContext} = \text{true} \implies \text{External
 
 # SECTION 4: LIVE PROTOCOL REPRODUCTIONS (24/24 Test Suite)
 
-Volta maintains a master suite of **24 passing verification test suites** in [`src/main.zig`](file:///C:/Users/srija/Projects/volta/src/main.zig) and [`src/live_protocol_tests.zig`](file:///C:/Users/srija/Projects/volta/src/live_protocol_tests.zig):
+ROCHE maintains a master suite of **24 passing verification test suites** in [`src/main.zig`](file:///C:/Users/srija/Projects/ROCHE/src/main.zig) and [`src/live_protocol_tests.zig`](file:///C:/Users/srija/Projects/ROCHE/src/live_protocol_tests.zig):
 
 | # | Test Target | Threat Class & Mechanism | Invariant Verified | Status |
 | :-: | :--- | :--- | :--- | :-: |
@@ -291,7 +291,7 @@ Volta maintains a master suite of **24 passing verification test suites** in [`s
 
 ```text
 ===================================================================================================
-                         VOLTA NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       
+                         ROCHE NATIVE HARDWARE BENCHMARK REPORT (ZIG 0.16.0)                       
 ===================================================================================================
 
 Iterations:          100,000 continuous evaluation passes
@@ -317,8 +317,8 @@ Telemetry Integrity Check:           100% Deterministic, 0 Heap Leaks
 
 ### Step 1: Clone and Build
 ```bash
-git clone https://github.com/creatorofaurad/volta.git
-cd volta
+git clone https://github.com/creatorofaurad/ROCHE.git
+cd ROCHE
 zig build -Doptimize=ReleaseFast
 ```
 
@@ -330,19 +330,19 @@ zig test src/main.zig
 ### Step 3: Audit Contract Bytecode
 ```bash
 # Run 22 static taint and CEI detectors
-./zig-out/bin/volta audit 0x6000F16103E860005500
+./zig-out/bin/ROCHE audit 0x6000F16103E860005500
 
 # Execute 50,000-run parallel stateful fuzzer
-./zig-out/bin/volta fuzz 0x6000F160005500 --runs 50000
+./zig-out/bin/ROCHE fuzz 0x6000F160005500 --runs 50000
 ```
 
 ### Step 4: Execute Autonomous Exploit Synthesis
 ```bash
-./zig-out/bin/volta orchestrate EulerVault 0x6000F16103E860005500 250
+./zig-out/bin/ROCHE orchestrate EulerVault 0x6000F16103E860005500 250
 ```
 
 ### Step 5: Test the Generated Foundry Reproduction Suite
-When Volta detects a breach, it immediately outputs an executable `.t.sol` file:
+When ROCHE detects a breach, it immediately outputs an executable `.t.sol` file:
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -394,10 +394,10 @@ forge test --match-contract EulerVault_ExploitPoC
 
 ---
 
-# SECTION 8: CONTRIBUTING & EXTENDING VOLTA
+# SECTION 8: CONTRIBUTING & EXTENDING ROCHE
 
 ### Adding Custom Protocol Invariants
-1. Define the mathematical invariant in [`src/invariants.zig`](file:///C:/Users/srija/Projects/volta/src/invariants.zig):
+1. Define the mathematical invariant in [`src/invariants.zig`](file:///C:/Users/srija/Projects/ROCHE/src/invariants.zig):
    ```zig
    pub fn verifyCustomSolvency(storage: *const StorageState, threshold: u256) bool {
        const assets = storage.get(0x01);
@@ -405,16 +405,16 @@ forge test --match-contract EulerVault_ExploitPoC
        return assets >= debt + threshold;
    }
    ```
-2. Connect the verifier to the execution loop in [`src/orchestrator.zig`](file:///C:/Users/srija/Projects/volta/src/orchestrator.zig).
-3. Add a dedicated test target in [`src/live_protocol_tests.zig`](file:///C:/Users/srija/Projects/volta/src/live_protocol_tests.zig) and verify via `zig test src/main.zig`.
+2. Connect the verifier to the execution loop in [`src/orchestrator.zig`](file:///C:/Users/srija/Projects/ROCHE/src/orchestrator.zig).
+3. Add a dedicated test target in [`src/live_protocol_tests.zig`](file:///C:/Users/srija/Projects/ROCHE/src/live_protocol_tests.zig) and verify via `zig test src/main.zig`.
 
 ---
 
 # SECTION 9: DEPLOYMENT & CI/CD OPERATIONS
 
-### GitHub Actions Workflow Template (`.github/workflows/volta_audit.yml`)
+### GitHub Actions Workflow Template (`.github/workflows/ROCHE_audit.yml`)
 ```yaml
-name: Volta Bare-Silicon Security Verification
+name: ROCHE Bare-Silicon Security Verification
 
 on:
   push:
@@ -434,14 +434,14 @@ jobs:
         with:
           version: 0.16.0
 
-      - name: Build Volta Engine (ReleaseFast)
+      - name: Build ROCHE Engine (ReleaseFast)
         run: zig build -Doptimize=ReleaseFast
 
       - name: Run Master 24-Suite Verification Battery
         run: zig test src/main.zig
 
       - name: Execute Autonomous Exploit Synthesis Pipeline
-        run: ./zig-out/bin/volta orchestrate ProtocolTarget 0x6000F16103E860005500 250
+        run: ./zig-out/bin/ROCHE orchestrate ProtocolTarget 0x6000F16103E860005500 250
 ```
 
 ---
@@ -456,4 +456,4 @@ jobs:
 ### Grant & Institutional Status
 - **Target Grant:** Octant Epoch 14 (Q4 2026).
 - **Funding Request:** $89,640 USD across 3 verifiable engineering milestones.
-- **Repository:** [github.com/creatorofaurad/volta](https://github.com/creatorofaurad/volta) (MIT License).
+- **Repository:** [github.com/creatorofaurad/ROCHE](https://github.com/creatorofaurad/ROCHE) (MIT License).

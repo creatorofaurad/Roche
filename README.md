@@ -58,9 +58,9 @@ flowchart TD
 
 1. **Static Security Audit (`roche audit`):** 22 formal detectors operating over basic block CFG graphs with $O(N)$ dataflow complexity. Flags unchecked external calls, arbitrary delegatecalls, selfdestruct sinks, and reentrancy CEI violations in microseconds.
 2. **Stateful Sequence Fuzzer (`roche fuzz`):** Multi-threaded execution arena utilizing 64KB AFL edge coverage bitmaps and in-memory rollback journals with zero dynamic heap allocation.
-3. **Automated Trace Minimizer (`roche synth`):** Bisects 10,000-step counterexample execution traces down to the minimal 3-step exploit sequence in $< 50\text{ ms}$ using hierarchical delta-debugging.
+3. **Automated Trace Minimizer (`roche synth`):** Bisects 10,000-step counterexample execution traces down to the minimal 3-step exploit sequence in `< 50ms` using hierarchical delta-debugging.
 4. **Foundry PoC Synthesizer:** Emits standalone, compilable, and executable Foundry Solidity test harnesses (`test/RocheExploit.t.sol`) directly from formal counterexamples.
-5. **McCarthy SMT Array Theory Prover:** Evaluates EVM storage slot taints and transient storage (`TSTORE`/`TLOAD`) invariants in $< 2.0\text{ \mu s}$ per state transition.
+5. **McCarthy SMT Array Theory Prover:** Evaluates EVM storage slot taints and transient storage (`TSTORE`/`TLOAD`) invariants in `< 2.0µs` per state transition.
 6. **Rust C-ABI Integration (`crates/roche-rs`):** Exported C-ABI static library enabling seamless integration into Rust, Go, and Python security toolchains.
 
 ---
@@ -158,7 +158,7 @@ Integrate Roche directly into your pre-deployment security pipeline. We provide 
 White-label Roche into your internal audit workflows. Automatically minimize 10,000-step traces down to 3-step PoCs in milliseconds, cutting manual trace triage by 50%+ on complex DeFi audits. (30% revenue-share model available).
 
 ### For Rollup Sequencers (Arbitrum Nitro, OP Stack, Base)
-Deploy `libroche.a` as a native static C-ABI filter in sequencer transaction pools to evaluate batch invariant safety in $< 0.8\text{ ms}$ before posting to L1.
+Deploy `libroche.a` as a native static C-ABI filter in sequencer transaction pools to evaluate batch invariant safety in `< 0.8ms` before posting to L1.
 
 ---
 

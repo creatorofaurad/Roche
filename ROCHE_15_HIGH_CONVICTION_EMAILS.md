@@ -1,4 +1,4 @@
-# Roche High-Conviction 15 Email Outbound Suite
+﻿# Roche High-Conviction 15 Email Outbound Suite
 **Author:** Charles (Lead Systems Architect, Age 15)  
 **System Engine:** Roche (Bare-Silicon EVM Invariant & Formal Verification Engine)  
 **Verification Audit:** Passing 29/29 Invariant Test Suites, 0 Bytes Heap Allocation  
@@ -17,7 +17,7 @@
 ```text
 Dear Uniswap Foundation,
 
-My name is Charles, I am 15 years old, and I have built Roche (https://roche-nine.vercel.app/) — a zero-allocation EVM formal verification engine engineered in pure Zig 0.16.0.
+My name is Charles, I am 15 years old, and I have built Roche (https://roche-nine.vercel.app/) â€” a zero-allocation EVM formal verification engine engineered in pure Zig 0.16.0.
 
 Every DeFi protocol operates near an economic Roche Limit where state invariants break. Rather than relying on randomized fuzzing heuristics, Roche uses formal SMT array theory (McCarthy store-select semantics) and symbolic execution at 1.84M state transitions/second to detect invariant breakdowns deterministically.
 
@@ -101,7 +101,7 @@ Lead Architect | Roche
 ### 4. ETHEREUM FOUNDATION ESP ($50,000)
 **To:** `esp@ethereum.org`  
 **Cc:** `info@ethereum.org`  
-**Subject:** Formal Invariant SMT Array Theory Prover for EVM Core — Roche Technical Dossier
+**Subject:** Formal Invariant SMT Array Theory Prover for EVM Core â€” Roche Technical Dossier
 
 ```text
 Dear Ethereum Foundation ESP Team,
@@ -135,7 +135,7 @@ Lead Systems Architect | Roche
 ```text
 Hi Paradigm Team,
 
-I'm Charles (15). I built Roche (https://roche-nine.vercel.app/) — a zero-allocation, bare-silicon EVM verification and formal SMT engine written from scratch in pure Zig 0.16.0.
+I'm Charles (15). I built Roche (https://roche-nine.vercel.app/) â€” a zero-allocation, bare-silicon EVM verification and formal SMT engine written from scratch in pure Zig 0.16.0.
 
 Roche executes symbolic EVM state transitions at 1.84M execs/sec with 0 bytes of dynamic heap allocation, using AVX2 SIMD vectorization and McCarthy store-select array theory to catch real-world protocol economic collapses deterministically.
 
@@ -177,7 +177,7 @@ Proposal:
 We are offering a free 3-month integration pilot with Curve:
 - Continuous symbolic invariant monitoring across Curve pools.
 - Automated trace minimization and Foundry invariant test generation on every contract update.
-- If verified valuable → $100K–$150K annual enterprise security contract. If not, zero obligation.
+- If verified valuable â†’ $100Kâ€“$150K annual enterprise security contract. If not, zero obligation.
 
 Proof & Specification:
 - Engine Source: https://github.com/creatorofaurad/Roche
@@ -196,7 +196,7 @@ Lead Architect | Roche
 ### 7. UNISWAP LABS (ENGINEERING)
 **To:** `security@uniswap.org`  
 **Cc:** `engineering@uniswap.org`  
-**Subject:** Real-Time V4 Hook Invariant Prover & TSTORE Isolation Pilot — Roche Security
+**Subject:** Real-Time V4 Hook Invariant Prover & TSTORE Isolation Pilot â€” Roche Security
 
 ```text
 Hi Uniswap Labs Engineering,
@@ -208,7 +208,7 @@ Roche automatically detects v4 custom hook invariant breakdowns, specifically:
 - AMM constant product (x * y >= k) monotonicity breaks and rounding drain sequences.
 
 Proposal:
-A complimentary 3-month pilot integrating Roche into Uniswap v4 hook security pipelines. If it saves critical audit and triage overhead, we explore a $150K–$250K annual licensing tier.
+A complimentary 3-month pilot integrating Roche into Uniswap v4 hook security pipelines. If it saves critical audit and triage overhead, we explore a $150Kâ€“$250K annual licensing tier.
 
 Technical Verification:
 - Live Platform: https://roche-nine.vercel.app/
@@ -227,7 +227,7 @@ Lead Architect | Roche
 ### 8. AAVE PROTOCOL
 **To:** `security@aave.com`  
 **Cc:** `aavegrants@gmail.com`  
-**Subject:** Formal Solvency & Liquidation Cascade Invariant Verification Pilot — Roche
+**Subject:** Formal Solvency & Liquidation Cascade Invariant Verification Pilot â€” Roche
 
 ```text
 Hi Aave Security Team,
@@ -240,7 +240,7 @@ Roche automatically proves:
 3. Flash-loan reentrancy isolation across v3/v4 pool reserves.
 
 Proposal:
-A free 3-month pilot integrating Roche into your pre-deployment security pipeline. If it prevents insolvency edge cases, we structure a $100K–$200K annual licensing agreement.
+A free 3-month pilot integrating Roche into your pre-deployment security pipeline. If it prevents insolvency edge cases, we structure a $100Kâ€“$200K annual licensing agreement.
 
 Proof & Test Suites:
 - 29/29 Test Suites Passing (100% Green).
@@ -265,7 +265,7 @@ Lead Architect | Roche
 ```text
 Hi Balancer Team,
 
-I'm Charles (15). I built Roche (https://roche-nine.vercel.app/) — a bare-silicon EVM verification engine engineered to detect complex invariant violations in real-time.
+I'm Charles (15). I built Roche (https://roche-nine.vercel.app/) â€” a bare-silicon EVM verification engine engineered to detect complex invariant violations in real-time.
 
 Roche formally models Balancer v2/v3 vault architecture, catching:
 - Vault read-only reentrancy vectors across Composable Stable Pools.
@@ -273,7 +273,7 @@ Roche formally models Balancer v2/v3 vault architecture, catching:
 - Generalized constant-product invariant violations.
 
 Proposal:
-Free 3-month pilot integrating Roche into Balancer's security pipeline. Upon proven value → $100K–$150K annual contract with zero upfront risk.
+Free 3-month pilot integrating Roche into Balancer's security pipeline. Upon proven value â†’ $100Kâ€“$150K annual contract with zero upfront risk.
 
 Verification Dossier:
 - Source Code: https://github.com/creatorofaurad/Roche
@@ -301,7 +301,7 @@ I built Roche (https://roche-nine.vercel.app/), a bare-silicon EVM verification 
 Observation: Audit teams spend significant hours manually bisecting traces to isolate minimal exploit sequences. Roche automates trace bisection and executable Foundry PoC generation in milliseconds with McCarthy SMT array theory.
 
 Partnership Proposition:
-White-label Roche into OpenZeppelin’s audit workflow:
+White-label Roche into OpenZeppelinâ€™s audit workflow:
 - Auditors cut trace triage time by 50%+ on complex DeFi engagements.
 - Automatically produce minimal invariant proof deliverables for clients.
 - 30% revenue-share on downstream protocol licensing.

@@ -1,4 +1,4 @@
-# Base Ecosystem Fund Application Dossier
+﻿# Base Ecosystem Fund Application Dossier
 **Target Portal:** [base.org/fund](https://base.org/fund) / Coinbase Ventures Base Ecosystem Program  
 **Target Category:** Onchain Infrastructure / Developer Tooling & Security  
 **Ask / Milestone Target:** $100,000  
@@ -19,7 +19,7 @@
 
 ### Question: Describe what you are building in detail. What specific problem does it solve for Base?
 **Response:**
-DeFi protocols on Base are vulnerable to state-transition exploits—such as transient storage (TSTORE) cross-contract leaks, ERC-4626 share-inflation donation attacks, and flash-loan reentrancy—which legacy fuzzers (Foundry, Echidna) fail to catch deterministically due to randomized heuristics and high computational overhead.
+DeFi protocols on Base are vulnerable to state-transition exploitsâ€”such as transient storage (TSTORE) cross-contract leaks, ERC-4626 share-inflation donation attacks, and flash-loan reentrancyâ€”which legacy fuzzers (Foundry, Echidna) fail to catch deterministically due to randomized heuristics and high computational overhead.
 
 Roche solves this by providing:
 1. **Bare-Silicon Verification Engine:** Built from scratch in pure Zig 0.16.0 and Rust with direct Win32/POSIX system calls and **0 bytes of dynamic heap allocation**, running formal SMT array theory (McCarthy store-select semantics) and symbolic taint analysis at **1.84M executions/second**.
@@ -63,14 +63,14 @@ Roche is an active, fully engineered engine with verified benchmarks:
 
 | Milestone | Deliverable | Scope of Work | Timeline | Allocation |
 | :--- | :--- | :--- | :--- | :--- |
-| **Milestone 1** | **OP Stack Sequencer Invariant Filter Plugin** | Build native Zig/C static bridge for OP Stack sequencer nodes to evaluate state invariants at <1ms latency per batch. | Month 1 (Weeks 1–4) | **$40,000** |
-| **Milestone 2** | **Base Ecosystem Builder CLI & CI Harness** | Deploy `roche-base-verify` CLI allowing any Base DeFi builder to formally prove ERC-4626, Aerodrome/Uniswap v4 hooks, and lending pool invariants in GitHub Actions. | Month 2 (Weeks 5–8) | **$35,000** |
-| **Milestone 3** | **Security Pilot on Top 5 Base Protocols** | Conduct formal verification audits on 5 flagship Base ecosystem protocols (e.g. Aerodrome, Moonwell, Seamless) and open-source public formal invariant specs. | Month 3 (Weeks 9–12) | **$25,000** |
+| **Milestone 1** | **OP Stack Sequencer Invariant Filter Plugin** | Build native Zig/C static bridge for OP Stack sequencer nodes to evaluate state invariants at <1ms latency per batch. | Month 1 (Weeks 1â€“4) | **$40,000** |
+| **Milestone 2** | **Base Ecosystem Builder CLI & CI Harness** | Deploy `roche-base-verify` CLI allowing any Base DeFi builder to formally prove ERC-4626, Aerodrome/Uniswap v4 hooks, and lending pool invariants in GitHub Actions. | Month 2 (Weeks 5â€“8) | **$35,000** |
+| **Milestone 3** | **Security Pilot on Top 5 Base Protocols** | Conduct formal verification audits on 5 flagship Base ecosystem protocols (e.g. Aerodrome, Moonwell, Seamless) and open-source public formal invariant specs. | Month 3 (Weeks 9â€“12) | **$25,000** |
 
 ---
 
 ## 4. Contact & Submission Details
-- **Email:** `contact@roche.dev` / Personal: Charles
+- **Email:** `srijaan@proton.me` / Personal: Charles
 - **GitHub:** https://github.com/creatorofaurad/Roche
 - **Landing Page:** https://roche-nine.vercel.app/
 - **X / Social:** `@creatorofaurad`

@@ -42,7 +42,7 @@ src/charyelog/
 src/charyec.zig
 src/charyelog_compiler.zig
 src/master_foundation_stack.zig
-src/mirofish_*.zig
+src/empirical_proof_*.zig
 private_core/
 models/
 *.nbw

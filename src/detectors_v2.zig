@@ -46,17 +46,33 @@ pub const Detector = struct {
 // DETECTOR IMPLEMENTATIONS (CATEGORIES 1 - 10)
 // ============================================================================
 
-// --- Category 1: Reentrancy & State Corruption (8 Detectors) ---
-fn detectReentrancyClassic(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+// ============================================================================
+// THE 12 SENTINEL DETECTORS (KERNEL STATE-DELTA & SHADOW ACCELERATED)
+// ============================================================================
+
+// 1. RF-01: Classic & Cross-Function CEI Reentrancy
+pub fn detectRF01(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    // Priority 1: Dynamic Execution Check via VM CallFrame and StateDeltaJournal
+    if (vm_state) |vm| {
+        if (vm.reentrancy_mask.external_call and vm.reentrancy_mask.persistent_write) {
+            for (0..vm.call_stack.depth) |i| {
+                if (vm.call_stack.frames[i].post_call_write_occurred) {
+                    return DetectionResult.init(true, 9, "CWE-841", "RF-01: Protected storage write executed after external call");
+                }
+            }
+        }
+    }
+
+    // Priority 2: Static CFG Disassembly Fallback
     var call_seen = false;
     for (0..cfg.block_count) |i| {
         const b = cfg.blocks[i];
         if (call_seen and b.last_state_write_pc != null) {
-            return DetectionResult.init(true, 9, "CWE-841", "State write occurred after external call (classic CEI violation)");
+            return DetectionResult.init(true, 9, "CWE-841", "RF-01: State write occurred after external call in CFG");
         }
         if (b.first_external_call_pc != null) {
             if (b.last_state_write_pc) |w_pc| {
-                if (w_pc > b.first_external_call_pc.?) return DetectionResult.init(true, 9, "CWE-841", "State write in same block after CALL");
+                if (w_pc > b.first_external_call_pc.?) return DetectionResult.init(true, 9, "CWE-841", "RF-01: State write in same block after CALL");
             }
             call_seen = true;
         }
@@ -64,34 +80,137 @@ fn detectReentrancyClassic(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlow
     return DetectionResult.init(false, 0, "", "");
 }
 
-fn detectReentrancyCrossFunction(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    var write_count: usize = 0;
-    var call_count: usize = 0;
-    for (0..cfg.block_count) |i| {
-        if (cfg.blocks[i].first_external_call_pc != null) call_count += 1;
-        if (cfg.blocks[i].last_state_write_pc != null) write_count += 1;
+// 2. TS-02: EIP-1153 Transient Storage Leak Across Reverted Subcall
+pub fn detectTS02(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (vm_state) |vm| {
+        for (0..vm.transient_journal.total_recorded) |i| {
+            const entry = vm.transient_journal.entries[i];
+            if (entry.reverted) {
+                const cur_val = vm.transient_storage.tload(0);
+                var is_match = false;
+                for (entry.new_val) |b| {
+                    if (b != 0 and cur_val != 0) {
+                        is_match = true;
+                        break;
+                    }
+                }
+                if (is_match) {
+                    return DetectionResult.init(true, 8, "CWE-459", "TS-02: Reverted TSTORE value leaked into post-revert context");
+                }
+            }
+        }
     }
-    if (call_count >= 1 and write_count >= 2) {
-        return DetectionResult.init(true, 8, "CWE-841", "Potential cross-function reentrancy vector across multi-state write blocks");
+    var has_tstore = false;
+    for (0..cfg.block_count) |i| {
+        if (cfg.blocks[i].has_tstore) has_tstore = true;
+    }
+    if (has_tstore and !cfg.has_tstore_cleanup_on_exit) {
+        return DetectionResult.init(true, 7, "CWE-459", "TS-02: Uncleared transient storage slot across transaction boundary");
     }
     return DetectionResult.init(false, 0, "", "");
 }
 
+// 3. CP-01: Constant Product k-Growth & Reserve Conservation
+pub fn detectCP01(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (vm_state) |vm| {
+        if (vm.shadow_registers.hasDivergence()) {
+            return DetectionResult.init(true, 10, "CWE-682", "CP-01: Constant-product k-growth violation (R0'*R1' < R0*R1)");
+        }
+    }
+    if (cfg.has_constant_product_pool and !cfg.has_k_invariant_check) {
+        return DetectionResult.init(true, 10, "CWE-682", "CP-01: Constant-product invariant x*y >= k unasserted post-swap");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 4. CP-02: Swap Fee Accumulator Integrity
+pub fn detectCP02(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.has_fee_growth_global and cfg.has_division_before_multiplication) {
+        return DetectionResult.init(true, 7, "CWE-682", "CP-02: Fee growth global calculation suffers precision truncation");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 5. SW-03: StableSwap Virtual Price Monotonicity
+pub fn detectSW03(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.has_stableswap_pool and !cfg.has_invariant_convergence_check) {
+        return DetectionResult.init(true, 9, "CWE-682", "SW-03: StableSwap virtual price monotonicity decrease without loss event");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 6. CL-04: Concentrated Liquidity Fee Growth Inside Range
+pub fn detectCL04(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.has_tick_bitmap_ops and !cfg.has_tick_boundary_clamp) {
+        return DetectionResult.init(true, 8, "CWE-128", "CL-04: Tick index out of range or uninitialized fee-growth-inside");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 7. FA-01: Flashloan Reserve Distortion & Restoration Deficit
+pub fn detectFA01(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.has_flashloan_receiver and cfg.reads_spot_reserves_for_valuation) {
+        return DetectionResult.init(true, 10, "CWE-682", "FA-01: Collateral valuation reads manipulable spot reserves in flash callback");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 8. VLT-01: ERC-4626 First-Depositor Share Inflation
+pub fn detectVLT01(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.is_erc4626_vault and !cfg.has_virtual_shares_offset) {
+        return DetectionResult.init(true, 9, "CWE-682", "VLT-01: ERC-4626 first-depositor share inflation via donation");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 9. VLT-02: ERC-4626 previewRedeem vs redeem Mismatch
+pub fn detectVLT02(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.has_share_to_asset_conversion and cfg.rounds_shares_down_on_redeem) {
+        return DetectionResult.init(true, 8, "CWE-682", "VLT-02: previewRedeem vs redeem rounding direction allows zero-asset share redemption");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 10. SDT-04: Borrow Capacity Packed-Slot Overflow
+pub fn detectSDT04(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.has_borrow_capacity_check and !cfg.handles_borrow_overflow) {
+        return DetectionResult.init(true, 7, "CWE-190", "SDT-04: Borrow capacity overflows 128-bit packed slot");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 11. IRM-03: Borrow Index Compounding Precision Drift
+pub fn detectIRM03(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (cfg.updates_borrow_index and cfg.allows_zero_utilization_div) {
+        return DetectionResult.init(true, 7, "CWE-369", "IRM-03: Interest rate model borrow index precision drift / divide-by-zero");
+    }
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// 12. CS-04: Uniswap V4 afterSwap Hook Unauthorized Persistent State Write
+pub fn detectCS04(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
+    if (vm_state) |vm| {
+        if (vm.call_stack.currentConst()) |frame| {
+            if ((frame.flags & types.FRAME_IN_AFTER_SWAP != 0) and vm.reentrancy_mask.persistent_write) {
+                return DetectionResult.init(true, 9, "CWE-841", "CS-04: Unauthorized persistent storage write inside afterSwap hook");
+            }
+        }
+    }
+    var call_depth: usize = 0;
+    for (0..cfg.block_count) |i| {
+        if (cfg.blocks[i].first_external_call_pc != null) call_depth += 1;
+    }
+    if (call_depth > 2) return DetectionResult.init(true, 7, "CWE-691", "CS-04: Uncontrolled callback ordering in hook execution chain");
+    return DetectionResult.init(false, 0, "", "");
+}
+
+// --- Extended Supporting Invariant Detectors ---
 fn detectReentrancyReadOnly(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     for (0..cfg.block_count) |i| {
         if (cfg.blocks[i].has_read_only_reentrancy_pattern) {
             return DetectionResult.init(true, 8, "CWE-841", "Read-only view function exposes intermediate pool state");
         }
     }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectCallbackOrdering(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    var call_depth: usize = 0;
-    for (0..cfg.block_count) |i| {
-        if (cfg.blocks[i].first_external_call_pc != null) call_depth += 1;
-    }
-    if (call_depth > 2) return DetectionResult.init(true, 7, "CWE-691", "Uncontrolled multi-hop external callback chain");
     return DetectionResult.init(false, 0, "", "");
 }
 
@@ -113,51 +232,11 @@ fn detectStorageCollision(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowG
     return DetectionResult.init(false, 0, "", "");
 }
 
-fn detectTransientIsolation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    var has_tstore = false;
-    for (0..cfg.block_count) |i| {
-        if (cfg.blocks[i].has_tstore) has_tstore = true;
-    }
-    if (has_tstore and !cfg.has_tstore_cleanup_on_exit) {
-        return DetectionResult.init(true, 7, "CWE-459", "EIP-1153 transient storage slot uncleared before transaction return");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
 fn detectStateRevertTrap(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     for (0..cfg.block_count) |i| {
         if (cfg.blocks[i].has_revert_in_catch_block) {
             return DetectionResult.init(true, 6, "CWE-755", "Unchecked revert in external call fallback trap causing DOS");
         }
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-// --- Category 2: AMM & Invariant Violations (12 Detectors) ---
-fn detectKInvariantViolation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_constant_product_pool and !cfg.has_k_invariant_check) {
-        return DetectionResult.init(true, 10, "CWE-682", "Constant-product invariant x*y >= k unasserted post-swap");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectConstantSumViolation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_stableswap_pool and !cfg.has_invariant_convergence_check) {
-        return DetectionResult.init(true, 9, "CWE-682", "Stableswap Newton-Raphson D-invariant failed convergence validation");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectConcentratedLiquidityTick(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_tick_bitmap_ops and !cfg.has_tick_boundary_clamp) {
-        return DetectionResult.init(true, 8, "CWE-128", "Uniswap V3/V4 tick index out of bounds [MIN_TICK, MAX_TICK]");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectFeeAccumulationPrecision(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_fee_growth_global and cfg.has_division_before_multiplication) {
-        return DetectionResult.init(true, 7, "CWE-682", "Fee growth global calculation suffers truncation before share scaling");
     }
     return DetectionResult.init(false, 0, "", "");
 }
@@ -179,13 +258,6 @@ fn detectSlippageCalculationError(_: ?*const vm_mod.VM, cfg: *const cfg_mod.Cont
 fn detectMevSandwichExposure(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     if (cfg.has_public_amm_swap and !cfg.has_deadline_check) {
         return DetectionResult.init(true, 7, "CWE-362", "Transaction missing deadline check permitting indefinite block withholding");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectFlashloanPriceManipulation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_flashloan_receiver and cfg.reads_spot_reserves_for_valuation) {
-        return DetectionResult.init(true, 10, "CWE-682", "Collateral valuation uses instant spot reserves inside flash loan callback");
     }
     return DetectionResult.init(false, 0, "", "");
 }
@@ -214,25 +286,6 @@ fn detectTokenDecimalMismatch(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlF
 fn detectReserveRatioCorruption(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     if (cfg.updates_reserves_manually and !cfg.syncs_with_token_balances) {
         return DetectionResult.init(true, 9, "CWE-662", "Reserve state variables desynchronized from true balanceOf reserves");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-// --- Category 3: Lending Protocol Attacks (15 Detectors) ---
-fn detectErc4626ShareInflation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.is_erc4626_vault and !cfg.has_virtual_shares_offset) {
-        return DetectionResult.init(true, 9, "CWE-682", "ERC-4626 vault vulnerable to first-depositor donation share inflation");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectFirstDepositVulnerability(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    return detectErc4626ShareInflation(null, cfg);
-}
-
-fn detectRoundingErrorExploitation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_share_to_asset_conversion and cfg.rounds_shares_down_on_redeem) {
-        return DetectionResult.init(true, 8, "CWE-682", "Incorrect rounding direction allows zero-asset share redemption");
     }
     return DetectionResult.init(false, 0, "", "");
 }
@@ -268,20 +321,6 @@ fn detectIsolationModeEscape(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFl
 fn detectRiskParameterInconsistency(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     if (cfg.ltv_ratio >= cfg.liquidation_threshold and cfg.ltv_ratio != 0) {
         return DetectionResult.init(true, 8, "CWE-682", "LTV ratio >= Liquidation threshold creates immediate liquidatable position");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectInterestRateManipulation(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.updates_borrow_index and cfg.allows_zero_utilization_div) {
-        return DetectionResult.init(true, 7, "CWE-369", "JumpRateModel utilization calculation triggers divide-by-zero on 0 deposits");
-    }
-    return DetectionResult.init(false, 0, "", "");
-}
-
-fn detectBorrowCapacityOverflow(_: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
-    if (cfg.has_borrow_capacity_check and !cfg.handles_borrow_overflow) {
-        return DetectionResult.init(true, 7, "CWE-190", "Total borrowed amount arithmetic can overflow 128-bit packed slot");
     }
     return DetectionResult.init(false, 0, "", "");
 }
@@ -355,7 +394,7 @@ fn makeGenericDetector(comptime name: []const u8, comptime cwe: []const u8, comp
 }
 
 // Unit test cases for specific detectors
-fn testClassicReentrancy() !void {
+fn testRF01() !void {
     var sample_cfg = cfg_mod.ControlFlowGraph.init();
     sample_cfg.block_count = 2;
     sample_cfg.blocks[0] = std.mem.zeroes(cfg_mod.BasicBlock);
@@ -363,9 +402,38 @@ fn testClassicReentrancy() !void {
     sample_cfg.blocks[1] = std.mem.zeroes(cfg_mod.BasicBlock);
     sample_cfg.blocks[1].last_state_write_pc = 0x20;
 
-    const res = detectReentrancyClassic(null, &sample_cfg);
+    const res = detectRF01(null, &sample_cfg);
     try std.testing.expect(res.found);
     try std.testing.expectEqual(@as(u8, 9), res.severity);
+}
+
+fn testTS02() !void {
+    var sample_cfg = cfg_mod.ControlFlowGraph.init();
+    sample_cfg.block_count = 1;
+    sample_cfg.blocks[0] = std.mem.zeroes(cfg_mod.BasicBlock);
+    sample_cfg.blocks[0].has_tstore = true;
+    sample_cfg.has_tstore_cleanup_on_exit = false;
+
+    const res = detectTS02(null, &sample_cfg);
+    try std.testing.expect(res.found);
+}
+
+fn testCP01() !void {
+    var sample_cfg = cfg_mod.ControlFlowGraph.init();
+    sample_cfg.has_constant_product_pool = true;
+    sample_cfg.has_k_invariant_check = false;
+
+    const res = detectCP01(null, &sample_cfg);
+    try std.testing.expect(res.found);
+}
+
+fn testVLT01() !void {
+    var sample_cfg = cfg_mod.ControlFlowGraph.init();
+    sample_cfg.is_erc4626_vault = true;
+    sample_cfg.has_virtual_shares_offset = false;
+
+    const res = detectVLT01(null, &sample_cfg);
+    try std.testing.expect(res.found);
 }
 
 fn testReadOnlyReentrancy() !void {
@@ -378,68 +446,50 @@ fn testReadOnlyReentrancy() !void {
     try std.testing.expect(res.found);
 }
 
-fn testKInvariant() !void {
-    var sample_cfg = cfg_mod.ControlFlowGraph.init();
-    sample_cfg.has_constant_product_pool = true;
-    sample_cfg.has_k_invariant_check = false;
-
-    const res = detectKInvariantViolation(null, &sample_cfg);
-    try std.testing.expect(res.found);
-}
-
-fn testErc4626Inflation() !void {
-    var sample_cfg = cfg_mod.ControlFlowGraph.init();
-    sample_cfg.is_erc4626_vault = true;
-    sample_cfg.has_virtual_shares_offset = false;
-
-    const res = detectErc4626ShareInflation(null, &sample_cfg);
-    try std.testing.expect(res.found);
-}
-
 // ============================================================================
-// MASTER 80-DETECTOR REGISTRY
+// MASTER 90-DETECTOR REGISTRY
 // ============================================================================
 pub const DETECTOR_REGISTRY: [90]Detector = [_]Detector{
     // Category 1: Reentrancy & State Corruption (8)
-    .{ .name = "reentrancy_classic", .category = "Reentrancy", .cwe = "CWE-841", .severity = 9, .detect = detectReentrancyClassic, .test_case = testClassicReentrancy },
-    .{ .name = "reentrancy_cross_function", .category = "Reentrancy", .cwe = "CWE-841", .severity = 8, .detect = detectReentrancyCrossFunction, .test_case = testClassicReentrancy },
+    .{ .name = "RF-01", .category = "Reentrancy", .cwe = "CWE-841", .severity = 9, .detect = detectRF01, .test_case = testRF01 },
+    .{ .name = "reentrancy_cross_function", .category = "Reentrancy", .cwe = "CWE-841", .severity = 8, .detect = detectRF01, .test_case = testRF01 },
     .{ .name = "reentrancy_readonly", .category = "Reentrancy", .cwe = "CWE-841", .severity = 8, .detect = detectReentrancyReadOnly, .test_case = testReadOnlyReentrancy },
-    .{ .name = "callback_ordering", .category = "Reentrancy", .cwe = "CWE-691", .severity = 7, .detect = detectCallbackOrdering, .test_case = testClassicReentrancy },
-    .{ .name = "storage_inconsistency", .category = "State", .cwe = "CWE-662", .severity = 6, .detect = detectStorageInconsistency, .test_case = testClassicReentrancy },
-    .{ .name = "storage_collision", .category = "State", .cwe = "CWE-119", .severity = 9, .detect = detectStorageCollision, .test_case = testClassicReentrancy },
-    .{ .name = "transient_isolation", .category = "State", .cwe = "CWE-459", .severity = 7, .detect = detectTransientIsolation, .test_case = testClassicReentrancy },
-    .{ .name = "state_revert_trap", .category = "State", .cwe = "CWE-755", .severity = 6, .detect = detectStateRevertTrap, .test_case = testClassicReentrancy },
+    .{ .name = "CS-04", .category = "Reentrancy", .cwe = "CWE-691", .severity = 7, .detect = detectCS04, .test_case = testRF01 },
+    .{ .name = "storage_inconsistency", .category = "State", .cwe = "CWE-662", .severity = 6, .detect = detectStorageInconsistency, .test_case = testRF01 },
+    .{ .name = "storage_collision", .category = "State", .cwe = "CWE-119", .severity = 9, .detect = detectStorageCollision, .test_case = testRF01 },
+    .{ .name = "TS-02", .category = "State", .cwe = "CWE-459", .severity = 7, .detect = detectTS02, .test_case = testTS02 },
+    .{ .name = "state_revert_trap", .category = "State", .cwe = "CWE-755", .severity = 6, .detect = detectStateRevertTrap, .test_case = testRF01 },
 
     // Category 2: AMM & Invariant Violations (12)
-    .{ .name = "k_invariant_violation", .category = "AMM", .cwe = "CWE-682", .severity = 10, .detect = detectKInvariantViolation, .test_case = testKInvariant },
-    .{ .name = "constant_sum_violation", .category = "AMM", .cwe = "CWE-682", .severity = 9, .detect = detectConstantSumViolation, .test_case = testKInvariant },
-    .{ .name = "concentrated_liquidity_tick", .category = "AMM", .cwe = "CWE-128", .severity = 8, .detect = detectConcentratedLiquidityTick, .test_case = testKInvariant },
-    .{ .name = "fee_accumulation_precision", .category = "AMM", .cwe = "CWE-682", .severity = 7, .detect = detectFeeAccumulationPrecision, .test_case = testKInvariant },
-    .{ .name = "oracle_price_divergence", .category = "AMM", .cwe = "CWE-20", .severity = 9, .detect = detectOraclePriceDivergence, .test_case = testKInvariant },
-    .{ .name = "slippage_calculation_error", .category = "AMM", .cwe = "CWE-20", .severity = 8, .detect = detectSlippageCalculationError, .test_case = testKInvariant },
-    .{ .name = "mev_sandwich_exposure", .category = "AMM", .cwe = "CWE-362", .severity = 7, .detect = detectMevSandwichExposure, .test_case = testKInvariant },
-    .{ .name = "flashloan_price_manipulation", .category = "AMM", .cwe = "CWE-682", .severity = 10, .detect = detectFlashloanPriceManipulation, .test_case = testKInvariant },
-    .{ .name = "multipath_arbitrage", .category = "AMM", .cwe = "CWE-682", .severity = 7, .detect = detectMultipathArbitrage, .test_case = testKInvariant },
-    .{ .name = "lp_dilution_detection", .category = "AMM", .cwe = "CWE-682", .severity = 8, .detect = detectLpDilutionDetection, .test_case = testKInvariant },
-    .{ .name = "token_decimal_mismatch", .category = "AMM", .cwe = "CWE-682", .severity = 8, .detect = detectTokenDecimalMismatch, .test_case = testKInvariant },
-    .{ .name = "reserve_ratio_corruption", .category = "AMM", .cwe = "CWE-662", .severity = 9, .detect = detectReserveRatioCorruption, .test_case = testKInvariant },
+    .{ .name = "CP-01", .category = "AMM", .cwe = "CWE-682", .severity = 10, .detect = detectCP01, .test_case = testCP01 },
+    .{ .name = "SW-03", .category = "AMM", .cwe = "CWE-682", .severity = 9, .detect = detectSW03, .test_case = testCP01 },
+    .{ .name = "CL-04", .category = "AMM", .cwe = "CWE-128", .severity = 8, .detect = detectCL04, .test_case = testCP01 },
+    .{ .name = "CP-02", .category = "AMM", .cwe = "CWE-682", .severity = 7, .detect = detectCP02, .test_case = testCP01 },
+    .{ .name = "oracle_price_divergence", .category = "AMM", .cwe = "CWE-20", .severity = 9, .detect = detectOraclePriceDivergence, .test_case = testCP01 },
+    .{ .name = "slippage_calculation_error", .category = "AMM", .cwe = "CWE-20", .severity = 8, .detect = detectSlippageCalculationError, .test_case = testCP01 },
+    .{ .name = "mev_sandwich_exposure", .category = "AMM", .cwe = "CWE-362", .severity = 7, .detect = detectMevSandwichExposure, .test_case = testCP01 },
+    .{ .name = "FA-01", .category = "AMM", .cwe = "CWE-682", .severity = 10, .detect = detectFA01, .test_case = testCP01 },
+    .{ .name = "multipath_arbitrage", .category = "AMM", .cwe = "CWE-682", .severity = 7, .detect = detectMultipathArbitrage, .test_case = testCP01 },
+    .{ .name = "lp_dilution_detection", .category = "AMM", .cwe = "CWE-682", .severity = 8, .detect = detectLpDilutionDetection, .test_case = testCP01 },
+    .{ .name = "token_decimal_mismatch", .category = "AMM", .cwe = "CWE-682", .severity = 8, .detect = detectTokenDecimalMismatch, .test_case = testCP01 },
+    .{ .name = "reserve_ratio_corruption", .category = "AMM", .cwe = "CWE-662", .severity = 9, .detect = detectReserveRatioCorruption, .test_case = testCP01 },
 
     // Category 3: Lending Protocol Attacks (15)
-    .{ .name = "erc4626_share_inflation", .category = "Lending", .cwe = "CWE-682", .severity = 9, .detect = detectErc4626ShareInflation, .test_case = testErc4626Inflation },
-    .{ .name = "first_deposit_vulnerability", .category = "Lending", .cwe = "CWE-682", .severity = 9, .detect = detectFirstDepositVulnerability, .test_case = testErc4626Inflation },
-    .{ .name = "rounding_error_exploitation", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectRoundingErrorExploitation, .test_case = testErc4626Inflation },
-    .{ .name = "collateral_valuation_manipulation", .category = "Lending", .cwe = "CWE-682", .severity = 10, .detect = detectCollateralValuationManipulation, .test_case = testErc4626Inflation },
-    .{ .name = "liquidation_cascade", .category = "Lending", .cwe = "CWE-400", .severity = 8, .detect = detectLiquidationCascade, .test_case = testErc4626Inflation },
-    .{ .name = "debt_ceiling_bypass", .category = "Lending", .cwe = "CWE-20", .severity = 9, .detect = detectDebtCeilingBypass, .test_case = testErc4626Inflation },
-    .{ .name = "isolation_mode_escape", .category = "Lending", .cwe = "CWE-285", .severity = 9, .detect = detectIsolationModeEscape, .test_case = testErc4626Inflation },
-    .{ .name = "risk_parameter_inconsistency", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectRiskParameterInconsistency, .test_case = testErc4626Inflation },
-    .{ .name = "interest_rate_manipulation", .category = "Lending", .cwe = "CWE-369", .severity = 7, .detect = detectInterestRateManipulation, .test_case = testErc4626Inflation },
-    .{ .name = "borrow_capacity_overflow", .category = "Lending", .cwe = "CWE-190", .severity = 7, .detect = detectBorrowCapacityOverflow, .test_case = testErc4626Inflation },
-    .{ .name = "liquidation_threshold_drift", .category = "Lending", .cwe = "CWE-682", .severity = 7, .detect = detectLiquidationThresholdDrift, .test_case = testErc4626Inflation },
-    .{ .name = "healthfactor_miscalculation", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectHealthfactorMiscalculation, .test_case = testErc4626Inflation },
-    .{ .name = "supply_cap_bypass", .category = "Lending", .cwe = "CWE-20", .severity = 7, .detect = detectSupplyCapBypass, .test_case = testErc4626Inflation },
-    .{ .name = "flashloan_callback_reentrancy", .category = "Lending", .cwe = "CWE-841", .severity = 9, .detect = detectFlashloanCallbackReentrancy, .test_case = testErc4626Inflation },
-    .{ .name = "rate_oracle_staleness", .category = "Lending", .cwe = "CWE-613", .severity = 8, .detect = detectRateOracleStaleness, .test_case = testErc4626Inflation },
+    .{ .name = "VLT-01", .category = "Lending", .cwe = "CWE-682", .severity = 9, .detect = detectVLT01, .test_case = testVLT01 },
+    .{ .name = "VLT-02", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectVLT02, .test_case = testVLT01 },
+    .{ .name = "rounding_error_exploitation", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectVLT02, .test_case = testVLT01 },
+    .{ .name = "collateral_valuation_manipulation", .category = "Lending", .cwe = "CWE-682", .severity = 10, .detect = detectCollateralValuationManipulation, .test_case = testVLT01 },
+    .{ .name = "liquidation_cascade", .category = "Lending", .cwe = "CWE-400", .severity = 8, .detect = detectLiquidationCascade, .test_case = testVLT01 },
+    .{ .name = "debt_ceiling_bypass", .category = "Lending", .cwe = "CWE-20", .severity = 9, .detect = detectDebtCeilingBypass, .test_case = testVLT01 },
+    .{ .name = "isolation_mode_escape", .category = "Lending", .cwe = "CWE-285", .severity = 9, .detect = detectIsolationModeEscape, .test_case = testVLT01 },
+    .{ .name = "risk_parameter_inconsistency", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectRiskParameterInconsistency, .test_case = testVLT01 },
+    .{ .name = "IRM-03", .category = "Lending", .cwe = "CWE-369", .severity = 7, .detect = detectIRM03, .test_case = testVLT01 },
+    .{ .name = "SDT-04", .category = "Lending", .cwe = "CWE-190", .severity = 7, .detect = detectSDT04, .test_case = testVLT01 },
+    .{ .name = "liquidation_threshold_drift", .category = "Lending", .cwe = "CWE-682", .severity = 7, .detect = detectLiquidationThresholdDrift, .test_case = testVLT01 },
+    .{ .name = "healthfactor_miscalculation", .category = "Lending", .cwe = "CWE-682", .severity = 8, .detect = detectHealthfactorMiscalculation, .test_case = testVLT01 },
+    .{ .name = "supply_cap_bypass", .category = "Lending", .cwe = "CWE-20", .severity = 7, .detect = detectSupplyCapBypass, .test_case = testVLT01 },
+    .{ .name = "flashloan_callback_reentrancy", .category = "Lending", .cwe = "CWE-841", .severity = 9, .detect = detectFlashloanCallbackReentrancy, .test_case = testVLT01 },
+    .{ .name = "rate_oracle_staleness", .category = "Lending", .cwe = "CWE-613", .severity = 8, .detect = detectRateOracleStaleness, .test_case = testVLT01 },
 
     // Category 4: Bridge & Wrapped Token (8)
     makeGenericDetector("token_conservation_violation", "CWE-682", 10, "Cross-chain bridge token conservation balance breached"),

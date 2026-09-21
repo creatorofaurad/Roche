@@ -300,9 +300,396 @@ pub const U256 = extern struct {
         }
         return false;
     }
+
+    pub inline fn sub(a: U256, b: U256) U256 {
+        var res: U256 = undefined;
+        var borrow: u64 = 0;
+        for (0..4) |idx| {
+            const diff1 = @subWithOverflow(a.limbs[idx], b.limbs[idx]);
+            const diff2 = @subWithOverflow(diff1[0], borrow);
+            res.limbs[idx] = diff2[0];
+            borrow = @as(u64, diff1[1]) | @as(u64, diff2[1]);
+        }
+        return res;
+    }
+
+    pub inline fn xorVec(a: U256, b: U256) Vec4u64 {
+        return a.toVector() ^ b.toVector();
+    }
 };
 
 comptime {
     std.debug.assert(@sizeOf(U256) == 32);
     std.debug.assert(@alignOf(U256) == 32);
 }
+
+// =================================================================================================
+// Kernel Invariant & State Delta Types (Zero Dynamic Heap Allocations)
+// =================================================================================================
+pub const MAX_STATE_DELTAS: usize = 4096;
+pub const MAX_TRANSIENT_DELTAS: usize = 1024;
+pub const MAX_CHECKPOINTS: usize = 512;
+pub const MAX_UNDO_ENTRIES: usize = 8192;
+pub const MAX_DETECTOR_FINDINGS: usize = 512;
+pub const MAX_CALL_DEPTH: usize = 1024;
+
+pub const StorageKey = struct {
+    address: [20]u8 = [_]u8{0} ** 20,
+    slot: [32]u8 = [_]u8{0} ** 32,
+
+    pub inline fn eq(self: StorageKey, other: StorageKey) bool {
+        return std.mem.eql(u8, &self.address, &other.address) and std.mem.eql(u8, &self.slot, &other.slot);
+    }
+};
+
+pub const DELTA_PERSISTENT: u16 = 1 << 0;
+pub const DELTA_TRANSIENT: u16  = 1 << 1;
+pub const DELTA_REVERTED: u16   = 1 << 2;
+pub const DELTA_SSTORE: u16     = 1 << 3;
+pub const DELTA_TSTORE: u16     = 1 << 4;
+pub const DELTA_DIRTY: u16      = 1 << 5;
+
+pub const StorageDeltaEntry = struct {
+    key: StorageKey = .{},
+    pre: [32]u8 = [_]u8{0} ** 32,
+    post: [32]u8 = [_]u8{0} ** 32,
+    frame_id: u32 = 0,
+    checkpoint_id: u32 = 0,
+    flags: u16 = 0,
+};
+
+pub const Checkpoint = struct {
+    checkpoint_id: u32 = 0,
+    delta_idx: usize = 0,
+    transient_idx: usize = 0,
+    undo_idx: usize = 0,
+};
+
+pub const UndoEntry = struct {
+    key: StorageKey = .{},
+    val: [32]u8 = [_]u8{0} ** 32,
+    is_transient: bool = false,
+};
+
+pub const StateDeltaJournal = struct {
+    entries: [MAX_STATE_DELTAS]StorageDeltaEntry = [_]StorageDeltaEntry{.{}} ** MAX_STATE_DELTAS,
+    len: usize = 0,
+
+    checkpoints: [MAX_CHECKPOINTS]Checkpoint = [_]Checkpoint{.{}} ** MAX_CHECKPOINTS,
+    checkpoint_len: usize = 0,
+
+    undo_log: [MAX_UNDO_ENTRIES]UndoEntry = [_]UndoEntry{.{}} ** MAX_UNDO_ENTRIES,
+    undo_len: usize = 0,
+
+    pub fn init() StateDeltaJournal {
+        return .{};
+    }
+
+    pub fn reset(self: *StateDeltaJournal) void {
+        self.len = 0;
+        self.checkpoint_len = 0;
+        self.undo_len = 0;
+    }
+
+    pub fn beginCheckpoint(self: *StateDeltaJournal) u32 {
+        const cp_id: u32 = @truncate(self.checkpoint_len);
+        if (self.checkpoint_len < MAX_CHECKPOINTS) {
+            self.checkpoints[self.checkpoint_len] = .{
+                .checkpoint_id = cp_id,
+                .delta_idx = self.len,
+                .transient_idx = 0,
+                .undo_idx = self.undo_len,
+            };
+            self.checkpoint_len += 1;
+        }
+        return cp_id;
+    }
+
+    pub fn commitCheckpoint(self: *StateDeltaJournal, cp_id: u32) void {
+        if (self.checkpoint_len > 0 and self.checkpoints[self.checkpoint_len - 1].checkpoint_id == cp_id) {
+            self.checkpoint_len -= 1;
+        }
+    }
+
+    pub fn revertToCheckpoint(self: *StateDeltaJournal, cp_id: u32) void {
+        var target_cp: ?Checkpoint = null;
+        while (self.checkpoint_len > 0) {
+            self.checkpoint_len -= 1;
+            const cp = self.checkpoints[self.checkpoint_len];
+            if (cp.checkpoint_id == cp_id) {
+                target_cp = cp;
+                break;
+            }
+        }
+        if (target_cp) |cp| {
+            // Mark rolled back deltas as reverted
+            var idx = cp.delta_idx;
+            while (idx < self.len) : (idx += 1) {
+                self.entries[idx].flags |= DELTA_REVERTED;
+            }
+            self.len = cp.delta_idx;
+            self.undo_len = cp.undo_idx;
+        }
+    }
+
+    pub fn recordSSTORE(self: *StateDeltaJournal, address: [20]u8, slot: [32]u8, pre: [32]u8, post: [32]u8, frame_id: u32) void {
+        if (self.len < MAX_STATE_DELTAS) {
+            self.entries[self.len] = .{
+                .key = .{ .address = address, .slot = slot },
+                .pre = pre,
+                .post = post,
+                .frame_id = frame_id,
+                .checkpoint_id = if (self.checkpoint_len > 0) self.checkpoints[self.checkpoint_len - 1].checkpoint_id else 0,
+                .flags = DELTA_PERSISTENT | DELTA_SSTORE | DELTA_DIRTY,
+            };
+            self.len += 1;
+        }
+    }
+
+    pub fn getPreState(self: *const StateDeltaJournal, address: [20]u8, slot: [32]u8) ?[32]u8 {
+        const key = StorageKey{ .address = address, .slot = slot };
+        for (0..self.len) |i| {
+            if (self.entries[i].key.eq(key) and (self.entries[i].flags & DELTA_REVERTED == 0)) {
+                return self.entries[i].pre;
+            }
+        }
+        return null;
+    }
+
+    pub fn getPostState(self: *const StateDeltaJournal, address: [20]u8, slot: [32]u8) ?[32]u8 {
+        const key = StorageKey{ .address = address, .slot = slot };
+        var i: usize = self.len;
+        while (i > 0) {
+            i -= 1;
+            if (self.entries[i].key.eq(key) and (self.entries[i].flags & DELTA_REVERTED == 0)) {
+                return self.entries[i].post;
+            }
+        }
+        return null;
+    }
+};
+
+pub const TransientDeltaEntry = struct {
+    key: StorageKey = .{},
+    old_val: [32]u8 = [_]u8{0} ** 32,
+    new_val: [32]u8 = [_]u8{0} ** 32,
+    frame_id: u32 = 0,
+    checkpoint_id: u32 = 0,
+    reverted: bool = false,
+};
+
+pub const TransientStorageJournal = struct {
+    entries: [MAX_TRANSIENT_DELTAS]TransientDeltaEntry = [_]TransientDeltaEntry{.{}} ** MAX_TRANSIENT_DELTAS,
+    len: usize = 0,
+    total_recorded: usize = 0,
+    checkpoint_len: usize = 0,
+    checkpoints: [MAX_CHECKPOINTS]usize = [_]usize{0} ** MAX_CHECKPOINTS,
+
+    pub fn init() TransientStorageJournal {
+        return .{};
+    }
+
+    pub fn recordTSTORE(self: *TransientStorageJournal, address: [20]u8, slot: [32]u8, old_v: [32]u8, new_v: [32]u8, frame_id: u32) void {
+        if (self.len < MAX_TRANSIENT_DELTAS) {
+            self.entries[self.len] = .{
+                .key = .{ .address = address, .slot = slot },
+                .old_val = old_v,
+                .new_val = new_v,
+                .frame_id = frame_id,
+                .checkpoint_id = @truncate(self.checkpoint_len),
+                .reverted = false,
+            };
+            self.len += 1;
+            if (self.len > self.total_recorded) self.total_recorded = self.len;
+        }
+    }
+
+    pub fn checkpoint(self: *TransientStorageJournal) usize {
+        const cp = self.len;
+        if (self.checkpoint_len < MAX_CHECKPOINTS) {
+            self.checkpoints[self.checkpoint_len] = cp;
+            self.checkpoint_len += 1;
+        }
+        return cp;
+    }
+
+    pub fn rollback(self: *TransientStorageJournal, cp: usize) void {
+        var idx = cp;
+        while (idx < self.len) : (idx += 1) {
+            self.entries[idx].reverted = true;
+        }
+        self.len = cp;
+        if (self.checkpoint_len > 0) {
+            self.checkpoint_len -= 1;
+        }
+    }
+
+    pub fn clearTransactionTransient(self: *TransientStorageJournal) void {
+        self.len = 0;
+        self.total_recorded = 0;
+        self.checkpoint_len = 0;
+    }
+};
+
+// =================================================================================================
+// Call Frame Stack & Reentrancy Mask
+// =================================================================================================
+pub const CallKind = enum(u8) {
+    call,
+    callcode,
+    delegatecall,
+    staticcall,
+    create,
+    create2,
+};
+
+pub const FRAME_HAS_VALUE: u32         = 1 << 0;
+pub const FRAME_IS_HOOK: u32           = 1 << 1;
+pub const FRAME_IS_CALLBACK: u32       = 1 << 2;
+pub const FRAME_IS_STATIC: u32         = 1 << 3;
+pub const FRAME_IN_AFTER_SWAP: u32     = 1 << 4;
+pub const FRAME_IN_BEFORE_SWAP: u32    = 1 << 5;
+pub const FRAME_IN_TOKEN_RECEIVER: u32 = 1 << 6;
+pub const FRAME_REENTRANCY_ARMED: u32  = 1 << 7;
+
+pub const CallFrame = struct {
+    frame_id: u32 = 0,
+    parent_frame_id: u32 = 0,
+
+    address: [20]u8 = [_]u8{0} ** 20,
+    caller: [20]u8 = [_]u8{0} ** 20,
+    origin: [20]u8 = [_]u8{0} ** 20,
+
+    value: [32]u8 = [_]u8{0} ** 32,
+    gas: u64 = 0,
+
+    call_kind: CallKind = .call,
+
+    storage_checkpoint: u32 = 0,
+    transient_checkpoint: u32 = 0,
+
+    selector: [4]u8 = [_]u8{0} ** 4,
+    flags: u32 = 0,
+
+    has_external_call_occurred: bool = false,
+    post_call_write_occurred: bool = false,
+};
+
+pub const CallFrameStack = struct {
+    frames: [MAX_CALL_DEPTH]CallFrame = [_]CallFrame{.{}} ** MAX_CALL_DEPTH,
+    depth: usize = 0,
+
+    pub fn init() CallFrameStack {
+        return .{};
+    }
+
+    pub fn push(self: *CallFrameStack, frame: CallFrame) bool {
+        if (self.depth < MAX_CALL_DEPTH) {
+            self.frames[self.depth] = frame;
+            self.depth += 1;
+            return true;
+        }
+        return false;
+    }
+
+    pub fn pop(self: *CallFrameStack) ?CallFrame {
+        if (self.depth > 0) {
+            self.depth -= 1;
+            return self.frames[self.depth];
+        }
+        return null;
+    }
+
+    pub fn current(self: *CallFrameStack) ?*CallFrame {
+        if (self.depth > 0) {
+            return &self.frames[self.depth - 1];
+        }
+        return null;
+    }
+
+    pub fn currentConst(self: *const CallFrameStack) ?*const CallFrame {
+        if (self.depth > 0) {
+            return &self.frames[self.depth - 1];
+        }
+        return null;
+    }
+};
+
+pub const ReentrancyMask = packed struct(u64) {
+    external_call: bool = false,
+    value_call: bool = false,
+    delegatecall: bool = false,
+    staticcall: bool = false,
+    token_transfer: bool = false,
+    hook_call: bool = false,
+    callback_call: bool = false,
+    persistent_write: bool = false,
+    transient_write: bool = false,
+    log_emit: bool = false,
+    create_op: bool = false,
+    selfdestruct_op: bool = false,
+    _reserved: u52 = 0,
+};
+
+pub const OpMask = struct {
+    pub const SLOAD: u64        = 1 << 0;
+    pub const SSTORE: u64       = 1 << 1;
+    pub const TLOAD: u64        = 1 << 2;
+    pub const TSTORE: u64       = 1 << 3;
+    pub const CALL: u64         = 1 << 4;
+    pub const CALLCODE: u64     = 1 << 5;
+    pub const DELEGATECALL: u64 = 1 << 6;
+    pub const STATICCALL: u64   = 1 << 7;
+    pub const CREATE: u64       = 1 << 8;
+    pub const CREATE2: u64      = 1 << 9;
+    pub const LOG0: u64         = 1 << 10;
+    pub const LOG1: u64         = 1 << 11;
+    pub const LOG2: u64         = 1 << 12;
+    pub const LOG3: u64         = 1 << 13;
+    pub const LOG4: u64         = 1 << 14;
+    pub const BALANCE: u64      = 1 << 15;
+    pub const EXTCODESIZE: u64  = 1 << 16;
+    pub const EXTCODECOPY: u64  = 1 << 17;
+    pub const EXTCODEHASH: u64  = 1 << 18;
+    pub const REVERT: u64       = 1 << 19;
+    pub const SELFDESTRUCT: u64 = 1 << 20;
+    pub const MSTORE: u64       = 1 << 21;
+    pub const MLOAD: u64        = 1 << 22;
+    pub const RETURN: u64       = 1 << 23;
+};
+
+// =================================================================================================
+// SIMD Register Shadow Table & Divergence Evaluation
+// =================================================================================================
+pub const ShadowVec256 = @Vector(4, u64);
+pub const OpcodeMaskVec = @Vector(4, u64);
+pub const DivergenceScoreVec = @Vector(8, f32);
+
+pub const ShadowRegisterFile = struct {
+    actual_state: [32]U256 = [_]U256{U256.ZERO} ** 32,
+    ideal_state: [32]U256 = [_]U256{U256.ZERO} ** 32,
+    divergence_scores: [32]f32 = [_]f32{0.0} ** 32,
+    len: usize = 0,
+
+    pub fn init() ShadowRegisterFile {
+        return .{};
+    }
+
+    pub inline fn recordSlot(self: *ShadowRegisterFile, slot_idx: usize, actual: u256, ideal: u256) void {
+        if (slot_idx < 32) {
+            self.actual_state[slot_idx] = U256.fromNative(actual);
+            self.ideal_state[slot_idx] = U256.fromNative(ideal);
+            const xor_v = self.actual_state[slot_idx].toVector() ^ self.ideal_state[slot_idx].toVector();
+            const has_diff = @reduce(.Or, xor_v != @as(Vec4u64, @splat(0)));
+            self.divergence_scores[slot_idx] = if (has_diff) 1.0 else 0.0;
+            if (slot_idx >= self.len) self.len = slot_idx + 1;
+        }
+    }
+
+    pub inline fn hasDivergence(self: *const ShadowRegisterFile) bool {
+        for (0..self.len) |i| {
+            if (self.divergence_scores[i] > 0.0) return true;
+        }
+        return false;
+    }
+};

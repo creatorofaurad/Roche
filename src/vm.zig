@@ -1,4 +1,4 @@
-﻿//! ROCHE: Bare-Silicon EVM Virtual Machine Interpreter
+//! ROCHE: Bare-Silicon EVM Virtual Machine Interpreter
 //! Zero Dynamic Heap Allocations (`malloc=0`), Multi-Account State, Cancun Opcodes & Direct Jump Table Dispatch.
 
 const std = @import("std");
@@ -77,6 +77,14 @@ pub const VM = struct {
     coverage: fuzzer_mod.CoverageEngine = .{},
     status: types.ExecutionStatus = .SUCCESS,
 
+    // High-Precision Kernel & Shadow Instrumentation
+    delta_journal: types.StateDeltaJournal = types.StateDeltaJournal.init(),
+    transient_journal: types.TransientStorageJournal = types.TransientStorageJournal.init(),
+    call_stack: types.CallFrameStack = types.CallFrameStack.init(),
+    shadow_registers: types.ShadowRegisterFile = types.ShadowRegisterFile.init(),
+    reentrancy_mask: types.ReentrancyMask = .{},
+    opcode_trace_mask: u64 = 0,
+
     calldata: [types.MAX_CALLDATA_BYTES]u8 = [_]u8{0} ** types.MAX_CALLDATA_BYTES,
     calldata_len: usize = 0,
     returndata: [types.MAX_RETURNDATA_BYTES]u8 = [_]u8{0} ** types.MAX_RETURNDATA_BYTES,
@@ -85,7 +93,16 @@ pub const VM = struct {
     created_contracts_count: u64 = 0,
 
     pub fn init() VM {
-        return .{};
+        var v = VM{};
+        _ = v.call_stack.push(.{
+            .frame_id = 0,
+            .parent_frame_id = 0,
+            .address = v.cheatcodes.current_address,
+            .caller = v.cheatcodes.current_caller,
+            .origin = v.cheatcodes.origin,
+            .call_kind = .call,
+        });
+        return v;
     }
 
     pub inline fn push(self: *VM, val: u256) bool {
@@ -608,11 +625,20 @@ pub const VM = struct {
                     self.memory.mstore8(off, @truncate(val & 0xFF));
                 },
                 0x54 => { // SLOAD
+                    self.opcode_trace_mask |= types.OpMask.SLOAD;
                     const slot_u = self.pop() orelse return self.status;
                     const slot: usize = @truncate(slot_u);
                     _ = self.push(self.storage.select(slot));
                 },
                 0x55 => { // SSTORE
+                    self.opcode_trace_mask |= types.OpMask.SSTORE;
+                    self.reentrancy_mask.persistent_write = true;
+                    if (self.call_stack.current()) |curr_frame| {
+                        if (curr_frame.has_external_call_occurred) {
+                            curr_frame.post_call_write_occurred = true;
+                        }
+                    }
+
                     if (self.is_static) {
                         self.status = .STATIC_MODE_VIOLATION;
                         return self.status;
@@ -620,6 +646,28 @@ pub const VM = struct {
                     const slot_u = self.pop() orelse return self.status;
                     const val = self.pop() orelse return self.status;
                     const slot: usize = @truncate(slot_u);
+
+                    const pre_val = self.storage.select(slot);
+                    var pre_bytes: [32]u8 = [_]u8{0} ** 32;
+                    var post_bytes: [32]u8 = [_]u8{0} ** 32;
+                    var slot_bytes: [32]u8 = [_]u8{0} ** 32;
+
+                    var temp_pre = pre_val;
+                    var temp_post = val;
+                    var temp_slot = slot_u;
+                    var b_idx: usize = 32;
+                    while (b_idx > 0) {
+                        b_idx -= 1;
+                        pre_bytes[b_idx] = @truncate(temp_pre & 0xFF);
+                        post_bytes[b_idx] = @truncate(temp_post & 0xFF);
+                        slot_bytes[b_idx] = @truncate(temp_slot & 0xFF);
+                        temp_pre >>= 8;
+                        temp_post >>= 8;
+                        temp_slot >>= 8;
+                    }
+
+                    const curr_fid = if (self.call_stack.current()) |f| f.frame_id else 0;
+                    self.delta_journal.recordSSTORE(self.cheatcodes.current_address, slot_bytes, pre_bytes, post_bytes, curr_fid);
                     self.storage.store(slot, val);
                 },
                 0x56 => { // JUMP
@@ -654,11 +702,14 @@ pub const VM = struct {
                 },
                 0x5B => {}, // JUMPDEST
                 0x5C => { // TLOAD (EIP-1153)
+                    self.opcode_trace_mask |= types.OpMask.TLOAD;
                     const slot_u = self.pop() orelse return self.status;
                     const slot: usize = @truncate(slot_u);
                     _ = self.push(self.transient_storage.tload(slot));
                 },
                 0x5D => { // TSTORE (EIP-1153)
+                    self.opcode_trace_mask |= types.OpMask.TSTORE;
+                    self.reentrancy_mask.transient_write = true;
                     if (self.is_static) {
                         self.status = .STATIC_MODE_VIOLATION;
                         return self.status;
@@ -666,6 +717,28 @@ pub const VM = struct {
                     const slot_u = self.pop() orelse return self.status;
                     const val = self.pop() orelse return self.status;
                     const slot: usize = @truncate(slot_u);
+
+                    const old_v = self.transient_storage.tload(slot);
+                    var old_bytes: [32]u8 = [_]u8{0} ** 32;
+                    var new_bytes: [32]u8 = [_]u8{0} ** 32;
+                    var slot_bytes: [32]u8 = [_]u8{0} ** 32;
+
+                    var temp_old = old_v;
+                    var temp_new = val;
+                    var temp_slot = slot_u;
+                    var b_idx: usize = 32;
+                    while (b_idx > 0) {
+                        b_idx -= 1;
+                        old_bytes[b_idx] = @truncate(temp_old & 0xFF);
+                        new_bytes[b_idx] = @truncate(temp_new & 0xFF);
+                        slot_bytes[b_idx] = @truncate(temp_slot & 0xFF);
+                        temp_old >>= 8;
+                        temp_new >>= 8;
+                        temp_slot >>= 8;
+                    }
+
+                    const curr_fid = if (self.call_stack.current()) |f| f.frame_id else 0;
+                    self.transient_journal.recordTSTORE(self.cheatcodes.current_address, slot_bytes, old_bytes, new_bytes, curr_fid);
                     self.transient_storage.tstore(slot, val);
                 },
                 0x5E => { // MCOPY (Cancun EIP-5656)
@@ -754,6 +827,12 @@ pub const VM = struct {
                 },
 
                 0xF1 => { // CALL
+                    self.opcode_trace_mask |= types.OpMask.CALL;
+                    self.reentrancy_mask.external_call = true;
+                    if (self.call_stack.current()) |curr_frame| {
+                        curr_frame.has_external_call_occurred = true;
+                    }
+
                     _ = self.popSafe(); // gas
                     const addr_u = self.popSafe() orelse 0;
                     const val = self.popSafe() orelse 0;
@@ -761,6 +840,8 @@ pub const VM = struct {
                     const args_sz = self.popSafe() orelse 0;
                     const ret_off = self.popSafe() orelse 0;
                     const ret_sz = self.popSafe() orelse 0;
+
+                    if (val > 0) self.reentrancy_mask.value_call = true;
 
                     if (self.is_static and val > 0) {
                         self.status = .STATIC_MODE_VIOLATION;
@@ -778,6 +859,12 @@ pub const VM = struct {
                 },
 
                 0xF2 => { // CALLCODE
+                    self.opcode_trace_mask |= types.OpMask.CALLCODE;
+                    self.reentrancy_mask.external_call = true;
+                    if (self.call_stack.current()) |curr_frame| {
+                        curr_frame.has_external_call_occurred = true;
+                    }
+
                     _ = self.popSafe(); // gas
                     _ = self.popSafe() orelse 0; // addr
                     const val = self.popSafe() orelse 0;
@@ -785,6 +872,8 @@ pub const VM = struct {
                     _ = self.popSafe() orelse 0; // args_sz
                     _ = self.popSafe() orelse 0; // ret_off
                     _ = self.popSafe() orelse 0; // ret_sz
+
+                    if (val > 0) self.reentrancy_mask.value_call = true;
 
                     if (self.is_static and val > 0) {
                         self.status = .STATIC_MODE_VIOLATION;
@@ -795,6 +884,12 @@ pub const VM = struct {
                 },
 
                 0xF4 => { // DELEGATECALL
+                    self.opcode_trace_mask |= types.OpMask.DELEGATECALL;
+                    self.reentrancy_mask.delegatecall = true;
+                    if (self.call_stack.current()) |curr_frame| {
+                        curr_frame.has_external_call_occurred = true;
+                    }
+
                     _ = self.popSafe(); // gas
                     const target_u = self.popSafe() orelse 0;
                     const args_off = self.popSafe() orelse 0;
@@ -813,6 +908,8 @@ pub const VM = struct {
                 },
 
                 0xF5 => { // CREATE2
+                    self.opcode_trace_mask |= types.OpMask.CREATE2;
+                    self.reentrancy_mask.create_op = true;
                     if (self.is_static) {
                         self.status = .STATIC_MODE_VIOLATION;
                         return self.status;
@@ -843,6 +940,12 @@ pub const VM = struct {
                 },
 
                 0xFA => { // STATICCALL
+                    self.opcode_trace_mask |= types.OpMask.STATICCALL;
+                    self.reentrancy_mask.staticcall = true;
+                    if (self.call_stack.current()) |curr_frame| {
+                        curr_frame.has_external_call_occurred = true;
+                    }
+
                     _ = self.popSafe(); // gas
                     _ = self.popSafe() orelse 0; // addr
                     _ = self.popSafe() orelse 0; // args_off
@@ -855,6 +958,7 @@ pub const VM = struct {
                 },
 
                 0xF3 => { // RETURN
+                    self.opcode_trace_mask |= types.OpMask.RETURN;
                     const offset = self.pop() orelse return self.status;
                     const size = self.pop() orelse return self.status;
                     const off: usize = @truncate(offset);
@@ -868,6 +972,7 @@ pub const VM = struct {
                 },
 
                 0xFD => { // REVERT
+                    self.opcode_trace_mask |= types.OpMask.REVERT;
                     const offset = self.pop() orelse return self.status;
                     const size = self.pop() orelse return self.status;
                     const off: usize = @truncate(offset);

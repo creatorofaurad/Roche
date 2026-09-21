@@ -63,3 +63,59 @@ test "ROCHE v2 INTEGRATION SUITE [5/5]: Multi-Tier Orchestrator & .PIER Chunked 
     try std.testing.expect(orch.metrics.violations_found >= 1);
     try std.testing.expect(orch.metrics.critical_findings >= 1);
 }
+
+test "ROCHE v2 KERNEL SUITE: RF-01 Dynamic CEI Post-Call Write Detection" {
+    var vm = @import("vm.zig").VM.init();
+    const exploit_bytecode = [_]u8{
+        0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60, 0xAA, 0x60, 0xFF, 0xF1, // CALL
+        0x60, 0x01, 0x60, 0x05, 0x55, // SSTORE(5, 1) after call
+        0x00,
+    };
+    _ = vm.execute(&exploit_bytecode);
+
+    var dummy_cfg = @import("cfg.zig").ControlFlowGraph.init();
+    const res = detectors.detectRF01(&vm, &dummy_cfg);
+    try std.testing.expect(res.found);
+    try std.testing.expectEqual(@as(u8, 9), res.severity);
+}
+
+test "ROCHE v2 KERNEL SUITE: TS-02 Transient Storage Rollback Verification" {
+    var vm = @import("vm.zig").VM.init();
+    const cp = vm.transient_journal.checkpoint();
+    const dummy_slot: [32]u8 = [_]u8{0} ** 32;
+    const dummy_old: [32]u8 = [_]u8{0} ** 32;
+    const dummy_new: [32]u8 = [_]u8{0xFF} ** 32;
+    vm.transient_journal.recordTSTORE(vm.cheatcodes.current_address, dummy_slot, dummy_old, dummy_new, 1);
+    vm.transient_storage.tstore(0, 0xFF);
+
+    // Rollback to checkpoint
+    vm.transient_journal.rollback(cp);
+    // If state wasn't cleared in transient_storage, TS-02 fires
+    var dummy_cfg = @import("cfg.zig").ControlFlowGraph.init();
+    const res = detectors.detectTS02(&vm, &dummy_cfg);
+    try std.testing.expect(res.found);
+}
+
+test "ROCHE v2 KERNEL SUITE: CP-01 SIMD Shadow Divergence Verification" {
+    var vm = @import("vm.zig").VM.init();
+    // Record actual vs ideal divergent reserve product
+    vm.shadow_registers.recordSlot(0, 990_000, 1_000_000);
+    var dummy_cfg = @import("cfg.zig").ControlFlowGraph.init();
+    const res = detectors.detectCP01(&vm, &dummy_cfg);
+    try std.testing.expect(res.found);
+    try std.testing.expectEqual(@as(u8, 10), res.severity);
+}
+
+test "ROCHE v2 KERNEL SUITE: CS-04 Uniswap V4 afterSwap Persistent Write Violation" {
+    var vm = @import("vm.zig").VM.init();
+    if (vm.call_stack.current()) |frame| {
+        frame.flags |= @import("types.zig").FRAME_IN_AFTER_SWAP;
+    }
+    vm.reentrancy_mask.persistent_write = true;
+
+    var dummy_cfg = @import("cfg.zig").ControlFlowGraph.init();
+    const res = detectors.detectCS04(&vm, &dummy_cfg);
+    try std.testing.expect(res.found);
+    try std.testing.expectEqual(@as(u8, 9), res.severity);
+}
+

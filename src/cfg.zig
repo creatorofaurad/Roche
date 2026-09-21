@@ -1,4 +1,4 @@
-﻿//! ROCHE: Slither-Style Basic Block Disassembly & Control Flow Graph
+//! ROCHE: Slither-Style Basic Block Disassembly & Control Flow Graph
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
 
 const std = @import("std");
@@ -40,12 +40,82 @@ pub const BasicBlock = struct {
     has_storage_collision_risk: bool = false,
     has_read_only_reentrancy_pattern: bool = false,
     has_oracle_staleness_pattern: bool = false,
+    has_storage_collision_pattern: bool = false,
+    has_revert_in_catch_block: bool = false,
+    detector_flags: u64 = 0,
+
+    pub fn set_detector_flag(self: *BasicBlock, comptime name: []const u8) void {
+        const hash = comptime std.hash.Fnv1a_64.hash(name);
+        self.detector_flags |= (@as(u64, 1) << @intCast(hash % 64));
+    }
+
+    pub fn has_detector_flag(self: *const BasicBlock, comptime name: []const u8) bool {
+        const hash = comptime std.hash.Fnv1a_64.hash(name);
+        return (self.detector_flags & (@as(u64, 1) << @intCast(hash % 64))) != 0;
+    }
 };
 
 pub const ControlFlowGraph = struct {
     blocks: [types.MAX_BASIC_BLOCKS]BasicBlock = [_]BasicBlock{.{}} ** types.MAX_BASIC_BLOCKS,
     block_count: usize = 0,
     has_back_edge: bool = false,
+    has_tstore_cleanup_on_exit: bool = false,
+    has_constant_product_pool: bool = false,
+    has_k_invariant_check: bool = false,
+    has_stableswap_pool: bool = false,
+    has_invariant_convergence_check: bool = false,
+    has_tick_bitmap_ops: bool = false,
+    has_tick_boundary_clamp: bool = false,
+    has_fee_growth_global: bool = false,
+    has_division_before_multiplication: bool = false,
+    reads_uniswap_twap: bool = false,
+    has_oracle_heartbeat_check: bool = false,
+    has_swap_execution: bool = false,
+    has_min_amount_out_check: bool = false,
+    has_public_amm_swap: bool = false,
+    has_deadline_check: bool = false,
+    has_flashloan_receiver: bool = false,
+    reads_spot_reserves_for_valuation: bool = false,
+    has_multi_pool_routing: bool = false,
+    has_net_output_balance_assertion: bool = false,
+    mints_lp_shares: bool = false,
+    has_minimum_liquidity_burn: bool = false,
+    handles_multi_tokens: bool = false,
+    normalizes_token_decimals: bool = false,
+    updates_reserves_manually: bool = false,
+    syncs_with_token_balances: bool = false,
+    is_erc4626_vault: bool = false,
+    has_virtual_shares_offset: bool = false,
+    has_share_to_asset_conversion: bool = false,
+    rounds_shares_down_on_redeem: bool = false,
+    computes_borrowing_power: bool = false,
+    reads_spot_price: bool = false,
+    has_liquidation_call: bool = false,
+    has_close_factor_limit: bool = false,
+    has_borrow_function: bool = false,
+    checks_global_debt_ceiling: bool = false,
+    has_isolated_collateral: bool = false,
+    allows_multiple_borrow_assets: bool = false,
+    ltv_ratio: u32 = 0,
+    liquidation_threshold: u32 = 0,
+    updates_borrow_index: bool = false,
+    allows_zero_utilization_div: bool = false,
+    has_borrow_capacity_check: bool = false,
+    handles_borrow_overflow: bool = false,
+    dynamic_liquidation_threshold: bool = false,
+    has_threshold_floor: bool = false,
+    computes_health_factor: bool = false,
+    ignores_accrued_interest: bool = false,
+    has_deposit_function: bool = false,
+    checks_supply_cap: bool = false,
+    has_flashloan_callback: bool = false,
+    has_reentrancy_guard: bool = false,
+    reads_exchange_rate_oracle: bool = false,
+    checks_oracle_updated_at: bool = false,
+
+    pub fn init() ControlFlowGraph {
+        return .{};
+    }
 
     pub fn build(bytecode: []const u8) ControlFlowGraph {
         var cfg = ControlFlowGraph{};

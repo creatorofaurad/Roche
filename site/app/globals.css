@@ -1,20 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Cormorant+SC:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
 @import "tailwindcss";
 
 @layer base {
   :root {
-    --background: #000000;
-    --foreground: #ffffff;
-    --card: #09090b;
-    --card-border: #18181b;
-    --muted: #71717a;
+    --background: #0A0908;
+    --foreground: #F4EBD9;
+    --card: #141210;
+    --card-border: #1C1916;
+    --muted: #8A8175;
   }
 
   body {
-    background-color: #000000;
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background-color: #0A0908;
+    color: #F4EBD9;
+    font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
     overflow-x: hidden;
   }
+}
+
+.font-serif {
+  font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+}
+
+.font-sc {
+  font-family: 'Cormorant SC', 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 .scrollbar-none::-webkit-scrollbar {

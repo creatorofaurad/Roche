@@ -1,20 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Roche",
-  description: "Zero-Allocation Bare-Silicon EVM Invariant Engine",
+  title: "ROCHE — Bare-Silicon Formal EVM Invariant Verifier",
+  description: "A high-throughput formal invariant verifier and state fuzzer for the Ethereum Virtual Machine. Zero-allocation bare-silicon runtime written in Zig 0.16.0.",
   icons: {
     icon: "/icon.svg",
   },
@@ -26,11 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-black`}
-    >
-      <body className="min-h-full flex flex-col bg-black text-white">{children}</body>
+    <html lang="en" className="h-full antialiased bg-[#0A0908]">
+      <body className="min-h-full flex flex-col bg-[#0A0908] text-[#F4EBD9] selection:bg-[#C5A059] selection:text-[#0A0908]">
+        {children}
+      </body>
     </html>
   );
 }

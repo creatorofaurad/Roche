@@ -1,4 +1,4 @@
-﻿.zig-cache/
+.zig-cache/
 zig-out/
 *.pdb
 *.obj
@@ -31,3 +31,20 @@ CANTINA_*.md
 
 ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md
 
+# ==============================================================================
+# PRIVATE PROPRIETARY ENGINE & MODEL SUBSTRATE (MADELYNE / PIER / NBW / CHARYELOG)
+# ==============================================================================
+src/madelyne/
+src/madelyne_*.zig
+src/pier_*.zig
+src/nbw_*.zig
+src/charyelog/
+src/charyec.zig
+src/charyelog_compiler.zig
+src/master_foundation_stack.zig
+src/mirofish_*.zig
+private_core/
+models/
+*.nbw
+*.pier
+*.charye

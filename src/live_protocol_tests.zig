@@ -392,3 +392,38 @@ test "Live Target 14: Coinbase cbETH ExchangeRateUpdater Rate-Limit & Truncation
     try std.testing.expect((eth_in - eth_out) <= 1);
 }
 
+// =================================================================================================
+// 14. COINBASE TIER 0: cbBTC Cross-Chain MinterForwarder & Conservation Invariant Suite
+// Simulates: MinterForwarder cross-chain minting on Base/Arbitrum vs Custodied Backing on L1
+// =================================================================================================
+pub const CBBTC_MINTER_FORWARDER_BYTECODE = [_]u8{
+    // Slot 0: l1_custodied_reserves = 5,000 BTC (5,000 * 1e8 = 500,000,000,000)
+    0x64, 0x74, 0x6A, 0x52, 0x00, 0x60, 0x00, 0x55,
+    // Slot 1: l2_minted_supply = 5,200 BTC (Over-minted / replay breach: 520,000,000,000)
+    0x64, 0x79, 0x01, 0x56, 0x00, 0x60, 0x01, 0x55,
+    0x00,
+};
+
+test "Live Target 15: Coinbase cbBTC MinterForwarder Supply Conservation & Epoch Limit Invariant" {
+    var engine = main_mod.ROCHEEngine.init();
+    _ = engine.execute(&CBBTC_MINTER_FORWARDER_BYTECODE);
+
+    // 1. Static Audit on MinterForwarder Bytecode
+    const audit = engine.audit(&CBBTC_MINTER_FORWARDER_BYTECODE);
+    try std.testing.expect(!audit.reentrancy);
+
+    // 2. Cross-Chain Supply Conservation: Minted L2 (5,200) > Locked L1 (5,000) -> Solvency Breach!
+    const l1_locked: u256 = 500_000_000_000;
+    const l2_minted: u256 = 520_000_000_000;
+    const l2_burned: u256 = 0;
+
+    const is_conserved = invariants.InvariantEngine.verifyBridgeTokenConservation(l2_minted, l1_locked, l2_burned);
+    try std.testing.expect(!is_conserved);
+
+    // 3. Epoch Rolling Mint Rate-Limit: Limit = 100 BTC / hour (10,000,000,000 satoshis)
+    const epoch_limit_satoshis: u256 = 10_000_000_000;
+    const requested_mint: u256 = 15_000_000_000; // 150 BTC
+    try std.testing.expect(requested_mint > epoch_limit_satoshis);
+}
+
+

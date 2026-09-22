@@ -118,13 +118,6 @@ roche-rs = "1.0"
 - [`SECURITY.md`](./SECURITY.md) — Security policy and disclosure guidelines
 
 ---
-
-## GitHub Stats
-- **1,047 clones** in 5 days (Sep 17-22, 2026)
-- **355 unique cloners**
-- **402 clones** on peak day (Sep 20, 2026)
-- **5,734 contributions** in 2026
-
 ## Institutional Pipeline
 - **Enterprise Pilots:** Active engagements with leading L1/L2 infrastructure providers and DeFi protocols.
 - **Grant Programs:** Under review with major ecosystem foundations.
@@ -145,4 +138,4 @@ Open Core — Free CLI with commercial enterprise tiers.
 - **Enterprise:** Custom licensing
 
 ## Contact
-Institutional inquiries: partnerships@roche.dev | Community: GitHub Discussions
+Institutional inquiries: srijaan@proton.me | Community: GitHub Discussions

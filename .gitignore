@@ -30,6 +30,12 @@ ROCHE_AUDIT_*.md
 ROCHE_VERIFIED_*.md
 BASE_ECOSYSTEM_*.md
 CANTINA_*.md
+findings_cbeth.json
+findings_pumpfun.json
+findings_paxos_medium.json
+verify_agglayer_parity.js
+pumpfun_state_corruption_trace.json
+findings_*.json
 
 
 ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md

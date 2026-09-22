@@ -1,0 +1,17 @@
+{
+  "target": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+  "contract_name": "cbBTC Token & Minter Controller",
+  "network": "Ethereum Mainnet",
+  "chain_id": 1,
+  "scan_timestamp": "2026-09-21T22:08:00Z",
+  "engine": "Roche v2.0.0-ReleaseFast",
+  "detectors_evaluated": ["CB-03", "CB-02"],
+  "boundary_mode": "strict",
+  "total_findings": 0,
+  "status": "PASS",
+  "invariants": {
+    "CB-03_custodial_share_inflation_protected": true,
+    "CB-02_cross_chain_replay_domain_isolated": true
+  },
+  "findings": []
+}

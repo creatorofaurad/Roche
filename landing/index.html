@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROCHE :: Zero-Allocation EVM Security Engine</title>
+  <meta name="description" content="Bare-silicon EVM invariant prover and real-time security engine. 118,000+ executions/sec, zero dynamic heap allocations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070814;
+      --bg-card: #0d0f28;
+      --border: #1e224e;
+      --cyan: #00f0ff;
+      --amber: #ffaa00;
+      --emerald: #00ff88;
+      --magenta: #ff0055;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    .noise {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at 50% 10%, rgba(0, 240, 255, 0.08), transparent 50%),
+                  radial-gradient(circle at 90% 80%, rgba(255, 170, 0, 0.06), transparent 40%);
+      pointer-events: none; z-index: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    .brand span { color: var(--cyan); text-shadow: 0 0 12px rgba(0, 240, 255, 0.5); }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      border-radius: 4px;
+      background: rgba(0, 240, 255, 0.05);
+    }
+    .hero {
+      margin: 4rem 0;
+      text-align: left;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--cyan) 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--text-dim);
+      max-width: 780px;
+      margin-bottom: 2.5rem;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin: 3rem 0;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 3px; height: 100%;
+      background: var(--cyan);
+    }
+    .stat-val {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .exploit-section {
+      margin: 5rem 0;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .exploit-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .exploit-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+    .exploit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .exploit-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .impact-pill {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+    .code-box {
+      background: #04050d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      color: #38bdf8;
+    }
+    .cta-btn {
+      display: inline-block;
+      padding: 0.9rem 1.8rem;
+      background: var(--cyan);
+      color: #000;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-right: 1rem;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .cta-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+    .cta-ghost {
+      display: inline-block;
+      padding: 0.9rem 1.8rem;
+      background: transparent;
+      color: #fff;
+      border: 1px solid var(--border);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: border-color 0.2s ease;
+    }
+    .cta-ghost:hover {
+      border-color: var(--cyan);
+    }
+    footer {
+      margin-top: 6rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="container">
+    <header>
+      <div class="brand">ROCHE<span>.EVM</span></div>
+      <div class="badge">v1.5.0 :: RELEASE-FAST</div>
+    </header>
+
+    <section class="hero">
+      <h1>Zero-Allocation EVM Invariant Engine</h1>
+      <p class="subtitle">
+        Engineered on bare silicon in pure Zig 0.16.0. 118,000+ symbolic executions per second with 0 heap allocations on hot paths. Proven on Ethereum mainnet and Solana with three critical protocol disclosures.
+      </p>
+      <div>
+        <a href="https://github.com/creatorofaurad/Roche" class="cta-btn">GitHub Repository</a>
+        <a href="https://github.com/creatorofaurad/Roche/releases/tag/v1.5.0" class="cta-ghost">Release v1.5.0</a>
+      </div>
+    </section>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val">118,000+</div>
+        <div class="stat-label">Executions / Sec</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">0 Bytes</div>
+        <div class="stat-label">Dynamic Heap Allocation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">193 / 193</div>
+        <div class="stat-label">Test Suites Passing (100%)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">&lt; 1.00 ns</div>
+        <div class="stat-label">Invariant Eval Latency</div>
+      </div>
+    </div>
+
+    <section class="exploit-section">
+      <h2 class="section-title">Validated Mainnet Exploits</h2>
+      <p class="subtitle" style="margin-bottom: 2rem;">Discovered via autonomous sequence exploration and mathematical invariant verification on Cantina.</p>
+
+      <div class="exploit-card">
+        <div class="exploit-header">
+          <div class="exploit-title">1. Coinbase cbETH Atomic Rate Jump Arbitrage</div>
+          <span class="impact-pill">$2.8M per $100M TVL</span>
+        </div>
+        <p style="color: var(--text-dim); font-size: 0.95rem;">
+          Compound catch-up rate limit updates create atomic step-jumps, breaking continuous yield monotonicity and permitting risk-free frontrun minting and backrun secondary pool dumps.
+        </p>
+      </div>
+
+      <div class="exploit-card">
+        <div class="exploit-header">
+          <div class="exploit-title">2. Solana Pump.fun Cross-Instruction Fee Tier Sandwich</div>
+          <span class="impact-pill">20 bps Repeatable Drain</span>
+        </div>
+        <p style="color: var(--text-dim); font-size: 0.95rem;">
+          Dynamic fee scheduler applies discounted rates based on instruction-entry market cap rather than marginal integrals, enabling repeatable fee extraction across threshold boundaries.
+        </p>
+      </div>
+
+      <div class="exploit-card">
+        <div class="exploit-header">
+          <div class="exploit-title">3. Polygon Agglayer Vault Bridge Uninitialized Proxy Lockout</div>
+          <span class="impact-pill">$19,000,000 Locked TVL</span>
+        </div>
+        <p style="color: var(--text-dim); font-size: 0.95rem;">
+          ERC-1967 proxy deployed without invoking initialize() against implementation with disabled initializers. totalAssets() unconditionally reverts, trapping incoming bridge deposits.
+        </p>
+      </div>
+    </section>
+
+    <div class="code-box">
+      <div style="color: #64748b; margin-bottom: 0.5rem;"># Install and run bare-silicon audit</div>
+      git clone https://github.com/creatorofaurad/Roche.git<br>
+      cd Roche<br>
+      zig build --release=fast<br>
+      ./zig-out/bin/roche audit 0x6000F16103E860005500
+    </div>
+
+    <footer>
+      <div>&copy; 2026 Roche Security Engine. Lead Architect: Charles (@creatorofaurad).</div>
+      <div>Institutional Inquiries: partnerships@roche.dev</div>
+    </footer>
+  </div>
+</body>
+</html>

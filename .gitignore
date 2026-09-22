@@ -6,6 +6,9 @@ zig-out/
 *.dll
 *.lib
 target/
+dist/
+test-results.log
+roche.sha256
 
 # Site dependencies & build artifacts
 site/node_modules/

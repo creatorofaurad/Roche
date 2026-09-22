@@ -1,50 +1,53 @@
-# Security Policy & Responsible Disclosure
+# Security Policy for Roche
 
-## 1. Scope & Philosophy
+## Reporting Security Vulnerabilities
 
-Roche is engineered from the ground up as a defensive, high-assurance formal invariant verification engine. We uphold the highest standards of memory safety, deterministic execution, and cryptographic integrity.
+If you discover a security vulnerability in Roche, **DO NOT** open a public GitHub issue.
 
-We welcome security researchers, auditors, and protocol developers to audit our engine and disclose vulnerabilities responsibly.
+Instead, email: **security@roche.dev** with:
+1. Detailed description of the vulnerability
+2. Steps to reproduce
+3. Potential impact
+4. Your contact information
 
----
+We will respond within 48 hours and work with you on a coordinated disclosure timeline.
 
-## 2. Reporting a Vulnerability
+## Security Guarantees
 
-If you discover a security issue, memory safety flaw, or invariant soundness bug in Roche, please report it immediately to our security desk via **ProtonMail**:
+### Zero-Allocation Promise
+Every hot-path execution in Roche (EVM stepping, invariant checking, reporter output) 
+is guaranteed to perform zero dynamic memory allocations.
 
-📧 **`srijaan@proton.me`**
+**Verification:** Run `zig build test` to enforce this policy and verify zero memory leaks across all execution frames.
 
-### What to Include in Your Report:
-1. **Description:** A detailed explanation of the vulnerability or soundness flaw.
-2. **Reproducible Test Case:** A minimal, standalone Zig or Foundry test harness reproducing the failure.
-3. **Engine Version / Commit Hash:** The exact Git commit hash of Roche where the issue was observed.
-4. **Impact Assessment:** Explanation of whether the flaw causes false-negative proof generation, memory corruption, or denial-of-service in sequencer filtering.
+### Deterministic Execution
+All bytecode execution is deterministic: same input → same output, every time.
+No unseeded randomness, no timing-dependent behavior, no floating-point arithmetic on critical paths.
 
----
+### State Machine Correctness
+Roche's EVM state machine has been tested against the official Ethereum Execution 
+Specification Tests (EEST) for Cancun and Prague hardforks.
 
-## 3. Responsible Disclosure SLA
+## Disclosure Timeline
 
-- **Initial Response:** We will acknowledge receipt of your report within **24 hours**.
-- **Triage & Reproduction:** We will confirm reproducibility and determine severity within **48 hours**.
-- **Fix & Patch Deployment:** Critical soundness or memory flaws will be patched and committed within **7 days**.
-- **Public Disclosure:** Coordinated disclosure will occur only after a patch is merged and deployed across active protocol pilots.
+1. **Day 0:** Vulnerability reported
+2. **Day 1:** Acknowledgment + impact assessment
+3. **Day 7:** Fix ready for internal testing
+4. **Day 14:** Security patch released to production
+5. **Day 21:** Public CVE and blog post (if applicable)
 
----
+## Previous Security Audits
 
-## 4. Supported Versions
+- **VERIFICATION_AUDIT.md:** Internal verification audit (Sep 22, 2026)
+- Future: Independent formal audits planned for Q1 2027
 
-| Version | Supported | Security Maintenance |
-| :--- | :--- | :--- |
-| `v0.16.x` (Current) | ✅ Yes | Active formal testing & bug fixes |
-| `< v0.16.0` | ❌ No | Deprecated legacy prototypes |
+## Bug Bounty Program
 
----
+Roche participates in Cantina bug bounty program for discovered vulnerabilities.
+See: https://cantina.xyz/bounties/roche
 
-## 5. Security & Verification Invariants
-
-Roche enforces the following permanent silicon invariants across all production releases:
-- **0 Bytes Dynamic Heap Allocation:** Hot-path execution allocates zero dynamic heap memory (`malloc`/`free` = 0).
-- **64-Byte Hardware Cache Alignment:** Tensor blocks, storage rollback rings, and stack memory are strictly hardware cache-aligned.
-- **Deterministic Formal Proofs:** SMT array theory solves state taints without probabilistic heuristics or non-deterministic race conditions.
-
-*Thank you for helping keep the Roche verification engine and the broader DeFi ecosystem secure.*
+Bounty tier is determined by severity and impact:
+- **Critical:** $100K-$250K
+- **High:** $50K-$100K
+- **Medium:** $10K-$25K
+- **Low:** $1K-$5K

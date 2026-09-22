@@ -54,7 +54,7 @@ pub const Detector = struct {
 pub fn detectRF01(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     // Priority 1: Dynamic Execution Check via VM CallFrame and StateDeltaJournal
     if (vm_state) |vm| {
-        if (vm.reentrancy_mask.external_call and vm.reentrancy_mask.persistent_write) {
+        if ((vm.reentrancy_mask.external_call or vm.reentrancy_mask.delegatecall) and vm.reentrancy_mask.persistent_write) {
             for (0..vm.call_stack.depth) |i| {
                 if (vm.call_stack.frames[i].post_call_write_occurred) {
                     return DetectionResult.init(true, 9, "CWE-841", "RF-01: Protected storage write executed after external call");
@@ -113,8 +113,10 @@ pub fn detectTS02(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGr
 // 3. CP-01: Constant Product k-Growth & Reserve Conservation
 pub fn detectCP01(vm_state: ?*const vm_mod.VM, cfg: *const cfg_mod.ControlFlowGraph) DetectionResult {
     if (vm_state) |vm| {
-        if (vm.shadow_registers.hasDivergence()) {
-            return DetectionResult.init(true, 10, "CWE-682", "CP-01: Constant-product k-growth violation (R0'*R1' < R0*R1)");
+        for (0..vm.shadow_registers.len) |i| {
+            if (vm.shadow_registers.actual_state[i].toNative() < vm.shadow_registers.ideal_state[i].toNative()) {
+                return DetectionResult.init(true, 10, "CWE-682", "CP-01: Constant-product k-growth violation (R0'*R1' < R0*R1)");
+            }
         }
     }
     if (cfg.has_constant_product_pool and !cfg.has_k_invariant_check) {

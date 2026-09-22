@@ -254,6 +254,16 @@ pub const U256 = extern struct {
             (@as(u256, self.limbs[3]) << 192);
     }
 
+    pub inline fn fromBytes(bytes: [32]u8) U256 {
+        return U256.fromNative(std.mem.readInt(u256, &bytes, .big));
+    }
+
+    pub inline fn toBytes(self: U256) [32]u8 {
+        var b: [32]u8 = undefined;
+        std.mem.writeInt(u256, &b, self.toNative(), .big);
+        return b;
+    }
+
     pub inline fn toVector(self: U256) Vec4u64 {
         return @as(Vec4u64, self.limbs);
     }

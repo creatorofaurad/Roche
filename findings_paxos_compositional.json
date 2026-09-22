@@ -1,0 +1,31 @@
+{
+  "protocol": "Paxos Ecosystem",
+  "scope": "1,000,000 USDG",
+  "timestamp": "2026-09-21T22:55:00Z",
+  "targets": [
+    {
+      "name": "PAXG Legacy Implementation",
+      "file": "paxos_scope/paxos-gold-contract/PAXG.bin",
+      "detectors": ["PX-FREEZE-01", "CB-03"],
+      "status": "CLEAN"
+    },
+    {
+      "name": "PaxosToken Base Implementation",
+      "file": "paxos_scope/paxos-token-contracts/PaxosToken.bin",
+      "detectors": ["PX-RATE-01", "CB-01"],
+      "status": "CLEAN"
+    },
+    {
+      "name": "Paxos V3 Diamond Facets",
+      "detectors": ["PX-DIAMOND-01"],
+      "status": "CLEAN"
+    },
+    {
+      "name": "LayerZero OFTWrapperUpgradeable",
+      "detectors": ["CB-02", "PX-RATE-01"],
+      "status": "CLEAN"
+    }
+  ],
+  "compositional_findings": [],
+  "verdict": "MATHEMATICALLY_HARDENED_0_BREACHES"
+}

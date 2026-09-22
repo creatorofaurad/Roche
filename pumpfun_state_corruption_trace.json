@@ -1,0 +1,30 @@
+{
+  "verdict": "INVARIANT_BREACH",
+  "invariant": "PF-05",
+  "cwe": "CWE-682",
+  "sequence_index": 6974,
+  "failing_step": 4,
+  "message": "PF-05: Cross-Instruction Fee Tier Arbitrage detected in roundtrip tier sandwich",
+  "pre_state": {
+    "virtual_token_reserves": 795234237767019,
+    "virtual_sol_reserves": 40478639464,
+    "real_token_reserves": 515334237767019,
+    "real_sol_reserves": 10478639464,
+    "market_cap": 50901530066,
+    "fee_tier": 1
+  },
+  "post_state": {
+    "virtual_token_reserves": 831831320373059,
+    "virtual_sol_reserves": 38697749425,
+    "real_token_reserves": 551931320373059,
+    "real_sol_reserves": 8697749425,
+    "market_cap": 46521149753,
+    "fee_tier": 0
+  },
+  "instructions": [    { "step": 0, "kind": "buy", "amount": 2658126473 },
+    { "step": 1, "kind": "buy", "amount": 3978401701 },
+    { "step": 2, "kind": "buy", "amount": 3654944392 },
+    { "step": 3, "kind": "buy", "amount": 292420989 },
+    { "step": 4, "kind": "sell", "amount": 36597082606040 }
+  ]
+}

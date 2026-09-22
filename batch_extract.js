@@ -6,8 +6,8 @@ const TRADE_EVENT_DISCRIMINATOR = Buffer.from([0xbd, 0xdb, 0x7f, 0xd3, 0x4e, 0xe
 const SCALE_FACTOR = 1000000000000000000n; // 1e18
 
 const TRACES_DIR = path.resolve(process.cwd(), "traces");
-const CONCURRENCY_LIMIT = 2; // Keep conservative to avoid public RPC 429
-const RPC_DELAY_MS = 600;
+const CONCURRENCY_LIMIT = 3;
+const RPC_DELAY_MS = 400;
 const API_URL = "https://frontend-api-v3.pump.fun/coins?offset=0&limit=50&sort=last_trade_timestamp&order=DESC&includeNsfw=false";
 
 function sleep(ms) {
@@ -89,19 +89,30 @@ function parseTradeEvent(b64) {
 }
 
 async function extractBondingCurveState(curveAddress, rpcUrl) {
-  const signatures = await rpcCall("getSignaturesForAddress", [curveAddress, { limit: 15 }], rpcUrl);
+  const signatures = await rpcCall("getSignaturesForAddress", [curveAddress, { limit: 25 }], rpcUrl);
   const transitions = [];
   let totalFeeExtracted = 0n;
 
   for (const sigInfo of signatures) {
     try {
-      await sleep(150);
-      const tx = await rpcCall(
-        "getTransaction",
-        [sigInfo.signature, { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 }],
-        rpcUrl
-      );
-      if (!tx || !tx.meta || !tx.meta.logMessages) continue;
+      await sleep(100);
+      let tx = null;
+      try {
+        tx = await rpcCall(
+          "getTransaction",
+          [sigInfo.signature, { encoding: "jsonParsed", maxSupportedTransactionVersion: 1 }],
+          rpcUrl
+        );
+      } catch (parseErr) {
+        // Fallback to base64 raw transaction
+        tx = await rpcCall(
+          "getTransaction",
+          [sigInfo.signature, { encoding: "base64", maxSupportedTransactionVersion: 1 }],
+          rpcUrl
+        );
+      }
+
+      if (!tx || !tx.meta || tx.meta.err || !tx.meta.logMessages) continue;
 
       for (const log of tx.meta.logMessages) {
         if (log.startsWith("Program data: ")) {
@@ -172,7 +183,7 @@ async function runBatch() {
     fs.mkdirSync(TRACES_DIR, { recursive: true });
   }
 
-  const rpcUrl = process.argv[2] || process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
+  const rpcUrl = process.argv[2] || process.env.SOLANA_RPC_URL || "https://solana-rpc.publicnode.com";
   console.log(`Starting batch trace extractor. Output: ${TRACES_DIR}, RPC: ${rpcUrl}`);
 
   let coins = [];
@@ -185,8 +196,7 @@ async function runBatch() {
   }
 
   let index = 0;
-  // Process with concurrency
-  const workers = Array(CONCURRENCY_LIMIT).fill(0).map(async (_, workerId) => {
+  const workers = Array(CONCURRENCY_LIMIT).fill(0).map(async () => {
     while (index < coins.length) {
       const currentIdx = index++;
       const coin = coins[currentIdx];
@@ -220,3 +230,5 @@ async function runBatch() {
 if (require.main === module) {
   runBatch().catch(console.error);
 }
+
+module.exports = { extractBondingCurveState };

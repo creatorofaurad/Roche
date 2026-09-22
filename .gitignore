@@ -40,6 +40,13 @@ findings_*.json
 
 ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md
 
+# Operational traces & debug scripts
+traces/
+pump_trace.json
+debug_trace_anomaly.js
+find_is_buy.js
+verify_byte.js
+
 # ==============================================================================
 # PRIVATE PROPRIETARY ENGINE & MODEL SUBSTRATE (MADELYNE / PIER / NBW / CHARYELOG)
 # ==============================================================================

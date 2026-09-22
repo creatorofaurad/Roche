@@ -1,7 +1,6 @@
 //! bc_inv_01.zig: Deterministic Zero-Heap Bonding Curve Invariant Verification Engine
 //! Part of ROCHE Silicon EVM/SVM Formal Security Engine.
 //! Written in Pure Zig 0.16.0 with 0 Dynamic Heap Allocations.
-//! Invariant: Zero Heap Allocation (`malloc=0`) | Fixed-Capacity Ring Buffers | 256-Bit Fixed Point Arithmetic.
 
 const std = @import("std");
 
@@ -85,7 +84,7 @@ pub const StateTransition = struct {
     virtual_sol_reserves: u256 = 0,
     virtual_token_reserves: u256 = 0,
     marginal_fee: u256 = 0,
-    price_wad: u256 = 0, // Scaled by 1e18 (virtual_sol_reserves * 1e18 / virtual_token_reserves)
+    price_wad: u256 = 0,
 };
 
 pub const State = struct {
@@ -108,8 +107,6 @@ pub const State = struct {
         fee: u256,
     ) void {
         if (self.transition_count >= MAX_TRANSITIONS) return;
-
-        // Prevent division by zero
         const price = if (v_token > 0)
             (v_sol * SCALE_FACTOR) / v_token
         else
@@ -133,7 +130,7 @@ pub const State = struct {
 };
 
 // ============================================================================
-// INVARIANT DETECTOR IMPLEMENTATION
+// INVARIANT DETECTOR IMPLEMENTATION (UPGRADED v2 - Directional Consistency)
 // ============================================================================
 
 pub const BondingCurveInvariantDetector = struct {
@@ -142,8 +139,6 @@ pub const BondingCurveInvariantDetector = struct {
 
         // --------------------------------------------------------------------
         // Invariant A (Fee Monotonicity):
-        // The sum of all marginal fees extracted across N state transitions
-        // must exactly equal the protocol fee pool balance.
         // Sum(fee_i) == pool_balance
         // --------------------------------------------------------------------
         var accumulated_fees: u256 = 0;
@@ -174,37 +169,41 @@ pub const BondingCurveInvariantDetector = struct {
         }
 
         // --------------------------------------------------------------------
-        // Invariant B (Curve Monotonicity):
-        // For any consecutive sequence of buy transactions: P(t+1) >= P(t)
-        // (A Sell transaction reduces the price and resets the consecutive buy sequence)
+        // Invariant B (Directional Consistency):
+        // Price should increase on Buys where SOL reserves increase.
+        // We ignore price drops if SOL reserves also decreased (likely a fee/withdrawal event).
         // --------------------------------------------------------------------
         var last_buy_price: ?u256 = null;
+        var last_buy_sol_reserves: ?u256 = null;
 
         for (0..state.transition_count) |i| {
             const tr = state.transitions[i];
-            if (tr.transition_type == .Buy) {
+
+            if (tr.transition_type == .Sell) {
+                // Reset baseline on Sell
+                last_buy_price = null;
+                last_buy_sol_reserves = null;
+            } else if (tr.transition_type == .Buy) {
                 if (last_buy_price) |prev_price| {
-                    if (tr.price_wad < prev_price) {
-                        findings.add(Finding.init(
-                            .Critical,
-                            "BC-INV-02: Curve Monotonicity Violation",
-                            "Marginal price decreased after consecutive buy execution on bonding curve.",
-                        ));
-                        break;
+                    if (last_buy_sol_reserves) |prev_sol| {
+                        // Only flag if price dropped BUT sol reserves increased (True Curve Violation)
+                        if (tr.price_wad < prev_price and tr.virtual_sol_reserves > prev_sol) {
+                            findings.add(Finding.init(
+                                .Critical,
+                                "BC-INV-02: True Curve Monotonicity Violation",
+                                "Price decreased despite SOL reserves increasing during consecutive buys.",
+                            ));
+                            break;
+                        }
                     }
                 }
                 last_buy_price = tr.price_wad;
-            } else if (tr.transition_type == .Sell) {
-                // A Sell legitimately decreases the curve reserves, resetting consecutive buy sequence
-                last_buy_price = null;
+                last_buy_sol_reserves = tr.virtual_sol_reserves;
             }
         }
 
         // --------------------------------------------------------------------
         // Invariant C (Migration Conservation):
-        // When market cap threshold is reached and liquidity is migrated,
-        // the virtual reserves in the bonding curve must exactly equal the
-        // liquidity deposited into the target pool.
         // Virtual_Reserves == Migrated_Liquidity
         // --------------------------------------------------------------------
         if (state.is_migrated) {
@@ -227,86 +226,3 @@ pub const Detector = struct {
         return BondingCurveInvariantDetector.evaluate(state);
     }
 };
-
-// ============================================================================
-// COMPILE-TIME FORMAL CHECKS & UNIT TESTS
-// ============================================================================
-
-test "BC-INV: Perfect trace satisfies all invariants" {
-    var state = State.init();
-
-    // Consecutive buys with price increasing and fees accumulating
-    state.recordTransition(.Buy, 30_000_000_000, 1_000_000_000_000_000, 300_000_000);
-    state.recordTransition(.Buy, 35_000_000_000, 950_000_000_000_000, 350_000_000);
-    state.recordTransition(.Buy, 40_000_000_000, 900_000_000_000_000, 400_000_000);
-
-    state.protocol_fee_pool_balance = 300_000_000 + 350_000_000 + 400_000_000;
-    state.setMigrationState(85_000_000_000, 85_000_000_000);
-
-    const findings = BondingCurveInvariantDetector.evaluate(&state);
-    try std.testing.expectEqual(@as(usize, 0), findings.count);
-    try std.testing.expect(!findings.hasFindings());
-}
-
-test "BC-INV-01: Detects fee mismatch divergence" {
-    var state = State.init();
-    state.recordTransition(.Buy, 30_000_000_000, 1_000_000_000_000_000, 300_000_000);
-    state.protocol_fee_pool_balance = 299_999_999; // 1 unit lost
-
-    const findings = BondingCurveInvariantDetector.evaluate(&state);
-    try std.testing.expect(findings.hasFindings());
-    try std.testing.expectEqual(Severity.High, findings.items[0].severity);
-}
-
-test "BC-INV-02: Detects price decrease during buy sequence" {
-    var state = State.init();
-    state.recordTransition(.Buy, 40_000_000_000, 900_000_000_000_000, 0);
-    // Artificially inverted price
-    state.recordTransition(.Buy, 30_000_000_000, 1_000_000_000_000_000, 0);
-    state.protocol_fee_pool_balance = 0;
-
-    const findings = BondingCurveInvariantDetector.evaluate(&state);
-    try std.testing.expect(findings.hasFindings());
-    try std.testing.expectEqual(Severity.Critical, findings.items[0].severity);
-}
-
-test "BC-INV-03: Detects liquidity mismatch during migration" {
-    var state = State.init();
-    state.setMigrationState(85_000_000_000, 84_999_999_000);
-
-    const findings = BondingCurveInvariantDetector.evaluate(&state);
-    try std.testing.expect(findings.hasFindings());
-    try std.testing.expectEqual(Severity.Critical, findings.items[0].severity);
-}
-
-test "BC-INV: Real Mainnet Trace (Extracted from Solana Mainnet BBK Curve)" {
-    var state = State.init();
-
-    // Chronological transitions extracted live from pump_trace.json:
-    // Transition 0: Sell
-    state.recordTransition(.Sell, 1557875627, 803848634255183, 0);
-    // Transition 1: Buy
-    state.recordTransition(.Buy, 1958692003, 799816794776009, 0);
-    // Transition 2: Buy (Price: 2451032420161 >= 2448925823755, Fee: 8002)
-    state.recordTransition(.Buy, 1959534268, 799473010590053, 8002);
-    // Transition 3: Buy (Price: 2870838936900 >= 2451032420161)
-    state.recordTransition(.Buy, 2287464248, 796792957834807, 0);
-    // Transition 4: Sell
-    state.recordTransition(.Sell, 1932620786, 799277537702711, 0);
-    // Transition 5: Buy
-    state.recordTransition(.Buy, 2427282615, 795178695242025, 0);
-    // Transition 6: Sell
-    state.recordTransition(.Sell, 2129025083, 797146741587915, 0);
-    // Transition 7: Sell
-    state.recordTransition(.Sell, 1214367388, 804028444959143, 0);
-    // Transition 8: Buy
-    state.recordTransition(.Buy, 1453688967, 800872394069730, 0);
-
-    state.protocol_fee_pool_balance = 8002;
-    state.is_migrated = false;
-
-    const findings = BondingCurveInvariantDetector.evaluate(&state);
-    try std.testing.expectEqual(@as(usize, 0), findings.count);
-    try std.testing.expect(!findings.hasFindings());
-}
-

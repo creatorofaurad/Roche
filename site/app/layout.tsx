@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ROCHE — Bare-Silicon Formal EVM Invariant Verifier",
-  description: "A high-throughput formal invariant verifier and state fuzzer for the Ethereum Virtual Machine. Zero-allocation bare-silicon runtime written in Zig 0.16.0.",
+  title: "ROCHE :: Zero-Allocation EVM Invariant Engine",
+  description: "Bare-silicon EVM invariant prover and real-time security engine. 118,000+ executions/sec, zero dynamic heap allocations.",
   icons: {
     icon: "/icon.svg",
   },
@@ -15,8 +14,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full antialiased bg-[#0A0908]">
-      <body className="min-h-full flex flex-col bg-[#0A0908] text-[#F4EBD9] selection:bg-[#C5A059] selection:text-[#0A0908]">
+    <html lang="en" style={{ backgroundColor: "#0a0e27" }}>
+      <head>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            html, body {
+              background-color: #0a0e27 !important;
+              color: #ffffff;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              line-height: 1.5;
+            }
+          `
+        }} />
+      </head>
+      <body style={{ backgroundColor: "#0a0e27", margin: 0, padding: 0 }}>
         {children}
       </body>
     </html>

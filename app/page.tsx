@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function SingleViewportLanding() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("Home");
+  const [activeTab, setActiveTab] = useState("Engine");
   const statsRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -75,6 +75,13 @@ export default function SingleViewportLanding() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const navItems = [
+    { label: "Engine", href: "#overview" },
+    { label: "42 Detectors", href: "#invariants" },
+    { label: "Exploits", href: "#exploits" },
+    { label: "GitHub", href: "https://github.com/creatorofaurad/Roche", external: true },
+  ];
+
   return (
     <>
       {/* Full-bleed background video container */}
@@ -91,11 +98,17 @@ export default function SingleViewportLanding() {
       <div className="page">
         {/* 1. Header (Desktop & Mobile) */}
         <header className="header">
-          {/* Circular Logo */}
-          <a href="#" className="logo-btn" aria-label="Roche Home">
+          {/* Circular Logo (Roche R) */}
+          <a
+            href="https://github.com/creatorofaurad/Roche"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="logo-btn"
+            aria-label="Roche GitHub Repository"
+          >
             <Image
               src="/assets/logo.webp"
-              alt=""
+              alt="Roche"
               width={52}
               height={52}
               className="logo-img"
@@ -105,24 +118,33 @@ export default function SingleViewportLanding() {
 
           {/* Desktop Nav Pill (White) */}
           <nav className="nav-pill" aria-label="Main Navigation">
-            {["Home", "Product", "Case Studies", "Contact"].map((item) => (
+            {navItems.map((item) => (
               <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className={`nav-link ${activeTab === item ? "active" : ""}`}
+                key={item.label}
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                className={`nav-link ${activeTab === item.label ? "active" : ""}`}
                 onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(item);
+                  if (!item.external) {
+                    e.preventDefault();
+                    setActiveTab(item.label);
+                  }
                 }}
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
 
-          {/* Desktop Sign In Pill */}
-          <a href="#signin" className="signin-btn">
-            Sign in
+          {/* Desktop Sign In / Release Pill */}
+          <a
+            href="https://github.com/creatorofaurad/Roche"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="signin-btn"
+          >
+            v1.5.0 Release
           </a>
 
           {/* Mobile Hamburger Button (≤720px) */}
@@ -140,57 +162,62 @@ export default function SingleViewportLanding() {
 
         {/* 2. Hero Section (Centered) */}
         <main className="hero">
-          {/* Trust Row ("Trusted by 2000+ Enterprises") */}
+          {/* Trust Row ("Verified on Ethereum, Solana & Agglayer") */}
           <div className="trust-row anim" style={{ "--d": "0.05s" } as React.CSSProperties}>
             <div className="trust-avatars">
-              {/* Microsoft */}
+              {/* Ethereum */}
               <div className="avatar-ring a1">
                 <div className="avatar-inner">
-                  <i className="fa-brands fa-microsoft"></i>
+                  <i className="fa-brands fa-ethereum"></i>
                 </div>
               </div>
-              {/* Amazon */}
+              {/* EVM Cube */}
               <div className="avatar-ring a2">
                 <div className="avatar-inner">
-                  <i className="fa-brands fa-amazon"></i>
+                  <i className="fa-solid fa-cube"></i>
                 </div>
               </div>
-              {/* Google */}
+              {/* Security Shield */}
               <div className="avatar-ring a3">
                 <div className="avatar-inner">
-                  <i className="fa-brands fa-google"></i>
+                  <i className="fa-solid fa-shield-halved"></i>
                 </div>
               </div>
             </div>
             <div className="trust-pill">
-              <span>Trusted by 2000+ Enterprises</span>
+              <span>Verified on Ethereum, Solana &amp; Agglayer</span>
             </div>
           </div>
 
           {/* Headline (Solid White, Exact Two Lines, BubbledotICG-FinePos) */}
           <h1 className="headline anim">
-            <span className="headline-line line-1">Intelligence</span>
-            <span className="headline-line line-2">Designed To Evolve</span>
+            <span className="headline-line line-1">Roche</span>
+            <span className="headline-line line-2">Silicon Invariant Engine</span>
           </h1>
 
-          {/* Subhead (Exact copy, +2pt font sizing) */}
+          {/* Subhead (Exact Roche copy) */}
           <p className="subhead anim" style={{ "--d": "0.28s" } as React.CSSProperties}>
-            Build applications that reason, adapt and collaborate using a modular
-            AI platform designed for production.
+            Zero-allocation EVM formal invariant verification &amp; symbolic fuzzing at 118,000 execs/sec.
+            Engineered in pure Zig 0.16.0 with direct Win32/POSIX system calls.
           </p>
 
-          {/* CTA (Get Started White Pill with Soft White Glow) */}
+          {/* CTA (Explore Roche on GitHub with Soft White Glow) */}
           <div className="cta-wrapper anim" style={{ "--d": "0.4s" } as React.CSSProperties}>
-            <a href="#get-started" className="cta-btn">
-              Get Started
+            <a
+              href="https://github.com/creatorofaurad/Roche"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cta-btn"
+            >
+              Explore Roche on GitHub
             </a>
           </div>
         </main>
 
-        {/* 3. Stats Footer (4 Exact Metrics) */}
+        {/* 3. Stats Footer (4 Exact Roche Metrics) */}
         <footer className="stats-footer" ref={statsRef}>
           <div className="stats-grid">
-            {/* Stat 1: < 120 ms Inference Time */}
+            {/* Stat 1: < 120 µs Pre-Execution Latency */}
             <div className="stat-card anim" style={{ "--d": "0.5s" } as React.CSSProperties}>
               <div className="stat-icon">&lt;</div>
               <div className="stat-value-row">
@@ -198,60 +225,60 @@ export default function SingleViewportLanding() {
                   className="stat-val"
                   data-target="120"
                   data-decimals="0"
-                  data-suffix="ms"
+                  data-suffix="µs"
                 >
                   0
                 </span>
               </div>
-              <div className="stat-label">Inference Time</div>
+              <div className="stat-label">Pre-Exec Latency</div>
             </div>
 
-            {/* Stat 2: % 99.99 % Platform Uptime */}
+            {/* Stat 2: % 100.0 % Solvency Accuracy */}
             <div className="stat-card anim" style={{ "--d": "0.58s" } as React.CSSProperties}>
               <div className="stat-icon">%</div>
               <div className="stat-value-row">
                 <span
                   className="stat-val"
-                  data-target="99.99"
-                  data-decimals="2"
+                  data-target="100.0"
+                  data-decimals="1"
                   data-suffix="%"
                 >
                   0
                 </span>
               </div>
-              <div className="stat-label">Platform Uptime</div>
+              <div className="stat-label">Solvency Accuracy</div>
             </div>
 
-            {/* Stat 3: * 24 /7 Autonomous Runtime */}
+            {/* Stat 3: * 118 k/s Symbolic Execution */}
             <div className="stat-card anim" style={{ "--d": "0.66s" } as React.CSSProperties}>
               <div className="stat-icon">*</div>
               <div className="stat-value-row">
                 <span
                   className="stat-val"
-                  data-target="24"
+                  data-target="118"
                   data-decimals="0"
-                  data-suffix="/7"
+                  data-suffix="k/s"
                 >
                   0
                 </span>
               </div>
-              <div className="stat-label">Autonomous Runtime</div>
+              <div className="stat-label">Symbolic Throughput</div>
             </div>
 
-            {/* Stat 4: # 2.4 M Context Windows */}
+            {/* Stat 4: # 0 B Dynamic Heap Allocs */}
             <div className="stat-card anim" style={{ "--d": "0.74s" } as React.CSSProperties}>
               <div className="stat-icon">#</div>
               <div className="stat-value-row">
                 <span
                   className="stat-val"
-                  data-target="2.4"
-                  data-decimals="1"
-                  data-suffix="M"
+                  data-target="0"
+                  data-decimals="0"
+                  data-suffix="B"
                 >
                   0
                 </span>
               </div>
-              <div className="stat-label">Context Windows</div>
+              <div className="stat-label">Dynamic Heap Allocs</div>
             </div>
           </div>
         </footer>
@@ -267,26 +294,32 @@ export default function SingleViewportLanding() {
       >
         <div className="mobile-sheet">
           <nav className="mobile-nav" aria-label="Mobile Navigation">
-            {["Home", "Product", "Case Studies", "Contact"].map((item) => (
+            {navItems.map((item) => (
               <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className={`mobile-link ${activeTab === item ? "active" : ""}`}
+                key={item.label}
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                className={`mobile-link ${activeTab === item.label ? "active" : ""}`}
                 onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(item);
+                  if (!item.external) {
+                    e.preventDefault();
+                    setActiveTab(item.label);
+                  }
                   setMobileOpen(false);
                 }}
               >
-                {item}
+                {item.label}
               </a>
             ))}
             <a
-              href="#signin"
+              href="https://github.com/creatorofaurad/Roche"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mobile-signin"
               onClick={() => setMobileOpen(false)}
             >
-              Sign in
+              v1.5.0 Release
             </a>
           </nav>
         </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intelligence Designed To Evolve</title>
+  <title>Roche :: Bare-Silicon EVM Security Engine</title>
 
   <!-- Google Fonts: Inter (400, 500, 600) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,7 +19,7 @@
     rel="stylesheet"
   />
 
-  <!-- Font Awesome 6.5.2 for Enterprise Brand Icons -->
+  <!-- Font Awesome 6.5.2 for Protocol / Platform Icons -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -45,11 +45,17 @@
   <div class="page">
     <!-- 1. Header (Desktop & Mobile) -->
     <header class="header">
-      <!-- Circular Logo -->
-      <a href="#" class="logo-btn" aria-label="Roche Home">
+      <!-- Circular Logo (Roche R) -->
+      <a
+        href="https://github.com/creatorofaurad/Roche"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="logo-btn"
+        aria-label="Roche GitHub Repository"
+      >
         <img
           src="assets/logo.webp"
-          alt=""
+          alt="Roche"
           width="52"
           height="52"
           class="logo-img"
@@ -58,14 +64,21 @@
 
       <!-- Desktop Nav Pill (White) -->
       <nav class="nav-pill" aria-label="Main Navigation">
-        <a href="#home" class="nav-link active">Home</a>
-        <a href="#product" class="nav-link">Product</a>
-        <a href="#case-studies" class="nav-link">Case Studies</a>
-        <a href="#contact" class="nav-link">Contact</a>
+        <a href="#overview" class="nav-link active">Engine</a>
+        <a href="#invariants" class="nav-link">42 Detectors</a>
+        <a href="#exploits" class="nav-link">Exploits</a>
+        <a href="https://github.com/creatorofaurad/Roche" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
       </nav>
 
-      <!-- Desktop Sign In Pill -->
-      <a href="#signin" class="signin-btn">Sign in</a>
+      <!-- Desktop Sign In / GitHub Pill -->
+      <a
+        href="https://github.com/creatorofaurad/Roche"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="signin-btn"
+      >
+        v1.5.0 Release
+      </a>
 
       <!-- Mobile Hamburger Button (≤720px) -->
       <button
@@ -81,55 +94,62 @@
 
     <!-- 2. Hero Section (Centered) -->
     <main class="hero">
-      <!-- Trust Row ("Trusted by 2000+ Enterprises") -->
+      <!-- Trust Row ("Verified on Ethereum, Solana & Agglayer") -->
       <div class="trust-row anim" style="--d: 0.05s">
         <div class="trust-avatars">
-          <!-- Microsoft -->
+          <!-- Ethereum -->
           <div class="avatar-ring a1">
             <div class="avatar-inner">
-              <i class="fa-brands fa-microsoft"></i>
+              <i class="fa-brands fa-ethereum"></i>
             </div>
           </div>
-          <!-- Amazon -->
+          <!-- Python / EVM -->
           <div class="avatar-ring a2">
             <div class="avatar-inner">
-              <i class="fa-brands fa-amazon"></i>
+              <i class="fa-solid fa-cube"></i>
             </div>
           </div>
-          <!-- Google -->
+          <!-- Shield / Security -->
           <div class="avatar-ring a3">
             <div class="avatar-inner">
-              <i class="fa-brands fa-google"></i>
+              <i class="fa-solid fa-shield-halved"></i>
             </div>
           </div>
         </div>
         <div class="trust-pill">
-          <span>Trusted by 2000+ Enterprises</span>
+          <span>Verified on Ethereum, Solana &amp; Agglayer</span>
         </div>
       </div>
 
       <!-- Headline (Solid White, Exact Two Lines, BubbledotICG-FinePos) -->
       <h1 class="headline anim">
-        <span class="headline-line line-1">Intelligence</span>
-        <span class="headline-line line-2">Designed To Evolve</span>
+        <span class="headline-line line-1">Roche</span>
+        <span class="headline-line line-2">Silicon Invariant Engine</span>
       </h1>
 
-      <!-- Subhead (Exact copy, +2pt font sizing) -->
+      <!-- Subhead (Roche Bare-Silicon Architecture) -->
       <p class="subhead anim" style="--d: 0.28s">
-        Build applications that reason, adapt and collaborate using a modular
-        AI platform designed for production.
+        Zero-allocation EVM formal invariant verification &amp; symbolic fuzzing at 118,000 execs/sec.
+        Engineered in pure Zig 0.16.0 with direct Win32/POSIX system calls.
       </p>
 
-      <!-- CTA (Get Started White Pill with Soft White Glow) -->
+      <!-- CTA (View Engine on GitHub with Soft White Glow) -->
       <div class="cta-wrapper anim" style="--d: 0.4s">
-        <a href="#get-started" class="cta-btn">Get Started</a>
+        <a
+          href="https://github.com/creatorofaurad/Roche"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="cta-btn"
+        >
+          Explore Roche on GitHub
+        </a>
       </div>
     </main>
 
-    <!-- 3. Stats Footer (4 Exact Metrics) -->
+    <!-- 3. Stats Footer (4 Exact Roche Bare-Silicon Metrics) -->
     <footer class="stats-footer">
       <div class="stats-grid">
-        <!-- Stat 1: < 120 ms Inference Time -->
+        <!-- Stat 1: < 120 µs Pre-Execution Latency -->
         <div class="stat-card anim" style="--d: 0.5s">
           <div class="stat-icon">&lt;</div>
           <div class="stat-value-row">
@@ -137,52 +157,52 @@
               class="stat-val"
               data-target="120"
               data-decimals="0"
-              data-suffix="ms"
+              data-suffix="µs"
             >0</span>
           </div>
-          <div class="stat-label">Inference Time</div>
+          <div class="stat-label">Pre-Exec Latency</div>
         </div>
 
-        <!-- Stat 2: % 99.99 % Platform Uptime -->
+        <!-- Stat 2: % 100.0 % Solvency Accuracy -->
         <div class="stat-card anim" style="--d: 0.58s">
           <div class="stat-icon">%</div>
           <div class="stat-value-row">
             <span
               class="stat-val"
-              data-target="99.99"
-              data-decimals="2"
+              data-target="100.0"
+              data-decimals="1"
               data-suffix="%"
             >0</span>
           </div>
-          <div class="stat-label">Platform Uptime</div>
+          <div class="stat-label">Solvency Accuracy</div>
         </div>
 
-        <!-- Stat 3: * 24 /7 Autonomous Runtime -->
+        <!-- Stat 3: * 118 k/s Symbolic Execution -->
         <div class="stat-card anim" style="--d: 0.66s">
           <div class="stat-icon">*</div>
           <div class="stat-value-row">
             <span
               class="stat-val"
-              data-target="24"
+              data-target="118"
               data-decimals="0"
-              data-suffix="/7"
+              data-suffix="k/s"
             >0</span>
           </div>
-          <div class="stat-label">Autonomous Runtime</div>
+          <div class="stat-label">Symbolic Throughput</div>
         </div>
 
-        <!-- Stat 4: # 2.4 M Context Windows -->
+        <!-- Stat 4: # 0 B Dynamic Heap Allocs -->
         <div class="stat-card anim" style="--d: 0.74s">
           <div class="stat-icon">#</div>
           <div class="stat-value-row">
             <span
               class="stat-val"
-              data-target="2.4"
-              data-decimals="1"
-              data-suffix="M"
+              data-target="0"
+              data-decimals="0"
+              data-suffix="B"
             >0</span>
           </div>
-          <div class="stat-label">Context Windows</div>
+          <div class="stat-label">Dynamic Heap Allocs</div>
         </div>
       </div>
     </footer>
@@ -192,11 +212,25 @@
   <div class="mobile-overlay" hidden>
     <div class="mobile-sheet">
       <nav class="mobile-nav" aria-label="Mobile Navigation">
-        <a href="#home" class="mobile-link active">Home</a>
-        <a href="#product" class="mobile-link">Product</a>
-        <a href="#case-studies" class="mobile-link">Case Studies</a>
-        <a href="#contact" class="mobile-link">Contact</a>
-        <a href="#signin" class="mobile-signin">Sign in</a>
+        <a href="#overview" class="mobile-link active">Engine</a>
+        <a href="#invariants" class="mobile-link">42 Detectors</a>
+        <a href="#exploits" class="mobile-link">Exploits</a>
+        <a
+          href="https://github.com/creatorofaurad/Roche"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mobile-link"
+        >
+          GitHub
+        </a>
+        <a
+          href="https://github.com/creatorofaurad/Roche"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mobile-signin"
+        >
+          v1.5.0 Release
+        </a>
       </nav>
     </div>
   </div>

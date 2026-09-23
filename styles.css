@@ -21,7 +21,7 @@
 /* Fallback local Geist Pixel Circle display font */
 @font-face {
   font-family: "Geist Pixel Circle";
-  src: url("/fonts/GeistPixel-Circle.woff2") format("woff2");
+  src: url("fonts/GeistPixel-Circle.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;

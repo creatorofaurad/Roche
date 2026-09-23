@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intelligence Designed To Evolve</title>
+
+  <!-- Google Fonts: Inter (400, 500, 600) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Primary Display: BubbledotICG-FinePos via OnlineWebFonts CDN -->
+  <link
+    href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome 6.5.2 for Enterprise Brand Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Full-bleed background video container -->
+  <div class="bg">
+    <video class="bg-video" autoplay muted loop playsinline>
+      <source
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4"
+        type="video/mp4"
+      />
+    </video>
+  </div>
+
+  <!-- Single-viewport page container -->
+  <div class="page">
+    <!-- 1. Header (Desktop & Mobile) -->
+    <header class="header">
+      <!-- Circular Logo -->
+      <a href="#" class="logo-btn" aria-label="Roche Home">
+        <img
+          src="assets/logo.webp"
+          alt=""
+          width="52"
+          height="52"
+          class="logo-img"
+        />
+      </a>
+
+      <!-- Desktop Nav Pill (White) -->
+      <nav class="nav-pill" aria-label="Main Navigation">
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#product" class="nav-link">Product</a>
+        <a href="#case-studies" class="nav-link">Case Studies</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <!-- Desktop Sign In Pill -->
+      <a href="#signin" class="signin-btn">Sign in</a>
+
+      <!-- Mobile Hamburger Button (≤720px) -->
+      <button
+        class="burger-btn"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+      >
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </header>
+
+    <!-- 2. Hero Section (Centered) -->
+    <main class="hero">
+      <!-- Trust Row ("Trusted by 2000+ Enterprises") -->
+      <div class="trust-row anim" style="--d: 0.05s">
+        <div class="trust-avatars">
+          <!-- Microsoft -->
+          <div class="avatar-ring a1">
+            <div class="avatar-inner">
+              <i class="fa-brands fa-microsoft"></i>
+            </div>
+          </div>
+          <!-- Amazon -->
+          <div class="avatar-ring a2">
+            <div class="avatar-inner">
+              <i class="fa-brands fa-amazon"></i>
+            </div>
+          </div>
+          <!-- Google -->
+          <div class="avatar-ring a3">
+            <div class="avatar-inner">
+              <i class="fa-brands fa-google"></i>
+            </div>
+          </div>
+        </div>
+        <div class="trust-pill">
+          <span>Trusted by 2000+ Enterprises</span>
+        </div>
+      </div>
+
+      <!-- Headline (Solid White, Exact Two Lines, BubbledotICG-FinePos) -->
+      <h1 class="headline anim">
+        <span class="headline-line line-1">Intelligence</span>
+        <span class="headline-line line-2">Designed To Evolve</span>
+      </h1>
+
+      <!-- Subhead (Exact copy, +2pt font sizing) -->
+      <p class="subhead anim" style="--d: 0.28s">
+        Build applications that reason, adapt and collaborate using a modular
+        AI platform designed for production.
+      </p>
+
+      <!-- CTA (Get Started White Pill with Soft White Glow) -->
+      <div class="cta-wrapper anim" style="--d: 0.4s">
+        <a href="#get-started" class="cta-btn">Get Started</a>
+      </div>
+    </main>
+
+    <!-- 3. Stats Footer (4 Exact Metrics) -->
+    <footer class="stats-footer">
+      <div class="stats-grid">
+        <!-- Stat 1: < 120 ms Inference Time -->
+        <div class="stat-card anim" style="--d: 0.5s">
+          <div class="stat-icon">&lt;</div>
+          <div class="stat-value-row">
+            <span
+              class="stat-val"
+              data-target="120"
+              data-decimals="0"
+              data-suffix="ms"
+            >0</span>
+          </div>
+          <div class="stat-label">Inference Time</div>
+        </div>
+
+        <!-- Stat 2: % 99.99 % Platform Uptime -->
+        <div class="stat-card anim" style="--d: 0.58s">
+          <div class="stat-icon">%</div>
+          <div class="stat-value-row">
+            <span
+              class="stat-val"
+              data-target="99.99"
+              data-decimals="2"
+              data-suffix="%"
+            >0</span>
+          </div>
+          <div class="stat-label">Platform Uptime</div>
+        </div>
+
+        <!-- Stat 3: * 24 /7 Autonomous Runtime -->
+        <div class="stat-card anim" style="--d: 0.66s">
+          <div class="stat-icon">*</div>
+          <div class="stat-value-row">
+            <span
+              class="stat-val"
+              data-target="24"
+              data-decimals="0"
+              data-suffix="/7"
+            >0</span>
+          </div>
+          <div class="stat-label">Autonomous Runtime</div>
+        </div>
+
+        <!-- Stat 4: # 2.4 M Context Windows -->
+        <div class="stat-card anim" style="--d: 0.74s">
+          <div class="stat-icon">#</div>
+          <div class="stat-value-row">
+            <span
+              class="stat-val"
+              data-target="2.4"
+              data-decimals="1"
+              data-suffix="M"
+            >0</span>
+          </div>
+          <div class="stat-label">Context Windows</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Mobile Navigation Sheet & Backdrop -->
+  <div class="mobile-overlay" hidden>
+    <div class="mobile-sheet">
+      <nav class="mobile-nav" aria-label="Mobile Navigation">
+        <a href="#home" class="mobile-link active">Home</a>
+        <a href="#product" class="mobile-link">Product</a>
+        <a href="#case-studies" class="mobile-link">Case Studies</a>
+        <a href="#contact" class="mobile-link">Contact</a>
+        <a href="#signin" class="mobile-signin">Sign in</a>
+      </nav>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

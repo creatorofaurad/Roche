@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ROCHE :: Zero-Allocation EVM Invariant Engine",
-  description: "Bare-silicon EVM invariant prover and real-time security engine. 118,000+ executions/sec, zero dynamic heap allocations.",
+  title: "Intelligence Designed To Evolve",
+  description: "Zero-Allocation Bare-Silicon EVM Invariant Engine",
   icons: {
     icon: "/icon.svg",
   },
@@ -14,24 +15,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" style={{ backgroundColor: "#0a0e27" }}>
+    <html lang="en" className="h-full antialiased bg-black">
       <head>
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            html, body {
-              background-color: #0a0e27 !important;
-              color: #ffffff;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-              line-height: 1.5;
-            }
-          `
-        }} />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos"
+          rel="stylesheet"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
       </head>
-      <body style={{ backgroundColor: "#0a0e27", margin: 0, padding: 0 }}>
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col bg-black text-white overflow-hidden">{children}</body>
     </html>
   );
 }

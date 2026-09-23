@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roche :: Bare-Silicon EVM Security Engine</title>
+  <title>Roche :: In Development</title>
 
-  <!-- Google Fonts: Inter (400, 500, 600) -->
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -17,15 +17,6 @@
   <link
     href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos"
     rel="stylesheet"
-  />
-
-  <!-- Font Awesome 6.5.2 for Protocol / Platform Icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
   />
 
   <link rel="stylesheet" href="styles.css" />
@@ -41,200 +32,13 @@
     </video>
   </div>
 
-  <!-- Single-viewport page container -->
+  <!-- Single-viewport minimal container -->
   <div class="page">
-    <!-- 1. Header (Desktop & Mobile) -->
-    <header class="header">
-      <!-- Circular Logo (Roche R) -->
-      <a
-        href="https://github.com/creatorofaurad/Roche"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="logo-btn"
-        aria-label="Roche GitHub Repository"
-      >
-        <img
-          src="assets/logo.webp"
-          alt="Roche"
-          width="52"
-          height="52"
-          class="logo-img"
-        />
-      </a>
-
-      <!-- Desktop Nav Pill (White) -->
-      <nav class="nav-pill" aria-label="Main Navigation">
-        <a href="#overview" class="nav-link active">Engine</a>
-        <a href="#invariants" class="nav-link">42 Detectors</a>
-        <a href="#exploits" class="nav-link">Exploits</a>
-        <a href="https://github.com/creatorofaurad/Roche" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
-      </nav>
-
-      <!-- Desktop Sign In / GitHub Pill -->
-      <a
-        href="https://github.com/creatorofaurad/Roche"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="signin-btn"
-      >
-        v1.5.0 Release
-      </a>
-
-      <!-- Mobile Hamburger Button (≤720px) -->
-      <button
-        class="burger-btn"
-        aria-label="Toggle navigation menu"
-        aria-expanded="false"
-      >
-        <span class="burger-bar"></span>
-        <span class="burger-bar"></span>
-        <span class="burger-bar"></span>
-      </button>
-    </header>
-
-    <!-- 2. Hero Section (Centered) -->
     <main class="hero">
-      <!-- Trust Row ("Verified on Ethereum, Solana & Agglayer") -->
-      <div class="trust-row anim" style="--d: 0.05s">
-        <div class="trust-avatars">
-          <!-- Ethereum -->
-          <div class="avatar-ring a1">
-            <div class="avatar-inner">
-              <i class="fa-brands fa-ethereum"></i>
-            </div>
-          </div>
-          <!-- Python / EVM -->
-          <div class="avatar-ring a2">
-            <div class="avatar-inner">
-              <i class="fa-solid fa-cube"></i>
-            </div>
-          </div>
-          <!-- Shield / Security -->
-          <div class="avatar-ring a3">
-            <div class="avatar-inner">
-              <i class="fa-solid fa-shield-halved"></i>
-            </div>
-          </div>
-        </div>
-        <div class="trust-pill">
-          <span>Verified on Ethereum, Solana &amp; Agglayer</span>
-        </div>
-      </div>
-
-      <!-- Headline (Solid White, Exact Two Lines, BubbledotICG-FinePos) -->
-      <h1 class="headline anim">
-        <span class="headline-line line-1">Roche</span>
-        <span class="headline-line line-2">Silicon Invariant Engine</span>
+      <h1 class="headline">
+        Site is in development
       </h1>
-
-      <!-- Subhead (Roche Bare-Silicon Architecture) -->
-      <p class="subhead anim" style="--d: 0.28s">
-        Zero-allocation EVM formal invariant verification &amp; symbolic fuzzing at 118,000 execs/sec.
-        Engineered in pure Zig 0.16.0 with direct Win32/POSIX system calls.
-      </p>
-
-      <!-- CTA (View Engine on GitHub with Soft White Glow) -->
-      <div class="cta-wrapper anim" style="--d: 0.4s">
-        <a
-          href="https://github.com/creatorofaurad/Roche"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="cta-btn"
-        >
-          Explore Roche on GitHub
-        </a>
-      </div>
     </main>
-
-    <!-- 3. Stats Footer (4 Exact Roche Bare-Silicon Metrics) -->
-    <footer class="stats-footer">
-      <div class="stats-grid">
-        <!-- Stat 1: < 120 µs Pre-Execution Latency -->
-        <div class="stat-card anim" style="--d: 0.5s">
-          <div class="stat-icon">&lt;</div>
-          <div class="stat-value-row">
-            <span
-              class="stat-val"
-              data-target="120"
-              data-decimals="0"
-              data-suffix="µs"
-            >0</span>
-          </div>
-          <div class="stat-label">Pre-Exec Latency</div>
-        </div>
-
-        <!-- Stat 2: % 100.0 % Solvency Accuracy -->
-        <div class="stat-card anim" style="--d: 0.58s">
-          <div class="stat-icon">%</div>
-          <div class="stat-value-row">
-            <span
-              class="stat-val"
-              data-target="100.0"
-              data-decimals="1"
-              data-suffix="%"
-            >0</span>
-          </div>
-          <div class="stat-label">Solvency Accuracy</div>
-        </div>
-
-        <!-- Stat 3: * 118 k/s Symbolic Execution -->
-        <div class="stat-card anim" style="--d: 0.66s">
-          <div class="stat-icon">*</div>
-          <div class="stat-value-row">
-            <span
-              class="stat-val"
-              data-target="118"
-              data-decimals="0"
-              data-suffix="k/s"
-            >0</span>
-          </div>
-          <div class="stat-label">Symbolic Throughput</div>
-        </div>
-
-        <!-- Stat 4: # 0 B Dynamic Heap Allocs -->
-        <div class="stat-card anim" style="--d: 0.74s">
-          <div class="stat-icon">#</div>
-          <div class="stat-value-row">
-            <span
-              class="stat-val"
-              data-target="0"
-              data-decimals="0"
-              data-suffix="B"
-            >0</span>
-          </div>
-          <div class="stat-label">Dynamic Heap Allocs</div>
-        </div>
-      </div>
-    </footer>
   </div>
-
-  <!-- Mobile Navigation Sheet & Backdrop -->
-  <div class="mobile-overlay" hidden>
-    <div class="mobile-sheet">
-      <nav class="mobile-nav" aria-label="Mobile Navigation">
-        <a href="#overview" class="mobile-link active">Engine</a>
-        <a href="#invariants" class="mobile-link">42 Detectors</a>
-        <a href="#exploits" class="mobile-link">Exploits</a>
-        <a
-          href="https://github.com/creatorofaurad/Roche"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mobile-link"
-        >
-          GitHub
-        </a>
-        <a
-          href="https://github.com/creatorofaurad/Roche"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mobile-signin"
-        >
-          v1.5.0 Release
-        </a>
-      </nav>
-    </div>
-  </div>
-
-  <script src="main.js"></script>
 </body>
 </html>

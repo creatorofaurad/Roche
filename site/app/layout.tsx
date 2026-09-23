@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Intelligence Designed To Evolve",
-  description: "Zero-Allocation Bare-Silicon EVM Invariant Engine",
+  title: "Roche :: Bare-Silicon EVM Security Engine",
+  description: "Zero-Allocation Bare-Silicon EVM Invariant Engine & State Fuzzer",
   icons: {
     icon: "/icon.svg",
   },

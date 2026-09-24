@@ -109,7 +109,7 @@ pub const Parser = struct {
 
         // Extract severity: HIGH
         if (std.mem.indexOf(u8, self.source, "severity:")) |sev_pos| {
-            const after_sev = std.mem.trimLeft(u8, self.source[sev_pos + 9 ..], " \t\r\n");
+            const after_sev = trimWhitespace(self.source[sev_pos + 9 ..]);
             var end: usize = 0;
             while (end < after_sev.len and std.ascii.isAlphabetic(after_sev[end])) : (end += 1) {}
             if (end > 0) {
@@ -121,10 +121,18 @@ pub const Parser = struct {
     }
 };
 
+fn trimWhitespace(s: []const u8) []const u8 {
+    var start: usize = 0;
+    while (start < s.len and (s[start] == ' ' or s[start] == '\t' or s[start] == '\r' or s[start] == '\n')) : (start += 1) {}
+    var end: usize = s.len;
+    while (end > start and (s[end - 1] == ' ' or s[end - 1] == '\t' or s[end - 1] == '\r' or s[end - 1] == '\n')) : (end -= 1) {}
+    return s[start..end];
+}
+
 fn extractBlock(s: []const u8) ?[]const u8 {
     const open = std.mem.indexOfScalar(u8, s, '{') orelse return null;
     const close = std.mem.indexOfScalar(u8, s[open + 1 ..], '}') orelse return null;
-    return std.mem.trim(u8, s[open + 1 .. open + 1 + close], " \t\r\n");
+    return trimWhitespace(s[open + 1 .. open + 1 + close]);
 }
 
 test "parse invariant DSL" {

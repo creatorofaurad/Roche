@@ -64,21 +64,24 @@ pub const AlertDispatcher = struct {
 
     fn formatWebhookPayload(self: *const AlertDispatcher, alert: *const Alert, out_payload: []u8) usize {
         _ = self;
-        return std.fmt.bufPrint(out_payload,
+        const res = std.fmt.bufPrint(out_payload,
             \\{{"channel":"webhook","severity":"{s}","protocol":"{s}","text":"[ROCHE ALERT] {s}"}}
-        , .{ @tagName(alert.severity), alert.getProtocol(), alert.getMessage() }) catch 0;
+        , .{ @tagName(alert.severity), alert.getProtocol(), alert.getMessage() }) catch return 0;
+        return res.len;
     }
 
     fn formatTelegramPayload(self: *const AlertDispatcher, alert: *const Alert, out_payload: []u8) usize {
-        return std.fmt.bufPrint(out_payload,
+        const res = std.fmt.bufPrint(out_payload,
             \\{{"channel":"telegram","bot_token":"{s}","severity":"{s}","protocol":"{s}","text":"🚨 [CRITICAL ALERT] {s}: {s}"}}
-        , .{ self.telegram_bot_token, @tagName(alert.severity), alert.getProtocol(), alert.getMessage() }) catch 0;
+        , .{ self.telegram_bot_token, @tagName(alert.severity), alert.getProtocol(), alert.getProtocol(), alert.getMessage() }) catch return 0;
+        return res.len;
     }
 
     fn formatEmailPayload(self: *const AlertDispatcher, alert: *const Alert, out_payload: []u8) usize {
-        return std.fmt.bufPrint(out_payload,
+        const res = std.fmt.bufPrint(out_payload,
             \\{{"channel":"email","to":"{s}","severity":"{s}","subject":"EMERGENCY PROTOCOL BREACH: {s}","body":"{s}"}}
-        , .{ self.email_recipient, @tagName(alert.severity), alert.getProtocol(), alert.getMessage() }) catch 0;
+        , .{ self.email_recipient, @tagName(alert.severity), alert.getProtocol(), alert.getMessage() }) catch return 0;
+        return res.len;
     }
 };
 

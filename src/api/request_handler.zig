@@ -84,7 +84,10 @@ fn findJsonField(haystack: []const u8, key: []const u8) ?[]const u8 {
     var key_pattern: [128]u8 = undefined;
     const formatted = std.fmt.bufPrint(&key_pattern, "\"{s}\":", .{key}) catch return null;
     const pos = std.mem.indexOf(u8, haystack, formatted) orelse return null;
-    var rest = std.mem.trimLeft(u8, haystack[pos + formatted.len ..], " \t\r\n");
+    var rest = haystack[pos + formatted.len ..];
+    var start: usize = 0;
+    while (start < rest.len and (rest[start] == ' ' or rest[start] == '\t' or rest[start] == '\r' or rest[start] == '\n')) : (start += 1) {}
+    rest = rest[start..];
 
     if (rest.len > 0 and rest[0] == '"') {
         rest = rest[1..];

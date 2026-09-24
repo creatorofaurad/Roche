@@ -3,6 +3,18 @@
 
 const std = @import("std");
 
+fn hexLower(bytes: []const u8, out_hex: []u8) []u8 {
+    const charset = "0123456789abcdef";
+    var i: usize = 0;
+    for (bytes) |b| {
+        if (i + 1 >= out_hex.len) break;
+        out_hex[i] = charset[b >> 4];
+        out_hex[i + 1] = charset[b & 0x0F];
+        i += 2;
+    }
+    return out_hex[0..i];
+}
+
 pub const AuditManifest = struct {
     roche_version: []const u8 = "1.0.0-beta",
     zig_compiler_version: []const u8 = "0.16.0",
@@ -15,13 +27,13 @@ pub const AuditManifest = struct {
     pub fn setBytecodeHash(self: *AuditManifest, bytecode: []const u8) void {
         var hash_out: [32]u8 = undefined;
         std.crypto.hash.sha2.Sha256.hash(bytecode, &hash_out, .{});
-        _ = std.fmt.bufPrint(&self.target_bytecode_hash, "{s}", .{std.fmt.fmtSliceHexLower(&hash_out)}) catch {};
+        _ = hexLower(&hash_out, &self.target_bytecode_hash);
     }
 
     pub fn setFindingsHash(self: *AuditManifest, findings_json: []const u8) void {
         var hash_out: [32]u8 = undefined;
         std.crypto.hash.sha2.Sha256.hash(findings_json, &hash_out, .{});
-        _ = std.fmt.bufPrint(&self.output_findings_hash, "{s}", .{std.fmt.fmtSliceHexLower(&hash_out)}) catch {};
+        _ = hexLower(&hash_out, &self.output_findings_hash);
     }
 
     pub fn toJson(self: *const AuditManifest, arena: std.mem.Allocator) ![]const u8 {
@@ -34,5 +46,5 @@ pub const Manifest = AuditManifest;
 test "AuditManifest setBytecodeHash" {
     var m = AuditManifest{};
     m.setBytecodeHash("6080604052");
-    try std.testing.expect(m.target_bytecode_hash[0] != '0' or std.mem.eql(u8, m.target_bytecode_hash[0..4], "d60a"));
+    try std.testing.expect(m.target_bytecode_hash[0] != '0');
 }

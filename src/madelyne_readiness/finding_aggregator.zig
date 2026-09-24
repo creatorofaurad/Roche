@@ -74,25 +74,31 @@ pub const FindingAggregator = struct {
     }
 
     pub fn buildJsonReport(self: *const FindingAggregator, out_buf: []u8) ![]const u8 {
-        var stream = std.io.fixedBufferStream(out_buf);
-        const writer = stream.writer();
+        var offset: usize = 0;
 
-        try writer.print(
+        const header = try std.fmt.bufPrint(out_buf[offset..],
             \\{{"status":"SUCCESS","total_findings":{d},"summary":{{"critical":{d},"high":{d},"medium":{d},"low":{d}}},"findings":[
         , .{ self.findings_cnt, self.critical_cnt, self.high_cnt, self.medium_cnt, self.low_cnt });
+        offset += header.len;
 
         var i: usize = 0;
         while (i < self.findings_cnt) : (i += 1) {
             const f = self.findings[i];
             const title_slice = f.title[0..f.title_len];
-            if (i > 0) try writer.writeAll(",");
-            try writer.print(
+            if (i > 0) {
+                const sep = try std.fmt.bufPrint(out_buf[offset..], ",", .{});
+                offset += sep.len;
+            }
+            const item = try std.fmt.bufPrint(out_buf[offset..],
                 \\{{"detector_id":{d},"severity":"{s}","pc":{d},"pattern_hash":"0x{x}","title":"{s}"}}
             , .{ f.detector_id, f.severity.asString(), f.pc, f.pattern_hash, title_slice });
+            offset += item.len;
         }
 
-        try writer.writeAll("]}");
-        return stream.getWritten();
+        const footer = try std.fmt.bufPrint(out_buf[offset..], "]}}", .{});
+        offset += footer.len;
+
+        return out_buf[0..offset];
     }
 };
 

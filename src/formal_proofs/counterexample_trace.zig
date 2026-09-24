@@ -29,19 +29,22 @@ pub const CounterexampleModel = struct {
     }
 
     pub fn formatSMTModel(self: *const CounterexampleModel, out_buf: []u8) !usize {
-        var stream = std.io.fixedBufferStream(out_buf);
-        const w = stream.writer();
+        var written: usize = 0;
 
-        try w.print("(model\n", .{});
-        try w.print("  ;; Counterexample Trace with {d} steps\n", .{self.step_count});
+        const header = try std.fmt.bufPrint(out_buf[written..], "(model\n  ;; Counterexample Trace with {d} steps\n", .{self.step_count});
+        written += header.len;
+
         var i: usize = 0;
         while (i < self.step_count) : (i += 1) {
             const st = self.steps[i];
-            try w.print("  (define-fun step_{d} () Int {d}) ; opcode 0x{X:0>2}, gas {d}\n", .{ i, st.pc, st.opcode, st.gas_remaining });
+            const line = try std.fmt.bufPrint(out_buf[written..], "  (define-fun step_{d} () Int {d}) ; opcode 0x{X:0>2}, gas {d}\n", .{ i, st.pc, st.opcode, st.gas_remaining });
+            written += line.len;
         }
-        try w.print(")\n", .{});
 
-        return stream.getWritten().len;
+        const footer = try std.fmt.bufPrint(out_buf[written..], ")\n", .{});
+        written += footer.len;
+
+        return written;
     }
 };
 

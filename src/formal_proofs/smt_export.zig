@@ -5,24 +5,24 @@ const std = @import("std");
 
 pub const SmtExporter = struct {
     pub fn exportHornClauses(state_cond: []const u8, inv_cond: []const u8, out_buf: []u8) !usize {
-        var stream = std.io.fixedBufferStream(out_buf);
-        const w = stream.writer();
+        const res = try std.fmt.bufPrint(out_buf,
+            \\(set-logic HORN)
+            \\(declare-fun State (Int Int Int) Bool)
+            \\(declare-fun Invariant (Int Int Int) Bool)
+            \\(declare-fun Exploitable (Int Int Int) Bool)
+            \\
+            \\; Pre-state condition: {s}
+            \\; Invariant assertion: {s}
+            \\(assert (forall ((balance Int) (reserve Int) (shares Int))
+            \\  (=> (and (State balance reserve shares) (not (Invariant balance reserve shares)))
+            \\      (Exploitable balance reserve shares))))
+            \\
+            \\(check-sat)
+            \\(get-model)
+            \\
+        , .{ state_cond, inv_cond });
 
-        try w.print("(set-logic HORN)\n", .{});
-        try w.print("(declare-fun State (Int Int Int) Bool)\n", .{});
-        try w.print("(declare-fun Invariant (Int Int Int) Bool)\n", .{});
-        try w.print("(declare-fun Exploitable (Int Int Int) Bool)\n\n", .{});
-
-        try w.print("; Pre-state condition: {s}\n", .{state_cond});
-        try w.print("; Invariant assertion: {s}\n", .{inv_cond});
-        try w.print("(assert (forall ((balance Int) (reserve Int) (shares Int))\n", .{});
-        try w.print("  (=> (and (State balance reserve shares) (not (Invariant balance reserve shares)))\n", .{});
-        try w.print("      (Exploitable balance reserve shares))))\n\n", .{});
-
-        try w.print("(check-sat)\n", .{});
-        try w.print("(get-model)\n", .{});
-
-        return stream.getWritten().len;
+        return res.len;
     }
 };
 

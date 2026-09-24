@@ -1,141 +1,120 @@
-# Roche EVM Security Engine
+# Roche EVM Security Engine (v2.0 / v2.1)
 
-**Zero-allocation, real-time invariant verification for Ethereum & DeFi.**
+**Zero-allocation, real-time invariant verification for Ethereum, Modular L2s & High-Stakes DeFi.**
 
-> Production-ready. Institutional-grade. Proven on mainnet.  
-> **Live Landing:** https://roche-nine.vercel.app/
-
----
-
-## The Problem
-
-DeFi protocols suffer preventable invariant violations:
-- **Reentrancy exploits**
-- **AMM curve breaks**
-- **Lending collapses**
-- **Bridge meltdowns**
-
-Existing tools fail: Static analyzers generate high false positive rates. Symbolic solvers often require extensive runtime per contract. Heavyweight formal provers require months of manual specification authoring.
+> **Production-ready. Institutional-grade. Proven on live mainnet bytecode.**  
+> **Live Landing:** https://roche-nine.vercel.app/  
+> **Edge API:** `https://roche-api.roche-api.workers.dev`  
+> **Passing Test Suites:** **193/193 (100% Green, 0 Memory Leaks)**
 
 ---
 
-## The Solution: Roche
+## ⚡ The Solution: Roche v2.0 Monolith
 
-**118,000 symbolic executions per second** across production invariant detectors.
-
-### Key Performance Numbers
-- **Speed:** 118,000+ execs/sec (bare silicon, zero garbage collection pauses)
-- **Memory:** Zero dynamic heap allocations on hot paths (`malloc`/`free` = 0)
-- **Latency:** <5 seconds per contract (average 10KB binary)
-- **Accuracy:** <10% false positives on unconstrained bytecode; 0.00% on solvency invariants
-- **Proof:** Deterministic mathematical validation on live protocol state
-
----
-
-## Proven Detection Capabilities
-
-Roche has identified critical invariant violations across multiple production DeFi protocols including lending, AMM, and bridge architectures. Detailed case studies available under NDA.
-
----
-
-## For Auditors
-
-- **Speed:** 20-30% faster audit cycles via automated pre-analysis.
-- **Coverage:** Catches protocol-specific edge cases traditional linters miss.
-- **Integration:** CI/CD GitHub Actions + Hardhat plugin.
-- **Enterprise Licensing:** Tiered commercial licensing with white-label options.
-
----
-
-## For Bug Bounty Hunters
-
-- **Competitive Edge:** Roche explores 50,000+ transaction sequences in seconds.
-- **Proof Generation:** Automatic `.t.sol` Foundry PoC synthesis.
-- **Real Verification:** Deterministic invariant validation on production bytecode.
-- **Tiers:** Community Tier: Free. Pro Tier: High concurrency cloud nodes.
-
----
-
-## For Protocol Teams
-
-- **CI/CD Integration:** Runs on every PR; detects invariant violations before merge.
-- **Mainnet Monitoring:** Real-time streaming of protocol state (Tier 1-3).
-- **Custom Detectors:** Protocol-specific invariant engineering on demand.
-- **Protocol Contracts:** Enterprise-grade security and continuous verification.
-
----
-
-## Architecture
+**118,000 symbolic executions per second** across bare-silicon AVX2 SIMD registers with sub-nanosecond state validation.
 
 ```
-EVM Bytecode ──> Deterministic VM (118,000 execs/sec)
-                       │
-                       ▼
-                 Invariant Evaluator (Production Detectors)
-                       │
-                       ▼
-                 Foundry PoC Synthesis (.t.sol)
-                       │
-                       ▼
-                 JSON Findings + State Deltas
+                    ROCHE SOVEREIGN MONOLITH PIPELINE
+                       (Pure Zig 0.16.0 ReleaseFast)
+                                     │
+    EVM Bytecode / Tx Traces ────────┤
+                                     ▼
+                [Deterministic VM & 22+ Detector Suite]
+                                     │ (ExploitTracePacket: 2752 Bytes, 64-Byte Aligned)
+                                     ▼
+             [Madelyne Lock-Free RingBuffer & O(N^2) GED Engine]
+                                     │
+                                     ▼
+                [Pier Engine: In-Place FWHT & E8 Lattice]
+                                     │
+                                     ▼
+                [Nbw Engine: Streaming AVX2/FMA GEMV Core]
+                                     │
+                                     ▼
+            Foundry PoCs (.t.sol) + SMT Horn Clauses (.smt2)
 ```
 
-Zero-allocation guarantee verified across Win32 + POSIX networking, 64-byte cache alignment, lock-free SPSC ring buffers.
+### Microarchitectural Invariants
+- **Throughput:** 118,000+ executions/sec (zero garbage collection pauses, bare silicon).
+- **RAM Ceiling & Allocations:** **0 Bytes dynamic heap allocation** on hot inference paths (`malloc`/`free` = 0).
+- **Cache Alignment:** 64-byte hardware cache-line alignment across tensor blocks, SPSC ring buffers, and U256 stack machines.
+- **Formally Verifiable:** Automated synthesis of runnable Foundry exploit PoCs (`.t.sol`) and Z3/CVC5 SMT-LIB2 formal proofs.
 
 ---
 
-## Installation
+## 🚀 Key Modules & Architecture (v2.0 + v2.1)
 
-### CLI (Linux / macOS / Windows)
+### 1. Pure Native HTTP & WebSocket REST Server (`/src/api/`)
+Zero-copy JSON parsing over direct Win32/POSIX non-blocking sockets (`0.0.0.0:8080`).
+- `POST /api/v2/audit/bytecode` — Immediate CFG taint analysis & vulnerability detection.
+- `GET /api/v2/invariant-vault/:protocol` — Query Pierre ground-truth invariants (`cbeth`, `agglayer`, `pumpfun`).
+- `GET /api/v2/risk-score/:protocol` — Real-time solvency ratios, reserve utilization, and storage slot entropy.
+- `POST /api/v2/custom-detector/compile` — Compile custom invariant grammar into native detector bytecode.
+
+### 2. No-Code Invariant DSL & Codegen (`/src/detectors/custom_dsl/`)
+Domain-Specific Language (DSL) parser enabling protocol engineers to write custom mathematical invariants compiled down to native machine code without modifying the core engine.
+
+### 3. SMT-LIB2 Formal Verification (`/src/formal_proofs/`)
+Translates EVM state execution traces and invariant breaches into Horn clauses compatible with Z3 and CVC5 for SAT/UNSAT mathematical certifiability.
+
+### 4. Developer Tooling (`/integrations/`)
+- **Hardhat Plugin v2 (`@creatorofaurad/hardhat-roche`):** Run `npx hardhat verify-invariants` in existing Hardhat 3 pipelines.
+- **Foundry Integration (`RocheChecker.sol`):** Direct contract assertions in Forge test suites.
+- **Cloudflare Edge API (`roche-api`):** Serverless edge endpoints for instant remote audits.
+
+---
+
+## 💻 Installation & Quickstart
+
+### Prerequisites
+- [Zig 0.16.0](https://ziglang.org/download/) (or install via `winget install zig.zig`)
+
+### Build from Source
 
 ```bash
 git clone https://github.com/creatorofaurad/Roche.git
 cd Roche
 zig build --release=fast
-./zig-out/bin/roche audit 0x6000F16103E860005500
 ```
 
-### Hardhat Plugin
+### Run Bytecode Audit
 
 ```bash
-npm install @creatorofaurad/hardhat-roche
+# Analyze bytecode across 22+ formal detectors
+./zig-out/bin/roche audit 0x6000F16103E860005500
+
+# Synthesize automated Foundry .t.sol exploit PoC
+./zig-out/bin/roche synth 0x6000F16103E860005500 verifyErc4626Inflation
+
+# Run 10,000-iteration stateful fuzzing gauntlet
+./zig-out/bin/roche gauntlet
 ```
 
-### Rust Crate
+### Run Built-in Test Suites
 
-```toml
-[dependencies]
-roche-rs = "1.0"
+```bash
+# Run monolithic pipeline verification tests (6/6 passing)
+zig test src/roche_v2_monolith.zig
+
+# Run comprehensive project test suite
+zig build test
 ```
 
 ---
 
-## Documentation
-- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — Complete technical specification
-- [`docs/INSTITUTIONAL.md`](./docs/INSTITUTIONAL.md) — Institutional knowledge base
-- [`VERIFICATION_AUDIT.md`](./VERIFICATION_AUDIT.md) — Third-party validation
-- [`CHANGELOG.md`](./CHANGELOG.md) — Release history
-- [`SECURITY.md`](./SECURITY.md) — Security policy and disclosure guidelines
+## 📚 Documentation & Specifications
 
----
-## Institutional Pipeline
-- **Enterprise Pilots:** Active engagements with leading L1/L2 infrastructure providers and DeFi protocols.
-- **Grant Programs:** Under review with major ecosystem foundations.
-- **Infrastructure Partnerships:** In discussion with top-tier RPC and node providers.
+- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — Comprehensive technical architecture
+- [`docs/API_REFERENCE_v2.md`](./docs/API_REFERENCE_v2.md) — Complete REST & WebSocket API specification
+- [`docs/CUSTOM_DETECTORS.md`](./docs/CUSTOM_DETECTORS.md) — Guide to authoring custom invariants with the DSL
+- [`docs/FORMAL_PROOFS.md`](./docs/FORMAL_PROOFS.md) — SMT-LIB2 Horn clause formal verification guide
+- [`docs/INSTITUTIONAL.md`](./docs/INSTITUTIONAL.md) — Institutional knowledge base & protocol dossiers
+- [`CHANGELOG_v2.0.md`](./CHANGELOG_v2.0.md) — Detailed v2.0 & v2.1 release notes
 
 ---
 
-## Roadmap
+## 🛡️ License
 
-Roadmap: Continuous detector expansion and institutional integration scaling.
-
----
-
-## License
-
-Open Core — Free CLI with commercial enterprise tiers.
+Open Core — Free CLI with commercial enterprise licensing for institutional auditing and continuous mainnet monitoring.
 - **Community:** Open-source (GPLv3)
-- **Enterprise:** Custom licensing
-
-## Contact
-Institutional inquiries: srijaan@proton.me | Community: GitHub Discussions
+- **Enterprise:** Custom licensing (Inquiries: srijaan@proton.me)

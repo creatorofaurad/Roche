@@ -1,66 +1,103 @@
-.zig-cache/
-zig-out/
-*.pdb
-*.obj
+# ==============================================================================
+# 1. Node modules & NPM
+# ==============================================================================
+/node_modules
+package-lock.json.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==============================================================================
+# 2. Zig, Rust & Hardhat Compilation / Output / Caches
+# ==============================================================================
+/.zig-cache
+/zig-out
+/target
+crates/*/target
+crates/*/*/target
+/artifacts
+/cache
+/.gas-snapshot
+/coverage
+/types
+/foundry/cache
+/foundry/out
+
+# ==============================================================================
+# 3. Binaries, Compiled Objects & Diagnostic Logs
+# ==============================================================================
 *.exe
+*.pdb
 *.dll
-*.lib
-target/
-dist/
+*.so
+*.dylib
+*.sha256
+*.zip
 test-results.log
-roche.sha256
+*.log
 
-# Site dependencies & build artifacts
-site/node_modules/
-site/.next/
-site/screenshot_*.png
+# ==============================================================================
+# 4. Environment & Secrets
+# ==============================================================================
+.env
+.env.*
+!.env.example
 
-# Internal Proposals & Private Audit Documents
-SPECIFICATION.md
-ROCHE_DEFENSIVE_SECURITY_PROPOSAL.md
-ROCHE_COMPLETE_INSTITUTIONAL_DOCUMENTATION.md
-ENZYME_BLUE_ROCHE_AUDIT_REPORT.md
+# ==============================================================================
+# 5. OS, Agent Harness & Editor Metadata
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.agents/
+.claude/
+CLAUDE.md
+AGENTS.md
 
-# Private Strategy & Operations
-ROCHE_MASTER_*.md
-ROCHE_TECHNICAL_*.md
-ROCHE_15_*.md
-ROCHE_GRANT_*.md
-ROCHE_AUDIT_*.md
-ROCHE_VERIFIED_*.md
-BASE_ECOSYSTEM_*.md
-CANTINA_*.md
-findings_cbeth.json
-findings_pumpfun.json
-findings_paxos_medium.json
-verify_agglayer_parity.js
-pumpfun_state_corruption_trace.json
-findings_*.json
-
-
+# ==============================================================================
+# 6. Confidential Institutional Grant Proposals & Private Dossiers
+# ==============================================================================
 ETHEREUM_FOUNDATION_ESP_500K_GRANT_PROPOSAL.md
-
-# Operational traces & debug scripts
-traces/
-pump_trace.json
-debug_trace_anomaly.js
-find_is_buy.js
-verify_byte.js
+CANTINA_SUPPORT_TICKET_SUBMISSION.md
+ROCHE_AUDIT_ROUTING_VERIFIED.md
+ROCHE_VERIFIED_TO_AND_CC_REGISTRY.md
+docs/ROCHE_MASTER_KNOWLEDGE_BASE.md
+archive/
 
 # ==============================================================================
-# PRIVATE PROPRIETARY ENGINE & MODEL SUBSTRATE (MADELYNE / PIER / NBW / CHARYELOG)
+# 7. Proprietary R&D Subsystems (.gitignore Quarantine)
 # ==============================================================================
-src/madelyne/
-src/madelyne_*.zig
-src/pier_*.zig
-src/nbw_*.zig
-src/charyelog/
+# Private Charye compiler & SMT engine
 src/charyec.zig
 src/charyelog_compiler.zig
+
+# Private Pier reversible / tensor engines
+src/pier_*.zig
+src/nbw_*.zig
+
+# Private Madelyne associative learning engines
+src/madelyne_*.zig
+src/madelyne/
+src/roche_v2_monolith.zig
 src/master_foundation_stack.zig
 src/empirical_proof_*.zig
-private_core/
-models/
-*.nbw
-*.pier
-*.charye
+
+# External audit targets & research scopes
+/alchemy-aa-sdk/
+/agglayer_scope/
+/paxos_scope/
+/pumpfun_scope/
+/LayerZero-v2/
+/liquity-bold/
+/liquity-poc/
+/liquity-v2-gov/
+/modular-account/
+/modular-account-v2/
+/modular-poc/
+/usdai-contracts/
+/usdai-governance/
+/usdai-loan-router/
+/bitgo-multisig-v4/
+/bitgo-stablecoin/
+/arithmetic-verification/
+/eip7702-replay-poc/
+/poc-hardhat/

@@ -1,0 +1,9 @@
+﻿{
+  "name": "@creatorofaurad/hardhat-roche-headless",
+  "version": "2.0.0",
+  "description": "Headless Roche EVM Security Engine for Hardhat",
+  "main": "dist/index.js",
+  "peerDependencies": {
+    "hardhat": "^2.10.0"
+  }
+}

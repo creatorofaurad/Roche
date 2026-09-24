@@ -1,141 +1,57 @@
-# Roche EVM Security Engine
+# Sample Hardhat 3 Project (`mocha` and `ethers`)
 
-**Zero-allocation, real-time invariant verification for Ethereum & DeFi.**
+This project showcases a Hardhat 3 project using `mocha` for tests and the `ethers` library for Ethereum interactions.
 
-> Production-ready. Institutional-grade. Proven on mainnet.  
-> **Live Landing:** https://roche-nine.vercel.app/
+To learn more about Hardhat 3, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3](https://hardhat.org/hardhat3-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
 
----
+## Project Overview
 
-## The Problem
+This example project includes:
 
-DeFi protocols suffer preventable invariant violations:
-- **Reentrancy exploits**
-- **AMM curve breaks**
-- **Lending collapses**
-- **Bridge meltdowns**
+- A simple Hardhat configuration file.
+- Foundry-compatible Solidity unit tests.
+- TypeScript integration tests using `mocha` and ethers.js
+- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
 
-Existing tools fail: Static analyzers generate high false positive rates. Symbolic solvers often require extensive runtime per contract. Heavyweight formal provers require months of manual specification authoring.
+## Usage
 
----
+### Running Tests
 
-## The Solution: Roche
+To run all the tests in the project, execute the following command:
 
-**118,000 symbolic executions per second** across production invariant detectors.
-
-### Key Performance Numbers
-- **Speed:** 118,000+ execs/sec (bare silicon, zero garbage collection pauses)
-- **Memory:** Zero dynamic heap allocations on hot paths (`malloc`/`free` = 0)
-- **Latency:** <5 seconds per contract (average 10KB binary)
-- **Accuracy:** <10% false positives on unconstrained bytecode; 0.00% on solvency invariants
-- **Proof:** Deterministic mathematical validation on live protocol state
-
----
-
-## Proven Detection Capabilities
-
-Roche has identified critical invariant violations across multiple production DeFi protocols including lending, AMM, and bridge architectures. Detailed case studies available under NDA.
-
----
-
-## For Auditors
-
-- **Speed:** 20-30% faster audit cycles via automated pre-analysis.
-- **Coverage:** Catches protocol-specific edge cases traditional linters miss.
-- **Integration:** CI/CD GitHub Actions + Hardhat plugin.
-- **Enterprise Licensing:** Tiered commercial licensing with white-label options.
-
----
-
-## For Bug Bounty Hunters
-
-- **Competitive Edge:** Roche explores 50,000+ transaction sequences in seconds.
-- **Proof Generation:** Automatic `.t.sol` Foundry PoC synthesis.
-- **Real Verification:** Deterministic invariant validation on production bytecode.
-- **Tiers:** Community Tier: Free. Pro Tier: High concurrency cloud nodes.
-
----
-
-## For Protocol Teams
-
-- **CI/CD Integration:** Runs on every PR; detects invariant violations before merge.
-- **Mainnet Monitoring:** Real-time streaming of protocol state (Tier 1-3).
-- **Custom Detectors:** Protocol-specific invariant engineering on demand.
-- **Protocol Contracts:** Enterprise-grade security and continuous verification.
-
----
-
-## Architecture
-
-```
-EVM Bytecode ──> Deterministic VM (118,000 execs/sec)
-                       │
-                       ▼
-                 Invariant Evaluator (Production Detectors)
-                       │
-                       ▼
-                 Foundry PoC Synthesis (.t.sol)
-                       │
-                       ▼
-                 JSON Findings + State Deltas
+```shell
+npx hardhat test
 ```
 
-Zero-allocation guarantee verified across Win32 + POSIX networking, 64-byte cache alignment, lock-free SPSC ring buffers.
+You can also selectively run the Solidity or `mocha` tests:
 
----
-
-## Installation
-
-### CLI (Linux / macOS / Windows)
-
-```bash
-git clone https://github.com/creatorofaurad/Roche.git
-cd Roche
-zig build --release=fast
-./zig-out/bin/roche audit 0x6000F16103E860005500
+```shell
+npx hardhat test solidity
+npx hardhat test mocha
 ```
 
-### Hardhat Plugin
+### Make a deployment to Sepolia
 
-```bash
-npm install @creatorofaurad/hardhat-roche
+This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+
+To run the deployment to a local chain:
+
+```shell
+npx hardhat ignition deploy ignition/modules/Counter.ts
 ```
 
-### Rust Crate
+To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
 
-```toml
-[dependencies]
-roche-rs = "1.0"
+You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+
+To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+
+```shell
+npx hardhat keystore set SEPOLIA_PRIVATE_KEY
 ```
 
----
+After setting the variable, you can run the deployment with the Sepolia network:
 
-## Documentation
-- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — Complete technical specification
-- [`docs/INSTITUTIONAL.md`](./docs/INSTITUTIONAL.md) — Institutional knowledge base
-- [`VERIFICATION_AUDIT.md`](./VERIFICATION_AUDIT.md) — Third-party validation
-- [`CHANGELOG.md`](./CHANGELOG.md) — Release history
-- [`SECURITY.md`](./SECURITY.md) — Security policy and disclosure guidelines
-
----
-## Institutional Pipeline
-- **Enterprise Pilots:** Active engagements with leading L1/L2 infrastructure providers and DeFi protocols.
-- **Grant Programs:** Under review with major ecosystem foundations.
-- **Infrastructure Partnerships:** In discussion with top-tier RPC and node providers.
-
----
-
-## Roadmap
-
-Roadmap: Continuous detector expansion and institutional integration scaling.
-
----
-
-## License
-
-Open Core — Free CLI with commercial enterprise tiers.
-- **Community:** Open-source (GPLv3)
-- **Enterprise:** Custom licensing
-
-## Contact
-Institutional inquiries: srijaan@proton.me | Community: GitHub Discussions
+```shell
+npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
+```

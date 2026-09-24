@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  roche-api:
+    build:
+      context: ../..
+      dockerfile: integrations/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PROMETHEUS_PORT=9090
+    depends_on:
+      - redis
+
+  dashboard:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    depends_on:
+      - roche-api
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"

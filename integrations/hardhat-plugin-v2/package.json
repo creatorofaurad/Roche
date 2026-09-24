@@ -1,9 +1,29 @@
-﻿{
-  "name": "@creatorofaurad/hardhat-roche-headless",
+{
+  "name": "@roche/hardhat-plugin-v2",
   "version": "2.0.0",
-  "description": "Headless Roche EVM Security Engine for Hardhat",
+  "description": "Roche EVM Security Engine plugin integration for Hardhat v2",
   "main": "dist/index.js",
-  "peerDependencies": {
-    "hardhat": "^2.10.0"
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-node tests/test_hardhat_plugin.ts"
+  },
+  "keywords": [
+    "hardhat",
+    "hardhat-plugin",
+    "ethereum",
+    "roche",
+    "security",
+    "evm",
+    "invariants"
+  ],
+  "author": "Roche EVM Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "hardhat": "^2.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   }
 }

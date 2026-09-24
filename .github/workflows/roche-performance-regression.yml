@@ -1,0 +1,21 @@
+name: Roche Performance Regression Benchmark
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.16.0
+
+      - name: Run Benchmark Tests
+        run: |
+          zig build test --summary all

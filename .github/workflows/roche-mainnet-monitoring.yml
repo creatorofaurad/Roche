@@ -1,0 +1,27 @@
+name: Roche Mainnet Monitoring
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.16.0
+
+      - name: Build Roche
+        run: zig build -Doptimize=ReleaseFast
+
+      - name: Run Mainnet Monitoring
+        env:
+          MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
+        run: |
+          ./zig-out/bin/roche monitor --rpc "$MAINNET_RPC_URL" --interval 15m

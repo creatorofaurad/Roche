@@ -1,0 +1,29 @@
+name: Roche Audit on PR
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  roche-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.16.0
+
+      - name: Build Roche
+        run: |
+          zig build -Doptimize=ReleaseFast
+
+      - name: Run Roche PR Audit
+        run: |
+          ./zig-out/bin/roche audit --input contracts --json > roche-report.json || true
+
+      - name: Report Annotations
+        run: |
+          node integrations/hardhat-plugin-v2/dist/github-action-reporter.js roche-report.json || true

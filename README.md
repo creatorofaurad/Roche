@@ -45,7 +45,7 @@ flowchart TD
     subgraph OUTPUTS["4. Deterministic Verification Artifacts"]
         J --> K["Foundry Exploit Reproduction (.t.sol)"]
         J --> L["SMT-LIB2 Horn Clause Proofs (Z3 / CVC5)"]
-        J --> M["Cloudflare Edge API / Hardhat Plugin v2"]
+        J --> M["Headless CLI Binary / Hardhat Plugin v2"]
     end
 ```
 
@@ -82,7 +82,7 @@ graph LR
     subgraph Tooling["Integrations & Verification"]
         SMT["formal_proofs/ (SMT-LIB2)"]
         POC["foundry_synth.zig (.t.sol)"]
-        API["api/ (Native HTTP Server)"]
+        CLI["cli.zig (Headless Engine)"]
         HH["integrations/hardhat-plugin-v2/"]
     end
 
@@ -100,7 +100,7 @@ graph LR
 | **Nbw** | `src/nbw_streaming_matmul.zig` | 8-lane AVX2 streaming matrix-vector multiplication with hardware FMA |
 | **SMT Exporter** | `src/formal_proofs/smt_export.zig` | Translates EVM execution traces to Horn clauses for Z3 and CVC5 solving |
 | **PoC Synthesizer** | `src/foundry_synth.zig` | Automatically synthesizes runnable Foundry `.t.sol` test files demonstrating the exploit |
-| **Native Server** | `src/api/server.zig` | Zero-copy non-blocking HTTP REST server listening on `0.0.0.0:8080` |
+| **Headless CLI** | `src/cli.zig` | High-performance command line interface with zero dynamic heap allocations |
 | **Abstract IR** | `src/abstract_ir.zig` | Universal 64-byte aligned SymbolicStatePacket queue for cross-chain execution domains |
 | **Multi-VM Suite** | `src/cross_chain_detectors.zig` | Full-spectrum invariant detectors for EVM, Solana SVM, Bitcoin UTXO, Move, and ZK circuits |
 
@@ -171,7 +171,7 @@ zig build test
 
 - **Hardhat 3:** Located at `integrations/hardhat-plugin-v2/`. Run `npx hardhat verify-invariants` inside existing Solidity projects.
 - **Foundry:** Located at `integrations/foundry-integration-v2/`. Include `RocheChecker.sol` directly in your test suites for on-chain invariant assertions.
-- **Cloudflare Edge API:** Deployed globally at `https://roche-api.roche-api.workers.dev`.
+- **C-ABI Static / Shared Library:** Linkable directly into Rust, C, C++, and Go projects without runtime overhead.
 
 ---
 

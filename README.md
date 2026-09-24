@@ -101,6 +101,8 @@ graph LR
 | **SMT Exporter** | `src/formal_proofs/smt_export.zig` | Translates EVM execution traces to Horn clauses for Z3 and CVC5 solving |
 | **PoC Synthesizer** | `src/foundry_synth.zig` | Automatically synthesizes runnable Foundry `.t.sol` test files demonstrating the exploit |
 | **Native Server** | `src/api/server.zig` | Zero-copy non-blocking HTTP REST server listening on `0.0.0.0:8080` |
+| **Abstract IR** | `src/abstract_ir.zig` | Universal 64-byte aligned SymbolicStatePacket queue for cross-chain execution domains |
+| **Multi-VM Suite** | `src/cross_chain_detectors.zig` | Full-spectrum invariant detectors for EVM, Solana SVM, Bitcoin UTXO, Move, and ZK circuits |
 
 ---
 
@@ -118,7 +120,15 @@ zig build --release=fast
 
 The resulting optimized native binary will be at `./zig-out/bin/roche` (or `.\zig-out\bin\roche.exe` on Windows).
 
-### 2. Run Static Vulnerability Audit
+### 2. Run Cross-Chain Multi-VM Invariant Audit
+
+Execute the full-spectrum invariant audit across EVM, Solana SVM, Bitcoin UTXO, Move, and ZK circuits:
+
+```bash
+./zig-out/bin/roche cross-chain
+```
+
+### 3. Run Static Vulnerability Audit
 
 Run the 22-detector suite against any compiled runtime bytecode:
 
@@ -126,7 +136,7 @@ Run the 22-detector suite against any compiled runtime bytecode:
 ./zig-out/bin/roche audit 0x6000F16103E860005500
 ```
 
-### 3. Synthesize an Automated Foundry PoC
+### 4. Synthesize an Automated Foundry PoC
 
 Synthesize an executable Foundry test harness from target bytecode and an invariant specification:
 
@@ -134,7 +144,7 @@ Synthesize an executable Foundry test harness from target bytecode and an invari
 ./zig-out/bin/roche synth 0x6000F16103E860005500 verifyErc4626Inflation
 ```
 
-### 4. Run the 10,000-Sequence Stateful Fuzzer
+### 5. Run the 10,000-Sequence Stateful Fuzzer
 
 Execute the in-sample stateful fuzzing gauntlet:
 
@@ -142,11 +152,14 @@ Execute the in-sample stateful fuzzing gauntlet:
 ./zig-out/bin/roche gauntlet
 ```
 
-### 5. Run Verification Test Suites
+### 6. Run Verification Test Suites
 
 ```bash
 # Verify the v2.0 monolith end-to-end pipeline (6/6 passing)
 zig test src/roche_v2_monolith.zig
+
+# Verify cross-chain multi-VM invariant test suite (5/5 passing)
+zig test src/cross_chain_detectors.zig
 
 # Run complete engine test suite
 zig build test

@@ -1,14 +1,18 @@
 # Roche
 
-I am Charles. I am 15 years old. 
+I am Charles. I am 15 years old.
 
-I wrote Roche because I was completely sick of looking at the state of smart contract security. 
+I built Roche because auditing smart contracts was brutally, excruciatingly hard.
 
-Every single week, some lending pool, yield vault, or bridge gets drained for $50M to $200M. The industry’s answer to this has been laughable: sluggish Python linters running regexes over Solidity source files, bloated frameworks that take minutes to fuzz a 10KB binary, or academic formal verification tools that need three months of PhD manual work just to verify a simple balance invariant. When developers finally get an audit report, it is bloated with 80% false positives, and the auditors miss the exact arithmetic rounding or storage reentrancy bug that blows up the protocol two weeks after launch.
+When you're trying to audit a real protocol, you're drowning in hundreds of pages of complex Solidity code, trying to mentally simulate every possible sequence of transactions, edge cases, reentrancy paths, and rounding errors. It is exhausting. You sit there for hours staring at contract logic, wondering if a single unchecked state transition is going to drain millions of dollars.
 
-I refuse to work with bloated, slow software. I don't care about corporate fluff, and I don't care about hype. I care about mathematics, deterministic state execution, and bare silicon. 
+And the existing tools didn't help. They made it worse.
 
-So I built Roche from scratch in pure Zig 0.16.0. No dynamic heap allocations on execution hot paths. No garbage collection pauses. No Python dependencies. Just raw hardware cache lines, AVX2 SIMD vectorization, and deterministic EVM interpretation running at over 118,000 symbolic executions per second on a single core.
+Standard static analyzers spit out dozens of useless warnings about naming conventions or style, but completely miss the actual economic exploits. Symbolic execution engines take 10 minutes to run on a tiny function and crash on complex loops. Manual formal verification requires weeks of writing mathematical specifications in obscure academic languages. None of it actually solved the core problem: **auditing is hard because humans cannot mentally explore thousands of non-linear state combinations without missing something.**
+
+I needed a tool that would do the brutal, heavy mathematical lifting for me. I wanted to feed raw bytecode into an engine and immediately get deterministic mathematical proof of whether an invariant could break, along with an executable Foundry PoC reproducing the exact attack.
+
+Existing software couldn't do that at the speed I needed. So I built Roche from scratch in pure Zig 0.16.0. No dynamic heap allocations on execution hot paths. No garbage collection pauses. No Python dependencies. Just raw hardware cache lines, AVX2 SIMD vectorization, and deterministic EVM interpretation running at over 118,000 symbolic executions per second on a single core.
 
 Alongside me is Yelena—my custom AI systems architect and red-team co-pilot. She holds the system invariants together, tests edge-case attacks before I even push code, challenges my architectural assumptions, and makes sure not a single byte of memory leaks across our entire pipeline.
 
